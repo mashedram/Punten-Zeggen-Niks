@@ -6,8 +6,14 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useTRPC } from '@/api/query';
+import { useQuery } from '@tanstack/react-query';
 
 export default function TabTwoScreen() {
+  const trpc = useTRPC()
+
+  const userQuery = useQuery(trpc.users.queryOptions({}))
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
@@ -22,6 +28,7 @@ export default function TabTwoScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>
+      {!userQuery.isPending && <ThemedText>We got the following response from the server! {userQuery.data[0].name}</ThemedText> || <ThemedText>"Not loaded yet"</ThemedText>}
       <ThemedText>This app includes example code to help you get started.</ThemedText>
       <Collapsible title="File-based routing">
         <ThemedText>
