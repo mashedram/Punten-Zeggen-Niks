@@ -1,18 +1,15 @@
 import { publicProcedure, router } from "@/api/server";
 import { z } from 'zod'
 
-export const appRouter = router({
-    users: publicProcedure.input(z.object({ name: z.string().optional() })).query(({ ctx, input }) => {
-        const users = [
-            {
-                name: "Jan"
-            },
-            {
-                name: "Willem"
-            }
-        ]
+let teller = 0;
 
-        return input.name ? users.filter(v => v.name == input.name) : users
+export const appRouter = router({
+    teller: publicProcedure.query(() => {
+        return teller
+    }),
+    add: publicProcedure.mutation(() => {
+        teller += 1;
+        return teller
     })
 })
 
