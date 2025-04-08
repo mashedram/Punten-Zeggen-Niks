@@ -64,27 +64,6 @@ export default function RootLayout() {
     return null;
   }
 
-  const queryClient = getQueryClient();
-  const [trpcClient] = useState(() => {
-    const wsClient = createWSClient({
-      // TODO: Make this load from env at compile time
-      url: "ws://localhost:3001"
-    })
-
-    return createTRPCClient<AppRouter>({
-      links: [
-          wsLink({
-              client: wsClient
-          }),
-          loggerLink({
-            enabled: (opts) =>
-              process.env.NODE_ENV === "development" ||
-              (opts.direction === "down" && opts.result instanceof Error),
-          }),
-      ],
-  })
-  })
-
   return (
     <QueryClientProvider client={queryClient}>
       <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
