@@ -7,12 +7,15 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useTRPC } from '@/api/query';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Button } from '@/stories/Button';
 
 export default function TabTwoScreen() {
   const trpc = useTRPC()
 
-  const userQuery = useQuery(trpc.users.queryOptions({}))
+  const tellerQuery = useQuery(trpc.teller.queryOptions())
+  const addMutation = useMutation(trpc.add.mutationOptions())
+  
 
   return (
     <ParallaxScrollView
@@ -28,7 +31,14 @@ export default function TabTwoScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>
-      {!userQuery.isPending && <ThemedText>We got the following response from the server! {userQuery.data[0].name}</ThemedText> || <ThemedText>"Not loaded yet"</ThemedText>}
+
+      <ThemedText>{tellerQuery.isPending && "Loading" || `Teller op: ${tellerQuery.data}`}</ThemedText>
+      <Button onPress={() => {
+        addMutation.mutateAsync().then(() => {
+          tellerQuery.refetch()
+        })
+      }} label='Hi!!' />
+
       <ThemedText>This app includes example code to help you get started.</ThemedText>
       <Collapsible title="File-based routing">
         <ThemedText>
