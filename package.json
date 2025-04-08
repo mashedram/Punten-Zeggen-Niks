@@ -45,12 +45,8 @@
     "react-native-screens": "~4.4.0",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
-<<<<<<< HEAD
     "ws": "^8.18.1",
     "zod": "^3.24.2"
-=======
-    "ws": "^8.18.1"
->>>>>>> 882be05 (- Added server side using bun)
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -65,14 +61,7 @@
     "@types/jest": "^29.5.12",
     "@types/react": "~18.3.12",
     "@types/react-test-renderer": "^18.3.0",
-<<<<<<< HEAD
-<<<<<<< HEAD
     "@types/ws": "^8.18.1",
-=======
->>>>>>> ffd3961 (- Added storybook)
-=======
-    "@types/ws": "^8.18.1",
->>>>>>> 882be05 (- Added server side using bun)
     "@vitest/browser": "^3.1.1",
     "@vitest/coverage-v8": "^3.1.1",
     "jest": "^29.2.1",
