@@ -1,3 +1,5 @@
+import { EventEmitter, on } from "ws";
+
 function generateRandomCode(length: number): string {
     let value = "";
 
@@ -9,6 +11,30 @@ function generateRandomCode(length: number): string {
 }
 
 const LOBBY_CODE_LENGTH = 6
+
+export class PlayerEvent<T> {
+    private id: number;
+    private type: string;
+    private data: T;
+
+    constructor(id: number, type: string, data: T) {
+        this.id = id
+        this.type = type
+        this.data = data
+    }
+
+    public getId(): number {
+        return this.id
+    }
+
+    public getType(): string {
+        return this.type
+    }
+
+    public getData(): T {
+        return this.data
+    }
+}
 
 export class PlayerToken {
     private lobbyCode: string
@@ -42,15 +68,19 @@ export class PlayerToken {
 }
 
 export class Player {
-    private id: string
-    private lobby: Lobby
+    private id: string;
+    private lobby: Lobby;
     /// The last timestamp on which an action was done
-    private lastAction: Date
+    private lastAction: Date;
+    private emitter: EventEmitter;
+    private lastEventId: number;
 
     constructor(lobby: Lobby) {
         this.id = crypto.randomUUID()
         this.lobby = lobby
         this.lastAction = new Date()
+        this.emitter = new EventEmitter()
+        this.lastEventId = 0
     }
 
     public getId(): string {
@@ -63,6 +93,15 @@ export class Player {
 
     public refresh() {
         this.lastAction = new Date()
+    }
+
+    public on(): NodeJS.AsyncIterator<PlayerEvent<unknown>[]> {
+        return on(this.emitter, "event")
+    }
+
+    public emit<T>(type: string, content: T) {
+        const event = new PlayerEvent(++this.lastEventId, type, content)
+        this.emitter.emit("event", event)
     }
 }
 
