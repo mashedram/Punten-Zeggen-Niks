@@ -15,8 +15,6 @@ export default function HomeScreen() {
   const lobbyData = useLobby();
 =======
 import { usePlayerData } from '@/hooks/usePlayerData';
-import { useRef } from 'react';
-import { Test } from '@/components/Test';
 
 export default function HomeScreen() {
   const [playerdata, joinLobby] = usePlayerData()
@@ -49,7 +47,6 @@ export default function HomeScreen() {
         </button>
 =======
       }>
-        <Test callback={(value) => console.log(value)}></Test>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome! + {playerdata?.id}</ThemedText>
 >>>>>>> f5c2565 (Added:)

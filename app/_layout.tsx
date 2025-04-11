@@ -7,7 +7,6 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
-<<<<<<< HEAD
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
@@ -19,15 +18,6 @@ import {
 import { AppRouter } from "@/api/router/root";
 import { TRPCProvider } from "@/api/query";
 import { LobbyProvider } from "@/hooks/useLobby";
-=======
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { createTRPCClient, createWSClient, loggerLink, wsLink } from '@trpc/client';
-import { AppRouter } from '@/api/router/root';
-import { createTRPCContext } from '@trpc/tanstack-react-query';
-import { TRPCProvider } from '@/api/query';
-import { NFCProvider } from '@/hooks/useNFCContext';
->>>>>>> f5c2565 (Added:)
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
