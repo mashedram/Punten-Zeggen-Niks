@@ -1,4 +1,4 @@
-import { useTRPC } from '@/api/query';
+import { useTRPC } from "@/api/query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import { MMKV, useMMKVString } from 'react-native-mmkv'
