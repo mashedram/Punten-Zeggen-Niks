@@ -1,16 +1,9 @@
 import { publicProcedure, router } from "@/api/server";
 import { z } from 'zod'
-
-let teller = 0;
+import { lobbyRouter } from "./manager/lobby_router";
 
 export const appRouter = router({
-    teller: publicProcedure.query(() => {
-        return teller
-    }),
-    add: publicProcedure.mutation(() => {
-        teller += 1;
-        return teller
-    })
+    lobby: lobbyRouter,
 })
 
 export type AppRouter = typeof appRouter
