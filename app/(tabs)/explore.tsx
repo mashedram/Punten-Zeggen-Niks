@@ -11,11 +11,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Button } from '@/stories/Button';
 
 export default function TabTwoScreen() {
-  const trpc = useTRPC()
-
-  const tellerQuery = useQuery(trpc.teller.queryOptions())
-  const addMutation = useMutation(trpc.add.mutationOptions())
-  
 
   return (
     <ParallaxScrollView
