@@ -1,5 +1,4 @@
-import { publicProcedure, router } from "@/api/server";
-import { z } from 'zod'
+import { router } from "@/api/server";
 import { lobbyRouter } from "./manager/lobby_router";
 
 export const appRouter = router({
