@@ -3,7 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -12,23 +12,18 @@ import { createTRPCClient, createWSClient, loggerLink, wsLink } from '@trpc/clie
 import { AppRouter } from '@/api/router/root';
 import { createTRPCContext } from '@trpc/tanstack-react-query';
 import { TRPCProvider } from '@/api/query';
+import { NFCProvider } from '@/hooks/useNFCContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-// Networking init
-const wsClient = createWSClient({
-  // TODO: Make this load from env at compile time
-  url: "ws://100.80.93.96:3001"
-})
-
 const queryClient = new QueryClient({
   defaultOptions: {
-      queries: {
-          // With SSR, we usually want to set some default staleTime
-          // above 0 to avoid refetching immediately on the client
-          staleTime: 60 * 1000,
-      },
+    queries: {
+      // With SSR, we usually want to set some default staleTime
+      // above 0 to avoid refetching immediately on the client
+      staleTime: 60 * 1000,
+    },
   },
 });
 
@@ -43,9 +38,16 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
- 
-  const [trpcClient] = useState(() =>
-    createTRPCClient<AppRouter>({
+
+  const [trpcClient] = useState(() => {
+    // Networking init
+    const wsClient = createWSClient({
+      // TODO: Make this load from env at compile time
+      url: "ws://100.80.93.96:3001",
+    })
+
+
+    return createTRPCClient<AppRouter>({
       links: [
         wsLink({
           client: wsClient
@@ -57,13 +59,24 @@ export default function RootLayout() {
         }),
       ],
     })
-  )
+  })
 
   if (!loaded) {
     return null;
   }
 
   return (
+    <QueryClientProvider client={queryClient}>
+      <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </TRPCProvider>
+    </QueryClientProvider>
     <QueryClientProvider client={queryClient}>
       <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
