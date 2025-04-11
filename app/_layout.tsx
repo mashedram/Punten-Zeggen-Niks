@@ -11,9 +11,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createTRPCClient, createWSClient, loggerLink, wsLink } from '@trpc/client';
 import { AppRouter } from '@/api/router/root';
-import { createTRPCContext } from '@trpc/tanstack-react-query';
 import { TRPCProvider } from '@/api/query';
-import { NFCProvider } from '@/hooks/useNFCContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -21,8 +19,6 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // With SSR, we usually want to set some default staleTime
-      // above 0 to avoid refetching immediately on the client
       staleTime: 60 * 1000,
     },
   },
