@@ -6,7 +6,6 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { usePlayerData } from '@/hooks/usePlayerData';
 import { useRef } from 'react';
-import { Test } from '@/components/Test';
 
 export default function HomeScreen() {
   const [playerdata, joinLobby] = usePlayerData()
@@ -20,7 +19,6 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-        <Test callback={(value) => console.log(value)}></Test>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome! + {playerdata?.id}</ThemedText>
         <HelloWave />
