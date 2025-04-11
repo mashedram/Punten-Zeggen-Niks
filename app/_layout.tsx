@@ -73,16 +73,5 @@ export default function RootLayout() {
         </ThemeProvider>
       </TRPCProvider>
     </QueryClientProvider>
-    <QueryClientProvider client={queryClient}>
-      <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
-      </TRPCProvider>
-    </QueryClientProvider>
   );
 }

@@ -5,7 +5,6 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { usePlayerData } from '@/hooks/usePlayerData';
-import { useRef } from 'react';
 
 export default function HomeScreen() {
   const [playerdata] = usePlayerData()
