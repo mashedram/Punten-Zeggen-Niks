@@ -30,26 +30,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-<<<<<<< HEAD
-          tabBarIcon: ({ color }: {color: string} ) => <IconSymbol size={28} name="house.fill" color={color} />,
-=======
           tabBarIcon: ({ color }: { color: OpaqueColorValue }) => <IconSymbol size={28} name="house.fill" color={color} />,
->>>>>>> f5c2565 (Added:)
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
           title: 'Explore',
-<<<<<<< HEAD
-<<<<<<< HEAD
           tabBarIcon: ({ color }: { color: string }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-=======
-          tabBarIcon: ({ color }: { color: OpaqueColorValue }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
->>>>>>> ee73fa6 (Added:)
-=======
-          tabBarIcon: ({ color }: { color: OpaqueColorValue }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
->>>>>>> f5c2565 (Added:)
         }}
       />
 
