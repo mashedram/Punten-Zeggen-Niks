@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { usePlayerData } from '@/hooks/usePlayerData';
 
 export default function HomeScreen() {
-  const [playerdata, joinLobby] = usePlayerData()
+  const [playerdata] = usePlayerData()
 
   return (
     <ParallaxScrollView
