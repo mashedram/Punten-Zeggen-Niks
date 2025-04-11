@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { OpaqueColorValue, Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -37,7 +37,11 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: 'Explore',
+<<<<<<< HEAD
           tabBarIcon: ({ color }: { color: string }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+=======
+          tabBarIcon: ({ color }: { color: OpaqueColorValue }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+>>>>>>> ee73fa6 (Added:)
         }}
       />
 
