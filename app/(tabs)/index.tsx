@@ -1,13 +1,26 @@
+<<<<<<< HEAD
 import { Image, StyleSheet, Platform, TextInput } from "react-native";
+=======
+import { Image, StyleSheet, Platform, TextInput } from 'react-native';
+>>>>>>> f5c2565 (Added:)
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+<<<<<<< HEAD
 import { useLobby } from "@/hooks/useLobby";
 
 export default function HomeScreen() {
   const lobbyData = useLobby();
+=======
+import { usePlayerData } from '@/hooks/usePlayerData';
+import { useRef } from 'react';
+import { Test } from '@/components/Test';
+
+export default function HomeScreen() {
+  const [playerdata, joinLobby] = usePlayerData()
+>>>>>>> f5c2565 (Added:)
 
   return (
     <ParallaxScrollView
@@ -17,6 +30,7 @@ export default function HomeScreen() {
           source={require("@/assets/images/partial-react-logo.png")}
           style={styles.reactLogo}
         />
+<<<<<<< HEAD
       }
     >
       <ThemedView style={styles.titleContainer}>
@@ -33,6 +47,12 @@ export default function HomeScreen() {
         >
           Create Lobby
         </button>
+=======
+      }>
+        <Test callback={(value) => console.log(value)}></Test>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Welcome! + {playerdata?.id}</ThemedText>
+>>>>>>> f5c2565 (Added:)
         <HelloWave />
       </ThemedView>
       <TextInput></TextInput>
