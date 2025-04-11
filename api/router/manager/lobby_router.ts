@@ -25,4 +25,13 @@ export const lobbyRouter = router({
     createLobby: publicProcedure.query(() => {
         return manager.createLobby()
     }),
+    listen: publicProcedure.input(z.object({ token: z.string() })).subscription(async function* ({ input }) {
+        const player = manager.getPlayer(PlayerToken.fromString(input.token))
+        if (!player)
+            return
+
+        for await (const [event] of player.on()) {
+            yield event;
+        }
+    })
 })
