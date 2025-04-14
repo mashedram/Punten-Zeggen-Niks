@@ -8,7 +8,7 @@ export function SpelersLijst() {
         <Text style={styles.title}>Spelers:</Text>
   
         <ScrollView style={styles.scrollBox}>
-          {[...Array(20)].map((_, i) => (
+          {[...Array(8)].map((_, i) => (
             <Text key={i} style={styles.item}>naam {i + 1}</Text>
           ))}
         </ScrollView>

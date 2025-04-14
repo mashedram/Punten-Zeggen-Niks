@@ -3,10 +3,10 @@ import { fn } from '@storybook/test';
 
 import { View } from 'react-native';
 
-import { Scherm } from '@/components/lobby_host/Scherm';
+import { Scherm } from '@/components/lobby_host/LobbyHostScherm';
 
 const meta = {
-  title: 'Lobby/Scherm',
+  title: 'Lobby/LobbyHostScherm',
   component: Scherm,
   decorators: [
     (Story) => (

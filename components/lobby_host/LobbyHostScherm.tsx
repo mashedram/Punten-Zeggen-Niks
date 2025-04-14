@@ -1,5 +1,3 @@
-import React, {useState} from 'react';
-import {Button, Text, View} from 'react-native';
 import { KickButton } from './KickButton';
 import { SettingsButton } from './SettingsButton';
 import { PlayerCount } from './PlayerCount';
@@ -10,9 +8,8 @@ import { MenuButton } from './MenuButton';
 
 export const Scherm = () => {
     
-
     return (
-        <>
+        
         <div>
         <KickButton/>
         <SettingsButton/>
@@ -23,7 +20,7 @@ export const Scherm = () => {
         <MenuButton/>
         </div>
 
-</>
+
     
     
     )

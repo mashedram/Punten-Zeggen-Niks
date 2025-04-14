@@ -1,13 +1,13 @@
 import React, {useState} from 'react'; 
 import {Button, Text, View} from 'react-native';
 
-export const GameStartButton= () => {
+export const CreateButton= () => {
     const [notPressed, pressed] = useState(true);
 
     return (
         <View>
             <Button
-            title={'Start'}
+            title={'Create a game'}
         />
         </View>
     
