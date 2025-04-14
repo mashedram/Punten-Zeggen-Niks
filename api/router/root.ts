@@ -5,4 +5,4 @@ export const appRouter = router({
     lobby: lobbyRouter,
 })
 
-export type AppRouter = typeof appRouter
+export type AppRouter = typeof appRouter;
