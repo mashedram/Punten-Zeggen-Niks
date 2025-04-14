@@ -1,4 +1,4 @@
-import { PlayerData, type PlayerEvent } from "@/api/managers/lobbies";
+import type { PlayerData, PlayerEvent } from "@/api/managers/lobby/Player";
 import { useTRPC } from "@/api/query";
 import { skipToken, useMutation } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";

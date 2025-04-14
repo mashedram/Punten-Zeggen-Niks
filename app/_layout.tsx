@@ -42,11 +42,19 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  /**
+   * Use the 'EXPO_PUBLIC_SERVER_ADDRESS' environment variable to set the remote server address
+   * Source: https://docs.expo.dev/guides/environment-variables/
+   */
+  const remote_server_address = process.env.EXPO_PUBLIC_SERVER_ADDRESS;
+
+  if (!remote_server_address)
+    throw new Error("EXPO_PUBLIC_SERVER_ADDRESS is not defined");
+
   const [trpcClient] = useState(() => {
     // Networking init
     const wsClient = createWSClient({
-      // TODO: Make this load from env at compile time
-      url: "ws://100.80.93.96:3001",
+      url: remote_server_address,
     });
 
     return createTRPCClient<AppRouter>({
