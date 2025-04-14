@@ -19,7 +19,6 @@ export default function HomeScreen() {
         />
       }
     >
-      
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome! + {lobbyData.self?.id}</ThemedText>
         <button
