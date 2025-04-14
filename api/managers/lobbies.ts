@@ -1,156 +1,258 @@
 import { EventEmitter, on } from "ws";
+import { z } from "zod";
 
 function generateRandomCode(length: number): string {
-    let value = "";
+  let value = "";
 
-    for (let i = 0; i < length; i++) {
-        value += Math.floor(Math.random() * 9)
-    }
+  for (let i = 0; i < length; i++) {
+    value += Math.floor(Math.random() * 9);
+  }
 
-    return value
+  return value;
 }
 
-const LOBBY_CODE_LENGTH = 6
+const LOBBY_CODE_LENGTH = 6;
+const DISCONNECT_TIMEOUT_MS = 5 * 1000;
 
-export class PlayerEvent<T> {
-    private id: number;
-    private type: string;
-    private data: T;
-
-    constructor(id: number, type: string, data: T) {
-        this.id = id
-        this.type = type
-        this.data = data
-    }
-
-    public getId(): number {
-        return this.id
-    }
-
-    public getType(): string {
-        return this.type
-    }
-
-    public getData(): T {
-        return this.data
-    }
-}
+export type PlayerEvent<T> = {
+  id: number;
+  type: string;
+  content: T;
+};
 
 export class PlayerToken {
-    private lobbyCode: string
-    private playerId: string
+  private lobbyCode: string;
+  private playerId: string;
 
-    constructor(lobbyCode: string, playerId: string) {
-        this.lobbyCode = lobbyCode
-        this.playerId = playerId
-    }
+  constructor(lobbyCode: string, playerId: string) {
+    this.lobbyCode = lobbyCode;
+    this.playerId = playerId;
+  }
 
-    public static fromPlayer(player: Player) {
-        return new PlayerToken(player.getLobby().getCode(), player.getId())
-    }
+  public static fromPlayer(player: Player) {
+    return new PlayerToken(player.getLobby().getCode(), player.getId());
+  }
 
-    public static fromString(token: string) {
-        const [lobbyCode, playerId] = token.split('|')
-        return new PlayerToken(lobbyCode, playerId)
-    }
+  public static fromString(token: string) {
+    const [lobbyCode, playerId] = token.split("|");
+    return new PlayerToken(lobbyCode, playerId);
+  }
 
-    public toString(): string {
-        return `${this.lobbyCode}|${this.playerId}`
-    }
+  public toString(): string {
+    return `${this.lobbyCode}|${this.playerId}`;
+  }
 
-    public getLobbyCode(): string {
-        return this.lobbyCode
-    }
+  public getLobbyCode(): string {
+    return this.lobbyCode;
+  }
 
-    public getPlayerId(): string {
-        return this.playerId
-    }
+  public getPlayerId(): string {
+    return this.playerId;
+  }
 }
 
-export class Player {
-    private id: string;
-    private lobby: Lobby;
-    /// The last timestamp on which an action was done
-    private lastAction: Date;
-    private emitter: EventEmitter;
-    private lastEventId: number;
+/**
+ * A type that defines publicly shared data between server and client
+ */
+export const playerDataSchema = z.object({
+  id: z.string(),
+})
 
-    constructor(lobby: Lobby) {
-        this.id = crypto.randomUUID()
-        this.lobby = lobby
-        this.lastAction = new Date()
-        this.emitter = new EventEmitter()
-        this.lastEventId = 0
+/**
+ * An interface that defines data that is only available to the player themselves
+ * Includes publicly available data
+ */
+export const priviligedPlayerDataSchema = playerDataSchema.extend({
+  token: z.string(),
+})
+
+// Create an extendable type of the schema to enforce it upon a class or somewhere else within TypeScript
+export type PlayerData = z.infer<typeof playerDataSchema>
+export type PriviligedPlayerData = z.infer<typeof priviligedPlayerDataSchema>
+
+export enum ConnectionState {
+  Connected,
+  Disconnected
+}
+
+export class Player implements PlayerData {
+  /// The public ID of the player
+  id: string;
+  /// The private token used by the client to get privileged data
+  private token: string;
+  private lobby: Lobby;
+  // Connection state
+  // The last timestamp on which an action was done
+  private connectionState: ConnectionState = ConnectionState.Disconnected;
+  private lastConnectedTime: Date = new Date();
+  private disconnectTimeout: NodeJS.Timeout | null = null;
+  // Event state
+  private emitter: EventEmitter = new EventEmitter();
+  private lastEventId: number = 0;
+
+  constructor(id: string, lobby: Lobby) {
+    this.id = id;
+    this.token = crypto.randomUUID();
+    this.lobby = lobby;
+  }
+
+  public getId(): string {
+    return this.id;
+  }
+
+  /**
+   * Called when the player is about to be removed
+   */
+  public removing(): void {
+    if (this.disconnectTimeout) {
+      clearTimeout(this.disconnectTimeout);
+      this.disconnectTimeout = null;
+    }
+  }
+
+  public getToken(): PlayerToken {
+    return PlayerToken.fromPlayer(this);
+  }
+
+  public getLobby(): Lobby {
+    return this.lobby;
+  }
+
+  public setConnected(state: ConnectionState) {
+    this.connectionState = state;
+    this.lastConnectedTime = new Date();
+
+    if (this.disconnectTimeout) {
+      clearTimeout(this.disconnectTimeout);
+      this.disconnectTimeout = null;
     }
 
-    public getId(): string {
-        return this.id
+    if (state === ConnectionState.Disconnected) {
+      this.disconnectTimeout = setTimeout(() => {
+        this.lobby.removePlayer(this.getId())
+      }, DISCONNECT_TIMEOUT_MS);
     }
+  }
 
-    public getLobby(): Lobby {
-        return this.lobby
-    }
+  public getPublicData(): PlayerData {
+    return {
+      id: this.id,
+    };
+  }
 
-    public refresh() {
-        this.lastAction = new Date()
-    }
+  public getPrivilegedData(): PriviligedPlayerData {
+    return {
+      ...this.getPublicData(),
+      token: this.token,
+    };
+  }
 
-    public on(): NodeJS.AsyncIterator<PlayerEvent<unknown>[]> {
-        return on(this.emitter, "event")
-    }
+  public createEvent<T>(type: string, content: T): PlayerEvent<T> {
+    return {
+      id: ++this.lastEventId,
+      type,
+      content,
+    };
+  }
 
-    public emit<T>(type: string, content: T) {
-        const event = new PlayerEvent(++this.lastEventId, type, content)
-        this.emitter.emit("event", event)
-    }
+  public on(signal?: AbortSignal): NodeJS.AsyncIterator<PlayerEvent<unknown>[]> {
+    return on(this.emitter, "event", {
+      signal
+    });
+  }
+
+  public emit<T>(type: string, content: T) {
+    const event = this.createEvent(type, content);
+    this.emitter.emit("event", event);
+  }
 }
 
 class Lobby {
-    private code: string
-    private players: {[id: string]: Player} = {}
+  // Keep a reference to the manager that created this lobby instance
+  private manager: LobbyManager;
 
-    constructor() {
-        this.code = generateRandomCode(LOBBY_CODE_LENGTH)
-    }
+  private code: string;
+  private players: { [id: string]: Player } = {};
+  private playerIdCounter = 0;
 
-    public getCode(): string {
-        return this.code
-    }
+  constructor(manager: LobbyManager) {
+    this.manager = manager;
+    this.code = generateRandomCode(LOBBY_CODE_LENGTH);
+  }
 
-    public getPlayer(id: string): Player | undefined {
-        return this.players[id]
+  /**
+   * Called when the lobby is about to be removed
+   */
+  public removing(): void {
+    for (const player of Object.values(this.players)) {
+      player.removing();
     }
+  }
 
-    public createPlayer(): Player {
-        const player = new Player(this)
-        this.players[player.getId()] = player
-        return player
+  // Event methods
+
+  public broadcast(event: string, content: unknown) {
+    for (const player of Object.values(this.players)) {
+      player.emit(event, content);
     }
+  }
+
+  // Player control methods
+
+  public getCode(): string {
+    return this.code;
+  }
+
+  public getPlayer(id: string): Player | undefined {
+    return this.players[id];
+  }
+
+  public createPlayer(): Player {
+    const id = this.playerIdCounter++;
+    const player = new Player(id.toString(), this);
+    this.players[player.getId()] = player;
+    return player;
+  }
+
+  public removePlayer(id: string) {
+    const player = this.players[id];
+    if (!player) return;
+
+    player.removing();
+    delete this.players[id];
+
+    if (Object.keys(this.players).length === 0) {
+      this.manager.deleteLobby(this.getCode());
+    }
+  }
 }
 
 export class LobbyManager {
-    private lobbies: {[key: string]: Lobby} = {}
+  private lobbies: { [key: string]: Lobby } = {};
 
-    public createLobby(): Lobby {
-        const lobby = new Lobby()
-        this.lobbies[lobby.getCode()] = lobby
+  public createLobby(): Lobby {
+    const lobby = new Lobby(this);
+    this.lobbies[lobby.getCode()] = lobby;
 
-        return lobby
-    }
+    return lobby;
+  }
 
-    public getLobby(code: string): Lobby | undefined {
-        return this.lobbies[code]
-    }
+  public getLobby(code: string): Lobby | undefined {
+    return this.lobbies[code];
+  }
 
-    public deleteLobby(code: string): void {
-        delete this.lobbies[code]
-    }
+  public deleteLobby(code: string): void {
+    const lobby = this.lobbies[code];
+    if (!lobby) return;
 
-    public getPlayer(token: PlayerToken): Player | undefined {
-        const lobby = this.getLobby(token.getLobbyCode())
-        if (!lobby)
-            return
+    lobby.removing();
+    delete this.lobbies[code];
+  }
 
-        return lobby.getPlayer(token.getPlayerId())
-    }
+  public getPlayer(token: PlayerToken): Player | undefined {
+    const lobby = this.getLobby(token.getLobbyCode());
+    if (!lobby) return;
+
+    return lobby.getPlayer(token.getPlayerId());
+  }
 }

@@ -27,13 +27,6 @@ export default function TabTwoScreen() {
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>
 
-      <ThemedText>{tellerQuery.isPending && "Loading" || `Teller op: ${tellerQuery.data}`}</ThemedText>
-      <Button onPress={() => {
-        addMutation.mutateAsync().then(() => {
-          tellerQuery.refetch()
-        })
-      }} label='Hi!!' />
-
       <ThemedText>This app includes example code to help you get started.</ThemedText>
       <Collapsible title="File-based routing">
         <ThemedText>
