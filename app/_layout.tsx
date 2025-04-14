@@ -1,16 +1,24 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { createTRPCClient, createWSClient, loggerLink, wsLink } from '@trpc/client';
+import {
+  createTRPCClient,
+  createWSClient,
+  loggerLink,
+  wsLink,
+} from '@trpc/client';
 import { AppRouter } from '@/api/router/root';
-import { createTRPCContext } from '@trpc/tanstack-react-query';
 import { TRPCProvider } from '@/api/query';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -19,16 +27,16 @@ SplashScreen.preventAutoHideAsync();
 // Networking init
 const wsClient = createWSClient({
   // TODO: Make this load from env at compile time
-  url: "ws://100.80.93.96:3001"
-})
+  url: 'ws://100.80.93.96:3001',
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {
-      queries: {
-          // With SSR, we usually want to set some default staleTime
-          // above 0 to avoid refetching immediately on the client
-          staleTime: 60 * 1000,
-      },
+    queries: {
+      // With SSR, we usually want to set some default staleTime
+      // above 0 to avoid refetching immediately on the client
+      staleTime: 60 * 1000,
+    },
   },
 });
 
@@ -43,21 +51,21 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
- 
+
   const [trpcClient] = useState(() =>
     createTRPCClient<AppRouter>({
       links: [
         wsLink({
-          client: wsClient
+          client: wsClient,
         }),
         loggerLink({
-          enabled: (opts) =>
-            process.env.NODE_ENV === "development" ||
-            (opts.direction === "down" && opts.result instanceof Error),
+          enabled: opts =>
+            process.env.NODE_ENV === 'development' ||
+            (opts.direction === 'down' && opts.result instanceof Error),
         }),
       ],
-    })
-  )
+    }),
+  );
 
   if (!loaded) {
     return null;
@@ -66,7 +74,8 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <ThemeProvider
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
