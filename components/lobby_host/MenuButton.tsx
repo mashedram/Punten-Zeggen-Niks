@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Button, Text, View, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 
-
 export const MenuButton = () => {
-    const [nietIngeklikt, ingeklikt] = useState(true);
+    const [notPressed, pressed] = useState(true);
 
     const handlePress = () => {
         Alert.alert('Je hebt op de afbeelding gedrukt!');
-        ingeklikt(!nietIngeklikt);
+        pressed(!notPressed);
     }
 
     const styles = StyleSheet.create({
@@ -19,7 +18,7 @@ export const MenuButton = () => {
         image: {
             width: 25,
             height: 25,
-           
+
         },
     });
 

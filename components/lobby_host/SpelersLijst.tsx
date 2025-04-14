@@ -2,7 +2,8 @@ import React, {useState} from 'react';
 import {Button, Text, View, ScrollView, StyleSheet} from 'react-native';
 
 export function SpelersLijst() {
-    return (
+    
+  return (
       <View style={styles.container}>
         <Text style={styles.title}>Spelers:</Text>
   

@@ -3,11 +3,11 @@ import { Button, Text, View, TouchableOpacity, StyleSheet, Alert, Image } from '
 
 
 export const SettingsButton = () => {
-    const [nietIngeklikt, ingeklikt] = useState(true);
+    const [notPressed, pressed] = useState(true);
 
     const handlePress = () => {
         Alert.alert('Je hebt op de afbeelding gedrukt!');
-        ingeklikt(!nietIngeklikt);
+        pressed(!notPressed);
     }
 
     const styles = StyleSheet.create({

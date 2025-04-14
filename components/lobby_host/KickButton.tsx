@@ -2,17 +2,17 @@ import React, {useState} from 'react';
 import {Button, Text, View} from 'react-native';
 
 export const KickButton = () => {
-    const [spelerVerwijderen, spelerVerwijderd] = useState(true);
+    const [deletePlayer, playerDeleted] = useState(true);
 
     return (
         <View>
             <Button
             onPress={() => {
-                spelerVerwijderd(false);
+            playerDeleted(false);
             }}
-            disabled={!spelerVerwijderen}
-            title={spelerVerwijderen ? 'kick' : 'kicked'}
-/>
+            disabled={!deletePlayer}
+            title={deletePlayer ? 'kick' : 'kicked'}
+            />
         </View>
     )
 }
