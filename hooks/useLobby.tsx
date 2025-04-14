@@ -1,15 +1,15 @@
-import type { PlayerData, PlayerEvent } from "@/api/managers/lobby/Player";
-import { useTRPC } from "@/api/query";
-import { skipToken, useMutation } from "@tanstack/react-query";
-import { useSubscription } from "@trpc/tanstack-react-query";
-import {
+import type { PlayerData, PlayerEvent } from '@/api/managers/lobby/Player';
+import { useTRPC } from '@/api/query';
+import { skipToken, useMutation } from '@tanstack/react-query';
+import { useSubscription } from '@trpc/tanstack-react-query';
+import React, {
   createContext,
   useCallback,
   useContext,
   useRef,
   useState,
-} from "react";
-import { useMMKVString } from "react-native-mmkv";
+} from 'react';
+import { useMMKVString } from 'react-native-mmkv';
 
 type LobbyEventCallback = (event: PlayerEvent<unknown>) => void;
 
@@ -22,7 +22,7 @@ interface LobbyState {
 
 const PlayerDataContext = createContext<LobbyState | null>(null);
 
-const TOKEN_STORAGE_KEY = "token.value";
+const TOKEN_STORAGE_KEY = 'token.value';
 
 /**
  * Hook to access the current lobby state.
@@ -38,7 +38,7 @@ const TOKEN_STORAGE_KEY = "token.value";
 export function useLobby(): LobbyState {
   const state = useContext(PlayerDataContext);
 
-  if (!state) throw new Error("useLobby must be used within a LobbyProvider");
+  if (!state) throw new Error('useLobby must be used within a LobbyProvider');
 
   return state;
 }
@@ -52,9 +52,9 @@ export function LobbyProvider({ children }: { children: React.ReactNode }) {
 
   useSubscription(
     trpc.lobby.listen.subscriptionOptions(token ? { token } : skipToken, {
-      onData: (event) => {
+      onData: event => {
         // Middleware to handle the player-state package
-        if (event.type === "player-state") {
+        if (event.type === 'player-state') {
           setSelfState(event.content as PlayerData);
           return;
         }
@@ -62,20 +62,20 @@ export function LobbyProvider({ children }: { children: React.ReactNode }) {
         if (!eventCallbackRef.current) return;
 
         eventCallbackRef.current(event as PlayerEvent<unknown>);
-      }
+      },
     }),
   );
 
   const joinMutation = useMutation(
     trpc.lobby.joinLobby.mutationOptions({
-      onSuccess: (data) => {
+      onSuccess: data => {
         setToken(data);
       },
     }),
   );
   const createMutation = useMutation(
     trpc.lobby.createLobby.mutationOptions({
-      onSuccess: (data) => {
+      onSuccess: data => {
         setToken(data);
       },
     }),
