@@ -1,16 +1,15 @@
 import { PlayerData, type PlayerEvent } from "@/api/managers/lobbies";
 import { useTRPC } from "@/api/query";
-import { skipToken, useMutation, useQuery } from "@tanstack/react-query";
+import { skipToken, useMutation } from "@tanstack/react-query";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useRef,
   useState,
 } from "react";
-import { MMKV, useMMKVString } from "react-native-mmkv";
+import { useMMKVString } from "react-native-mmkv";
 
 type LobbyEventCallback = (event: PlayerEvent<unknown>) => void;
 

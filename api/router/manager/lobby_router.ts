@@ -1,10 +1,7 @@
 import {
   ConnectionState,
   LobbyManager,
-  Player,
-  PlayerData,
   PlayerToken,
-  priviligedPlayerDataSchema,
 } from "@/api/managers/lobbies";
 import { publicProcedure, router } from "@/api/server";
 import z from "zod";
