@@ -1,8 +1,6 @@
-import {
-  ConnectionState,
-  LobbyManager,
-  PlayerToken,
-} from "@/api/managers/lobbies";
+import { LobbyManager } from "@/api/managers/lobby/LobbyManager";
+import { ConnectionState } from "@/api/managers/lobby/Player";
+import { PlayerToken } from "@/api/managers/lobby/PlayerToken";
 import { publicProcedure, router } from "@/api/server";
 import z from "zod";
 
@@ -20,7 +18,7 @@ export const lobbyRouter = router({
     }),
   createLobby: publicProcedure.output(z.string()).mutation(() => {
     const lobby = manager.createLobby();
-    return PlayerToken.fromPlayer(lobby.createPlayer()).toString();
+    return lobby.createPlayer().getToken().toString()
   }),
   listen: publicProcedure
     .input(
@@ -41,7 +39,7 @@ export const lobbyRouter = router({
         console.warn(`No signal provided for player ${player.getId()} in lobby ${player.getLobby().getCode()}`);
       }
 
-      for await (const [event] of player.on(signal)) {
+      for await (const [event] of player.listen(signal)) {
         yield event;
       }
     }),
