@@ -37,7 +37,7 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color }: { color: string }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color }: { color: OpaqueColorValue }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />
 
