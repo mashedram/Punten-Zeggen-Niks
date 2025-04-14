@@ -6,7 +6,6 @@ import * as ws from "ws"
 const wss = new ws.Server({
     port: 3001,
 })
-
 /// source: https://trpc.io/docs/server/websockets
 const handler = applyWSSHandler({
     wss,

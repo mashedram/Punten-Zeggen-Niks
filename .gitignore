@@ -6,6 +6,9 @@ node_modules/
 #JetBrains
 .idea
 
+# VSCode
+.vscode
+
 # Expo
 .expo/
 dist/
@@ -39,7 +42,5 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
-
-app-example
 
 *storybook.log
