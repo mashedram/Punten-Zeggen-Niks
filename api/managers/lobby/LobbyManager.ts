@@ -1,10 +1,11 @@
-import { Lobby } from "./Lobby";
-import { Player } from "./Player";
-import { PlayerToken } from "./PlayerToken";
+import { Lobby } from './Lobby';
+import { Player } from './Player';
+import { PlayerToken } from './PlayerToken';
 
 export const LOBBY_CONSTANTS = {
   LOBBY_CODE_LENGTH: 6,
   DISCONNECT_TIMEOUT_MS: 5 * 1000,
+  LOBBY_STATE_EVENT: 'lobby-state',
 };
 
 export class LobbyManager {
