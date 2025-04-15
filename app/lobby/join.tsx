@@ -3,8 +3,14 @@ import { Image, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import CodeInput from '@/components/CodeInput';
+import { useLobby } from '@/hooks/useLobby';
+import { useRoute } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
+  const lobby = useLobby();
+  const router = useRouter();
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#90ffac', dark: '#1D3D47' }}
@@ -21,8 +27,9 @@ export default function HomeScreen() {
         <ThemedText type="subtitle">Enter a Code</ThemedText>
         <ThemedText>Enter the code you received from your friend.</ThemedText>
         <CodeInput
-          callback={code => {
-            console.log(code);
+          onSubmit={code => {
+            lobby.join(code);
+            router.navigate('/lobby');
           }}
         />
       </ThemedView>

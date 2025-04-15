@@ -1,8 +1,8 @@
-import { EventEmitter, on as on } from "ws";
-import { z } from "zod";
-import { PlayerToken } from "./PlayerToken";
-import { LOBBY_CONSTANTS } from "./LobbyManager";
-import { Lobby } from "./Lobby";
+import { EventEmitter, on as on } from 'ws';
+import { z } from 'zod';
+import { PlayerToken } from './PlayerToken';
+import { LOBBY_CONSTANTS } from './LobbyManager';
+import { Lobby } from './Lobby';
 
 /**
  * A type that defines a player event
@@ -38,9 +38,9 @@ export enum ConnectionState {
   Disconnected,
 }
 
-export class Player implements PlayerData {
+export class Player {
   /// The public ID of the player
-  id: string;
+  private id: string;
   /// The private token used by the client to get privileged data
   private token: string;
   private lobby: Lobby;
@@ -73,6 +73,10 @@ export class Player implements PlayerData {
     }
   }
 
+  public sync(): void {
+    this.lobby.syncOthers(this);
+  }
+
   public getToken(): PlayerToken {
     return PlayerToken.fromPlayer(this);
   }
@@ -95,6 +99,10 @@ export class Player implements PlayerData {
         this.lobby.removePlayer(this.getId());
       }, LOBBY_CONSTANTS.DISCONNECT_TIMEOUT_MS);
     }
+  }
+
+  public getConnectionState(): ConnectionState {
+    return this.connectionState;
   }
 
   public getPublicData(): PlayerData {
@@ -121,14 +129,13 @@ export class Player implements PlayerData {
   public listen(
     signal?: AbortSignal,
   ): NodeJS.AsyncIterator<PlayerEvent<unknown>[]> {
-    return on(this.emitter, "event", {
+    return on(this.emitter, 'event', {
       signal,
     });
   }
 
-
   public emit<T>(type: string, content: T) {
     const event = this.createEvent(type, content);
-    this.emitter.emit("event", event);
+    this.emitter.emit('event', event);
   }
 }

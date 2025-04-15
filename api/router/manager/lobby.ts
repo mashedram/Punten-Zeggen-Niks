@@ -14,7 +14,8 @@ export const lobbyRouter = router({
       const lobby = manager.getLobby(input.code);
       if (!lobby) throw new Error('Lobby not found');
 
-      return lobby.createPlayer().getToken().toString();
+      const player = lobby.createPlayer();
+      return player.getToken().toString();
     }),
   createLobby: publicProcedure.output(z.string()).mutation(() => {
     const lobby = manager.createLobby();
@@ -26,11 +27,18 @@ export const lobbyRouter = router({
       let player = manager.getPlayer(PlayerToken.fromString(input.token));
       if (!player) throw new Error('Player not found');
 
-      yield player.createEvent('player-state', player.getPrivilegedData());
+      yield player.createEvent(
+        'lobby-state',
+        player.getLobby().getDataForPlayer(player),
+      );
+
+      player.setConnected(ConnectionState.Connected);
+      player.sync();
 
       if (signal) {
         signal.addEventListener('abort', () => {
           player.setConnected(ConnectionState.Disconnected);
+          player.sync();
         });
       } else {
         console.warn(
