@@ -1,15 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
 
 import { View } from 'react-native';
 
-import { SpelersLijst } from '@/components/lobby_host/SpelersLijst';
+import { PlayerList } from '@/components/lobby_host/PlayerList';
 
 const meta = {
-  title: 'Lobby/SpelersLijst',
-  component: SpelersLijst,
+  title: 'Lobby/PlayerList',
+  component: PlayerList,
   decorators: [
-    (Story) => (
+    Story => (
       <View style={{ flex: 1, alignItems: 'flex-start' }}>
         <Story />
       </View>
@@ -19,7 +18,7 @@ const meta = {
   tags: ['autodocs'],
   // Use `fn` to spy on the onPress arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#action-args
   args: {},
-} satisfies Meta<typeof SpelersLijst>;
+} satisfies Meta<typeof PlayerList>;
 
 export default meta;
 
@@ -27,6 +26,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
-  speler: "" 
+    speler: '',
   },
 };
