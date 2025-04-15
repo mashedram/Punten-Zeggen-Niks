@@ -1,16 +1,17 @@
-import React, {useState} from 'react'; 
-import {Button, Text, View} from 'react-native';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Button, Text, View } from 'react-native';
 
-export const JoinButton= () => {
-    const [notPressed, pressed] = useState(true);
-
-    return (
-        <View>
-            <Button
-            title={'Join a game'}
-        />
-        </View>
-    
-    );
-
+export const JoinButton = () => {
+  const router = useRouter();
+  return (
+    <View>
+      <Button
+        title={'Join a game'}
+        onPress={() => {
+          router.navigate('/lobby/join');
+        }}
+      />
+    </View>
+  );
 };
