@@ -10,7 +10,7 @@ export default function HomeScreen() {
       headerBackgroundColor={{ light: '#90ffac', dark: '#1D3D47' }}
       headerImage={
         <Image
-          source={{ uri: 'https://twopine.nl/opengraph.jpg' }}
+          source={require('@/assets/images/two-pine-logo.jpeg')}
           style={styles.reactLogo}
         />
       }>

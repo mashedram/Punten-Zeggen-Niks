@@ -1,16 +1,11 @@
-import { Image, StyleSheet, Platform, TextInput } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
+import { CreateButton } from '@/components/Home_page/CreateButton';
+import { JoinButton } from '@/components/Home_page/JoinButton';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { StyleSheet, Image } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useLobby } from '@/hooks/useLobby';
-import { JoinButton } from '@/components/Home_page/JoinButton';
-import { CreateButton } from '@/components/Home_page/CreateButton';
 
-export default function HomeScreen() {
-  const lobbyData = useLobby();
-
+export default function HomePage() {
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#90FFAC', dark: '#1D3D47' }}
