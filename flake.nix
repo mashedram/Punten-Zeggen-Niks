@@ -11,7 +11,7 @@
         let
           runtimeDeps = with pkgs; [ nodejs_20 ];
           buildDeps = with pkgs; [ pkg-config ];
-          devDeps = with pkgs; [ nixfmt-tree bun ];
+          devDeps = with pkgs; [ nixfmt-tree bun nodejs_20 nodePackages.prettier ];
 
           pinnedJDK = pkgs.jdk17;
           buildToolsVersion = "34.0.0";
