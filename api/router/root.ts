@@ -1,8 +1,8 @@
-import { router } from "@/api/server";
-import { lobbyRouter } from "@/api/router/manager/lobby_router";
+import { router } from '@/api/server';
+import { lobbyRouter } from '@/api/router/manager/lobby';
 
 export const appRouter = router({
-    lobby: lobbyRouter,
-})
+  lobby: lobbyRouter,
+});
 
 export type AppRouter = typeof appRouter;

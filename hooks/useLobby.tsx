@@ -43,7 +43,7 @@ export function useLobby(): LobbyState {
   return state;
 }
 
-export function LobbyProvider({ children }: { children: React.ReactNode }) {
+export function LobbyProvider({ children }: { children?: React.ReactNode }) {
   const trpc = useTRPC();
 
   const [token, setToken] = useMMKVString(TOKEN_STORAGE_KEY);
