@@ -3,13 +3,13 @@ import { fn } from '@storybook/test';
 
 import { View } from 'react-native';
 
-import { Scherm } from '@/components/lobby_host/LobbyHostScherm';
+import { Scherm } from '@/components/lobby_host/LobbyHostScreen';
 
 const meta = {
   title: 'Lobby/LobbyHostScherm',
   component: Scherm,
   decorators: [
-    (Story) => (
+    Story => (
       <View style={{ flex: 1, alignItems: 'flex-start' }}>
         <Story />
       </View>
@@ -26,6 +26,5 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
-  args: {
-  },
+  args: {},
 };
