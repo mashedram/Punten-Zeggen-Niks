@@ -4,7 +4,6 @@ import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import CodeInput from '@/components/CodeInput';
 import { useLobby } from '@/hooks/useLobby';
-import { useRoute } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
