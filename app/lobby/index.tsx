@@ -15,6 +15,7 @@ import { StyleSheet } from 'react-native';
 
 export default function LobbyPage() {
   const lobby = useLobby();
+  const router = useRouter();
 
   const activeLobby = lobby.get();
 
@@ -58,7 +59,13 @@ export default function LobbyPage() {
       <ThemedView>
         <GameStartButton />
         <KickButton />
-        <ReturnButton />
+        <Button
+          title={'return'}
+          onPress={() => {
+            lobby.leave();
+            router.navigate('/');
+          }}
+        />
       </ThemedView>
     </ParallaxScrollView>
   );
