@@ -1,74 +1,124 @@
-import { LOBBY_CONSTANTS, LobbyManager } from "./LobbyManager";
-import { Player } from "./Player";
+import { z } from 'zod';
+import { LOBBY_CONSTANTS, LobbyManager } from './LobbyManager';
+import {
+  ConnectionState,
+  Player,
+  playerDataSchema,
+  PlayerEvent,
+  priviligedPlayerDataSchema,
+} from './Player';
+import { PlayerToken } from './PlayerToken';
 
 function generateRandomCode(length: number): string {
-    let value = "";
-  
-    for (let i = 0; i < length; i++) {
-      value += Math.floor(Math.random() * 9);
-    }
-  
-    return value;
+  let value = '';
+
+  for (let i = 0; i < length; i++) {
+    value += Math.floor(Math.random() * 9);
   }
 
+  return value;
+}
+
+/**
+ * A type that defines publicly shared data between server and client for a lobby
+ */
+export const lobbyDataSchema = z.object({
+  code: z.string(),
+  self: priviligedPlayerDataSchema,
+  players: z.array(playerDataSchema),
+});
+
+export type LobbyData = z.infer<typeof lobbyDataSchema>;
+
 export class Lobby {
-    // Keep a reference to the manager that created this lobby instance
-    private manager: LobbyManager;
-  
-    private code: string;
-    private players: { [id: string]: Player } = {};
-    private playerIdCounter = 0;
-  
-    constructor(manager: LobbyManager) {
-      this.manager = manager;
-      this.code = generateRandomCode(LOBBY_CONSTANTS.LOBBY_CODE_LENGTH);
-    }
-  
-    /**
-     * Called when the lobby is about to be removed
-     */
-    public removing(): void {
-      for (const player of Object.values(this.players)) {
-        player.removing();
-      }
-    }
-  
-    // Event methods
-  
-    public broadcast(event: string, content: unknown) {
-      for (const player of Object.values(this.players)) {
-        player.emit(event, content);
-      }
-    }
-  
-    // Player control methods
-  
-    public getCode(): string {
-      return this.code;
-    }
-  
-    public getPlayer(id: string): Player | undefined {
-      return this.players[id];
-    }
-  
-    public createPlayer(): Player {
-      const id = this.playerIdCounter++;
-      const player = new Player(id.toString(), this);
-      this.players[player.getId()] = player;
-      return player;
-    }
-  
-    public removePlayer(id: string) {
-      const player = this.players[id];
-      if (!player) return;
-  
-      player.removing();
-      delete this.players[id];
-  
-      if (Object.keys(this.players).length === 0) {
-        this.manager.deleteLobby(this.getCode());
-      }
+  private manager: LobbyManager;
+
+  code: string;
+  private players: { [id: string]: Player } = {};
+  private playerIdCounter = 0;
+
+  constructor(manager: LobbyManager) {
+    this.manager = manager;
+    this.code = generateRandomCode(LOBBY_CONSTANTS.LOBBY_CODE_LENGTH);
+  }
+
+  /**
+   * Called when the lobby is about to be removed
+   */
+  public onRemoval(): void {
+    for (const player of Object.values(this.players)) {
+      player.onRemoval();
     }
   }
-  
-  
+
+  // Player control methods
+
+  public getCode(): string {
+    return this.code;
+  }
+
+  public getDataForPlayer(player: Player): LobbyData {
+    return {
+      code: this.code,
+      self: player.getPrivilegedData(),
+      players: this.getActivePlayers()
+        .filter(p => p !== player)
+        .map(p => p.getPublicData()),
+    };
+  }
+
+  public createSyncEventFor(player: Player): PlayerEvent<LobbyData> {
+    const data = this.getDataForPlayer(player);
+    return {
+      type: LOBBY_CONSTANTS.LOBBY_STATE_EVENT,
+      content: data,
+    };
+  }
+
+  public syncWith(player: Player) {
+    const event = this.createSyncEventFor(player);
+    player.emit(event);
+  }
+
+  public syncOthers(player: Player) {
+    for (const other of this.getActivePlayers()) {
+      if (other === player) continue;
+      const event = this.createSyncEventFor(other);
+      other.emit(event);
+    }
+  }
+
+  public getPlayer(playerToken: PlayerToken): Player | undefined {
+    return Object.values(this.players).find(p =>
+      p.checkAuthToken(playerToken.getPlayerAuthToken()),
+    );
+  }
+
+  /**
+   * @returns all players that are currently in the lobby and are active (connected, not inactive, etc.)
+   */
+  public getActivePlayers(): Player[] {
+    return Object.values(this.players).filter(
+      p => p.getConnectionState() === ConnectionState.Connected,
+    );
+  }
+
+  public createPlayer(): Player {
+    const id = this.playerIdCounter++;
+    const player = new Player(id.toString(), this);
+    this.players[player.getId()] = player;
+    return player;
+  }
+
+  public removePlayer(id: string) {
+    const player = this.players[id];
+    if (!player) return;
+
+    player.onRemoval();
+    delete this.players[id];
+
+    if (Object.keys(this.players).length === 0) {
+      this.manager.deleteLobby(this.getCode());
+    }
+  }
+}

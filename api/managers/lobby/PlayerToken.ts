@@ -1,32 +1,26 @@
-import { Player } from "./Player";
-
 export class PlayerToken {
   private lobbyCode: string;
-  private playerId: string;
+  private playerAuthToken: string;
 
-  constructor(lobbyCode: string, playerId: string) {
+  constructor(lobbyCode: string, playerAuthToken: string) {
     this.lobbyCode = lobbyCode;
-    this.playerId = playerId;
-  }
-
-  public static fromPlayer(player: Player) {
-    return new PlayerToken(player.getLobby().getCode(), player.getId());
+    this.playerAuthToken = playerAuthToken;
   }
 
   public static fromString(token: string) {
-    const [lobbyCode, playerId] = token.split("|");
-    return new PlayerToken(lobbyCode, playerId);
+    const [lobbyCode, playerAuthToken] = token.split('|');
+    return new PlayerToken(lobbyCode, playerAuthToken);
   }
 
   public toString(): string {
-    return `${this.lobbyCode}|${this.playerId}`;
+    return `${this.lobbyCode}|${this.playerAuthToken}`;
   }
 
   public getLobbyCode(): string {
     return this.lobbyCode;
   }
 
-  public getPlayerId(): string {
-    return this.playerId;
+  public getPlayerAuthToken(): string {
+    return this.playerAuthToken;
   }
 }

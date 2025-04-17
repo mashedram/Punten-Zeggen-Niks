@@ -3,14 +3,19 @@ import { Image, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import CodeInput from '@/components/CodeInput';
+import { useLobby } from '@/hooks/useLobby';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
+  const lobby = useLobby();
+  const router = useRouter();
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#90ffac', dark: '#1D3D47' }}
       headerImage={
         <Image
-          source={{ uri: 'https://twopine.nl/opengraph.jpg' }}
+          source={require('@/assets/images/two-pine-logo.jpeg')}
           style={styles.reactLogo}
         />
       }>
@@ -21,8 +26,9 @@ export default function HomeScreen() {
         <ThemedText type="subtitle">Enter a Code</ThemedText>
         <ThemedText>Enter the code you received from your friend.</ThemedText>
         <CodeInput
-          callback={code => {
-            console.log(code);
+          onSubmit={code => {
+            lobby.join(code);
+            router.navigate('/lobby');
           }}
         />
       </ThemedView>

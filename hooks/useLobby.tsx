@@ -1,4 +1,5 @@
-import type { PlayerData, PlayerEvent } from '@/api/managers/lobby/Player';
+import type { LobbyData } from '@/api/managers/lobby/Lobby';
+import type { PlayerEvent } from '@/api/managers/lobby/Player';
 import { useTRPC } from '@/api/query';
 import { skipToken, useMutation } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
@@ -14,10 +15,11 @@ import { useMMKVString } from 'react-native-mmkv';
 type LobbyEventCallback = (event: PlayerEvent<unknown>) => void;
 
 interface LobbyState {
-  self: PlayerData | null;
+  get: () => LobbyData | null;
   setEventHandler: (callback: LobbyEventCallback) => void;
   join: (code: string) => void;
   create: () => void;
+  leave: () => void;
 }
 
 const PlayerDataContext = createContext<LobbyState | null>(null);
@@ -43,20 +45,20 @@ export function useLobby(): LobbyState {
   return state;
 }
 
-export function LobbyProvider({ children }: { children: React.ReactNode }) {
-  const trpc = useTRPC();
+export function LobbyProvider({ children }: { children?: React.ReactNode }) {
+  const tRPC = useTRPC();
 
   const [token, setToken] = useMMKVString(TOKEN_STORAGE_KEY);
-  const [selfState, setSelfState] = useState<PlayerData | null>(null);
+  const [lobbyState, setLobbyState] = useState<LobbyData | null>(null);
   const eventCallbackRef = useRef<LobbyEventCallback | null>(null);
 
   useSubscription(
-    trpc.lobby.listen.subscriptionOptions(token ? { token } : skipToken, {
+    tRPC.lobby.listen.subscriptionOptions(token ? { token } : skipToken, {
       onData: event => {
-        // Middleware to handle the player-state package
-        if (event.type === 'player-state') {
-          setSelfState(event.content as PlayerData);
-          return;
+        switch (event.type) {
+          case 'lobby-state':
+            setLobbyState(event.content as LobbyData);
+            return;
         }
 
         if (!eventCallbackRef.current) return;
@@ -67,19 +69,23 @@ export function LobbyProvider({ children }: { children: React.ReactNode }) {
   );
 
   const joinMutation = useMutation(
-    trpc.lobby.joinLobby.mutationOptions({
+    tRPC.lobby.joinLobby.mutationOptions({
       onSuccess: data => {
         setToken(data);
       },
     }),
   );
   const createMutation = useMutation(
-    trpc.lobby.createLobby.mutationOptions({
+    tRPC.lobby.createLobby.mutationOptions({
       onSuccess: data => {
         setToken(data);
       },
     }),
   );
+
+  const getLobby = useCallback(() => {
+    return lobbyState;
+  }, [lobbyState]);
 
   const joinLobbyCallback = useCallback(
     (code: string) => {
@@ -92,15 +98,21 @@ export function LobbyProvider({ children }: { children: React.ReactNode }) {
     createMutation.mutate();
   }, [createMutation]);
 
+  const leaveLobbyCallback = useCallback(() => {
+    setToken(undefined);
+    setLobbyState(null);
+  }, [setToken]);
+
   const setEventHandler = useCallback((callback: LobbyEventCallback) => {
     eventCallbackRef.current = callback;
   }, []);
 
   const state: LobbyState = {
-    self: selfState,
+    get: getLobby,
     setEventHandler: setEventHandler,
     join: joinLobbyCallback,
     create: createLobbyCallback,
+    leave: leaveLobbyCallback,
   };
 
   return (

@@ -1,10 +1,11 @@
-import { Lobby } from "./Lobby";
-import { Player } from "./Player";
-import { PlayerToken } from "./PlayerToken";
+import { Lobby } from './Lobby';
+import { Player } from './Player';
+import { PlayerToken } from './PlayerToken';
 
 export const LOBBY_CONSTANTS = {
   LOBBY_CODE_LENGTH: 6,
   DISCONNECT_TIMEOUT_MS: 5 * 1000,
+  LOBBY_STATE_EVENT: 'lobby-state',
 };
 
 export class LobbyManager {
@@ -25,14 +26,13 @@ export class LobbyManager {
     const lobby = this.lobbies[code];
     if (!lobby) return;
 
-    lobby.removing();
+    lobby.onRemoval();
     delete this.lobbies[code];
   }
 
-  public getPlayer(token: PlayerToken): Player | undefined {
+  public getPlayerLobby(token: PlayerToken): Lobby | undefined {
     const lobby = this.getLobby(token.getLobbyCode());
-    if (!lobby) return;
 
-    return lobby.getPlayer(token.getPlayerId());
+    return lobby;
   }
 }

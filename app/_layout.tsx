@@ -6,24 +6,23 @@ import {
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   createTRPCClient,
   createWSClient,
   loggerLink,
   wsLink,
-} from "@trpc/client";
-import { AppRouter } from "@/api/router/root";
-import { TRPCProvider } from "@/api/query";
-import { LobbyProvider } from "@/hooks/useLobby";
+} from '@trpc/client';
+import { AppRouter } from '@/api/router/root';
+import { TRPCProvider } from '@/api/query';
+import { LobbyProvider } from '@/hooks/useLobby';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(e => console.warn(e));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,12 +35,12 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch(e => console.warn(e));
     }
   }, [loaded]);
 
@@ -52,9 +51,9 @@ export default function RootLayout() {
   const remote_server_address = process.env.EXPO_PUBLIC_SERVER_ADDRESS;
 
   if (!remote_server_address)
-    throw new Error("EXPO_PUBLIC_SERVER_ADDRESS is not defined");
+    throw new Error('EXPO_PUBLIC_SERVER_ADDRESS is not defined');
 
-  const [trpcClient] = useState(() => {
+  const [tRPCClient] = useState(() => {
     // Networking init
     const wsClient = createWSClient({
       url: remote_server_address,
@@ -80,16 +79,11 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
+      <TRPCProvider queryClient={queryClient} trpcClient={tRPCClient}>
         <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <LobbyProvider>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-            <StatusBar style="auto" />
+            <Stack screenOptions={{ headerShown: false }} />
           </LobbyProvider>
         </ThemeProvider>
       </TRPCProvider>
