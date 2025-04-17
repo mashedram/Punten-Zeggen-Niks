@@ -6,6 +6,6 @@ module.exports = {
   extends: ['expo', 'eslint:recommended'],
   ignorePatterns: ['/dist/*'],
   rules: {
-    'no-undef': false,
+    'no-undef': 0,
   },
 };
