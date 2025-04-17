@@ -1,6 +1,6 @@
 import { useThemeColor } from '@/hooks/useThemeColor';
 import React from 'react';
-import { StyleSheet, TextInput, TextInputProps, TextProps } from 'react-native';
+import { StyleSheet, TextInput, TextInputProps } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
 export type CodeInputProps = TextInputProps & {

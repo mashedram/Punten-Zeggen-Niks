@@ -1,9 +1,8 @@
 import type { LobbyData } from '@/api/managers/lobby/Lobby';
-import type { PlayerData, PlayerEvent } from '@/api/managers/lobby/Player';
+import type { PlayerEvent } from '@/api/managers/lobby/Player';
 import { useTRPC } from '@/api/query';
 import { skipToken, useMutation } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
-import { listen } from 'bun';
 import React, {
   createContext,
   useCallback,

@@ -15,7 +15,6 @@ import { StyleSheet } from 'react-native';
 
 export default function LobbyPage() {
   const lobby = useLobby();
-  const router = useRouter();
 
   const activeLobby = lobby.get();
 
