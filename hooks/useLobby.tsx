@@ -46,16 +46,15 @@ export function useLobby(): LobbyState {
 }
 
 export function LobbyProvider({ children }: { children?: React.ReactNode }) {
-  const trpc = useTRPC();
+  const tRPC = useTRPC();
 
   const [token, setToken] = useMMKVString(TOKEN_STORAGE_KEY);
   const [lobbyState, setLobbyState] = useState<LobbyData | null>(null);
   const eventCallbackRef = useRef<LobbyEventCallback | null>(null);
 
   useSubscription(
-    trpc.lobby.listen.subscriptionOptions(token ? { token } : skipToken, {
+    tRPC.lobby.listen.subscriptionOptions(token ? { token } : skipToken, {
       onData: event => {
-        // Middleware to handle the state packages
         switch (event.type) {
           case 'lobby-state':
             setLobbyState(event.content as LobbyData);
@@ -70,14 +69,14 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
   );
 
   const joinMutation = useMutation(
-    trpc.lobby.joinLobby.mutationOptions({
+    tRPC.lobby.joinLobby.mutationOptions({
       onSuccess: data => {
         setToken(data);
       },
     }),
   );
   const createMutation = useMutation(
-    trpc.lobby.createLobby.mutationOptions({
+    tRPC.lobby.createLobby.mutationOptions({
       onSuccess: data => {
         setToken(data);
       },

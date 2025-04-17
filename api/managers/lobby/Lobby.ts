@@ -28,11 +28,9 @@ export const lobbyDataSchema = z.object({
   players: z.array(playerDataSchema),
 });
 
-// Create an extendable type of the schema to enforce it upon a class or somewhere else within TypeScript
 export type LobbyData = z.infer<typeof lobbyDataSchema>;
 
 export class Lobby {
-  // Keep a reference to the manager that created this lobby instance
   private manager: LobbyManager;
 
   code: string;
@@ -72,8 +70,6 @@ export class Lobby {
   public createSyncEventFor(player: Player): PlayerEvent<LobbyData> {
     const data = this.getDataForPlayer(player);
     return {
-      // Dummy value
-      id: 0,
       type: LOBBY_CONSTANTS.LOBBY_STATE_EVENT,
       content: data,
     };

@@ -9,7 +9,6 @@ import { Lobby } from './Lobby';
  * @template T The content of the event, based on it's type
  */
 export type PlayerEvent<T> = {
-  id: number;
   type: string;
   content: T;
 };
@@ -29,7 +28,6 @@ export const priviligedPlayerDataSchema = playerDataSchema.extend({
   // Empty for future usage
 });
 
-// Create an extendable type of the schema to enforce it upon a class or somewhere else within TypeScript
 export type PlayerData = z.infer<typeof playerDataSchema>;
 export type PriviligedPlayerData = z.infer<typeof priviligedPlayerDataSchema>;
 
@@ -45,9 +43,8 @@ export class Player {
 
   private connectionState: ConnectionState = ConnectionState.Disconnected;
   private disconnectTimeout: NodeJS.Timeout | null = null;
-  // Event state
+
   private emitter: EventEmitter = new EventEmitter();
-  private lastEventId: number = 0;
 
   constructor(id: string, lobby: Lobby) {
     this.id = id;
@@ -121,7 +118,6 @@ export class Player {
   }
 
   public emit<T>(event: PlayerEvent<T>) {
-    event.id = ++this.lastEventId;
     this.emitter.emit('event', event);
   }
 }
