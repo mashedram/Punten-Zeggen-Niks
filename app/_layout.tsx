@@ -53,7 +53,7 @@ export default function RootLayout() {
   if (!remote_server_address)
     throw new Error('EXPO_PUBLIC_SERVER_ADDRESS is not defined');
 
-  const [trpcClient] = useState(() => {
+  const [tRPCClient] = useState(() => {
     // Networking init
     const wsClient = createWSClient({
       url: remote_server_address,
@@ -79,7 +79,7 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
+      <TRPCProvider queryClient={queryClient} trpcClient={tRPCClient}>
         <ThemeProvider
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <LobbyProvider>

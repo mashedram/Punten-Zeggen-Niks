@@ -1,5 +1,3 @@
-import { GameStartButton } from '@/components/lobby_host/GameStartButton';
-import { KickButton } from '@/components/lobby_host/KickButton';
 import { SettingsButton } from '@/components/lobby_host/SettingsButton';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -54,8 +52,7 @@ export default function LobbyPage() {
         <SettingsButton />
       </ThemedView>
       <ThemedView>
-        <GameStartButton />
-        <KickButton />
+        <Button title={'Start'} />
         <Button
           title={'return'}
           onPress={() => {
