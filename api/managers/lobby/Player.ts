@@ -26,7 +26,7 @@ export const playerDataSchema = z.object({
  * Includes publicly available data
  */
 export const priviligedPlayerDataSchema = playerDataSchema.extend({
-  token: z.string(),
+  // Empty for future usage
 });
 
 // Create an extendable type of the schema to enforce it upon a class or somewhere else within TypeScript
@@ -39,15 +39,11 @@ export enum ConnectionState {
 }
 
 export class Player {
-  /// The public ID of the player
   private id: string;
-  /// The private token used by the client to get privileged data
-  private token: string;
+  private authToken: string;
   private lobby: Lobby;
-  // Connection state
-  // The last timestamp on which an action was done
+
   private connectionState: ConnectionState = ConnectionState.Disconnected;
-  private lastConnectedTime: Date = new Date();
   private disconnectTimeout: NodeJS.Timeout | null = null;
   // Event state
   private emitter: EventEmitter = new EventEmitter();
@@ -55,7 +51,7 @@ export class Player {
 
   constructor(id: string, lobby: Lobby) {
     this.id = id;
-    this.token = crypto.randomUUID();
+    this.authToken = crypto.randomUUID();
     this.lobby = lobby;
   }
 
@@ -63,10 +59,14 @@ export class Player {
     return this.id;
   }
 
+  public checkAuthToken(token: string): boolean {
+    return this.authToken === token;
+  }
+
   /**
    * Called when the player is about to be removed
    */
-  public removing(): void {
+  public onRemoval(): void {
     if (this.disconnectTimeout) {
       clearTimeout(this.disconnectTimeout);
       this.disconnectTimeout = null;
@@ -78,16 +78,11 @@ export class Player {
   }
 
   public getToken(): PlayerToken {
-    return PlayerToken.fromPlayer(this);
-  }
-
-  public getLobby(): Lobby {
-    return this.lobby;
+    return new PlayerToken(this.lobby.getCode(), this.authToken);
   }
 
   public setConnected(state: ConnectionState) {
     this.connectionState = state;
-    this.lastConnectedTime = new Date();
 
     if (this.disconnectTimeout) {
       clearTimeout(this.disconnectTimeout);
@@ -114,15 +109,6 @@ export class Player {
   public getPrivilegedData(): PriviligedPlayerData {
     return {
       ...this.getPublicData(),
-      token: this.token,
-    };
-  }
-
-  public createEvent<T>(type: string, content: T): PlayerEvent<T> {
-    return {
-      id: ++this.lastEventId,
-      type,
-      content,
     };
   }
 
@@ -134,8 +120,8 @@ export class Player {
     });
   }
 
-  public emit<T>(type: string, content: T) {
-    const event = this.createEvent(type, content);
+  public emit<T>(event: PlayerEvent<T>) {
+    event.id = ++this.lastEventId;
     this.emitter.emit('event', event);
   }
 }

@@ -4,6 +4,7 @@ import {
   ConnectionState,
   Player,
   playerDataSchema,
+  PlayerEvent,
   priviligedPlayerDataSchema,
 } from './Player';
 import { PlayerToken } from './PlayerToken';
@@ -46,17 +47,9 @@ export class Lobby {
   /**
    * Called when the lobby is about to be removed
    */
-  public removing(): void {
+  public onRemoval(): void {
     for (const player of Object.values(this.players)) {
-      player.removing();
-    }
-  }
-
-  // Event methods
-
-  public broadcast(event: string, content: unknown) {
-    for (const player of Object.values(this.players)) {
-      player.emit(event, content);
+      player.onRemoval();
     }
   }
 
@@ -76,27 +69,37 @@ export class Lobby {
     };
   }
 
-  public syncWith(player: Player) {
+  public createSyncEventFor(player: Player): PlayerEvent<LobbyData> {
     const data = this.getDataForPlayer(player);
-    player.emit(LOBBY_CONSTANTS.LOBBY_STATE_EVENT, data);
+    return {
+      // Dummy value
+      id: 0,
+      type: LOBBY_CONSTANTS.LOBBY_STATE_EVENT,
+      content: data,
+    };
+  }
+
+  public syncWith(player: Player) {
+    const event = this.createSyncEventFor(player);
+    player.emit(event);
   }
 
   public syncOthers(player: Player) {
     for (const other of this.getActivePlayers()) {
       if (other === player) continue;
-      other.emit(
-        LOBBY_CONSTANTS.LOBBY_STATE_EVENT,
-        this.getDataForPlayer(other),
-      );
+      const event = this.createSyncEventFor(other);
+      other.emit(event);
     }
   }
 
-  public getPlayer(id: string): Player | undefined {
-    return this.players[id];
+  public getPlayer(playerToken: PlayerToken): Player | undefined {
+    return Object.values(this.players).find(p =>
+      p.checkAuthToken(playerToken.getPlayerAuthToken()),
+    );
   }
 
   /**
-   * Get all players that are currently in the lobby and are active (connected, not inactive, etc.)
+   * @returns all players that are currently in the lobby and are active (connected, not inactive, etc.)
    */
   public getActivePlayers(): Player[] {
     return Object.values(this.players).filter(
@@ -115,7 +118,7 @@ export class Lobby {
     const player = this.players[id];
     if (!player) return;
 
-    player.removing();
+    player.onRemoval();
     delete this.players[id];
 
     if (Object.keys(this.players).length === 0) {

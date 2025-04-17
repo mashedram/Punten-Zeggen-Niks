@@ -26,14 +26,13 @@ export class LobbyManager {
     const lobby = this.lobbies[code];
     if (!lobby) return;
 
-    lobby.removing();
+    lobby.onRemoval();
     delete this.lobbies[code];
   }
 
-  public getPlayer(token: PlayerToken): Player | undefined {
+  public getPlayerLobby(token: PlayerToken): Lobby | undefined {
     const lobby = this.getLobby(token.getLobbyCode());
-    if (!lobby) return;
 
-    return lobby.getPlayer(token.getPlayerId());
+    return lobby;
   }
 }
