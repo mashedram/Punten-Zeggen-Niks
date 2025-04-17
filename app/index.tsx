@@ -2,7 +2,6 @@ import { CreateButton } from '@/components/Home_page/CreateButton';
 import { JoinButton } from '@/components/Home_page/JoinButton';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { StyleSheet, Image } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 export default function HomePage() {

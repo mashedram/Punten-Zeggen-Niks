@@ -6,7 +6,6 @@ import {
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
@@ -23,7 +22,7 @@ import { TRPCProvider } from '@/api/query';
 import { LobbyProvider } from '@/hooks/useLobby';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(e => console.warn(e));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,7 +40,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch(e => console.warn(e));
     }
   }, [loaded]);
 

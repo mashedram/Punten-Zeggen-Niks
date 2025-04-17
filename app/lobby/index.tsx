@@ -1,8 +1,5 @@
 import { GameStartButton } from '@/components/lobby_host/GameStartButton';
 import { KickButton } from '@/components/lobby_host/KickButton';
-import { PlayerCount } from '@/components/lobby_host/PlayerCount';
-import { PlayerList } from '@/components/lobby_host/PlayerList';
-import { ReturnButton } from '@/components/lobby_host/ReturnButton';
 import { SettingsButton } from '@/components/lobby_host/SettingsButton';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
