@@ -1,9 +1,8 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useLobby } from '@/hooks/useLobby';
-import { Button } from '@/stories/Button';
 import { Link, useRouter } from 'expo-router';
-import { ScrollView, View } from 'react-native';
+import { Button, ScrollView, View } from 'react-native';
 
 export default function LobbyPage() {
   const lobby = useLobby();
@@ -27,7 +26,7 @@ export default function LobbyPage() {
           lobby.leave();
           router.navigate('/');
         }}
-        label="Leave"
+        title="Leave"
       />
       <ScrollView>
         {lobby.get()?.players.map(player => (
