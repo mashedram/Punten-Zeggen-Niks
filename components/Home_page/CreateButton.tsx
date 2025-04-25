@@ -1,6 +1,6 @@
 import { useLobby } from '@/hooks/useLobby';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 export const CreateButton = () => {
