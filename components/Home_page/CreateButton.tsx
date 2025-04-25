@@ -1,21 +1,38 @@
 import { useLobby } from '@/hooks/useLobby';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Button, Text, View } from 'react-native';
+import { Button, Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export const CreateButton = () => {
   const lobby = useLobby();
   const router = useRouter();
 
   return (
-    <View>
-      <Button
-        title={'Create a game'}
-        onPress={() => {
-          lobby.create();
-          router.navigate('/lobby');
-        }}
-      />
-    </View>
+    <TouchableOpacity
+      style={styles.createButton}
+      onPress={() => {
+        lobby.create();
+        router.navigate('/lobby');
+      }}>
+      <Text style={styles.createText}>Create a game</Text>
+    </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  createButton: {
+    width: '100%',
+    height: 45,
+    backgroundColor: 'white',
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  createText: {
+    color: '#665858',
+    marginTop: 16,
+    fontWeight: '700',
+    fontSize: 16,
+  },
+});

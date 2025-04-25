@@ -1,6 +1,5 @@
-import { CreateButton } from '@/components/Home_page/CreateButton';
-import { JoinButton } from '@/components/Home_page/JoinButton';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import React from 'react';
+
 import {
   View,
   Text,
@@ -11,14 +10,15 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import { ThemedView } from '@/components/ThemedView';
-import { Link } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
 export default function HomePage() {
   return (
     <SafeAreaView style={styles.container}>
+      {/* Top Bar */}
+      <View style={styles.topBar}></View>
+
       {/* Main Content */}
       <View style={styles.mainContent}>
         <View style={styles.profileBox} />
@@ -34,10 +34,20 @@ export default function HomePage() {
 
       {/* Bottom Card */}
       <View style={styles.bottomCard}>
-        <JoinButton />
-        <CreateButton />
+        <TouchableOpacity style={styles.joinButton}>
+          <Text style={styles.joinText}>JOIN ROOM</Text>
+        </TouchableOpacity>
 
-        <Text style={styles.Text}>Support</Text>
+        <Text style={styles.menuOption}>CREATE LOBBY</Text>
+        <Text style={styles.menuOption}>SETTINGS</Text>
+        <Text style={styles.menuOption}>SUPPORT</Text>
+      </View>
+
+      {/* Footer Nav */}
+      <View style={styles.footer}>
+        {[...Array(4)].map((_, i) => (
+          <View key={i} style={styles.footerIcon} />
+        ))}
       </View>
     </SafeAreaView>
   );
@@ -174,11 +184,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
-  Text: {
-    color: '#665858',
+  menuOption: {
     marginTop: 16,
-    fontWeight: '700',
     fontSize: 16,
+    fontWeight: '700',
+    color: '#665858',
   },
   footer: {
     flexDirection: 'row',

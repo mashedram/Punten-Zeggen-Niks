@@ -1,17 +1,31 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Button, Text, View } from 'react-native';
+import { Button, Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export const JoinButton = () => {
   const router = useRouter();
   return (
-    <View>
-      <Button
-        title={'Join a game'}
-        onPress={() => {
-          router.navigate('/lobby/join');
-        }}
-      />
-    </View>
+    <TouchableOpacity
+      style={styles.joinButton}
+      onPress={() => router.navigate('/lobby/join')}>
+      <Text style={styles.joinText}>Join a game</Text>
+    </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  joinButton: {
+    width: '100%',
+    height: 45,
+    backgroundColor: '#70C25C',
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  joinText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+});
