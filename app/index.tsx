@@ -1,7 +1,7 @@
 import { CreateButton } from '@/components/Home_page/CreateButton';
 import { JoinButton } from '@/components/Home_page/JoinButton';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { StyleSheet, Image } from 'react-native';
+import { StyleSheet, Image, Text } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 
 export default function HomePage() {
@@ -15,6 +15,8 @@ export default function HomePage() {
         />
       }>
       <ThemedView style={styles.container}>
+        <Text style={styles.gamePin}>Game Pin</Text>{' '}
+        {/* Toevoegen van Game Pin */}
         <JoinButton />
         <CreateButton />
       </ThemedView>
@@ -41,5 +43,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  gamePin: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16, // optioneel, om wat ruimte te geven
   },
 });
