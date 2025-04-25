@@ -1,18 +1,15 @@
 import { CreateButton } from '@/components/Home_page/CreateButton';
 import { JoinButton } from '@/components/Home_page/JoinButton';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   SafeAreaView,
   Dimensions,
   Platform,
   StatusBar,
 } from 'react-native';
-import { ThemedView } from '@/components/ThemedView';
-import { Link } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
