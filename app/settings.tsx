@@ -73,7 +73,6 @@ export default function Settingsv2() {
         {/* Player Count Adjustment */}
         <Text style={styles.sectionTitle}>Select player count</Text>
         <View style={styles.playerCountContainer}>
-          <Text style={styles.playerCountLabel}>Players in Lobby:</Text>
           <View style={styles.playerCountControls}>
             <TouchableOpacity
               style={styles.controlButton}
