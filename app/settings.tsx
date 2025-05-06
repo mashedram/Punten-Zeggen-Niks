@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Animated,
 } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 
@@ -63,7 +64,7 @@ export default function Settingsv2() {
                 </Text>
               </View>
               <TouchableOpacity onPress={() => toggleSwitch(index)}>
-                <Switch selected={selected} />
+                <AnimatedSwitch selected={selected} />
               </TouchableOpacity>
             </View>
           ))}
@@ -72,6 +73,7 @@ export default function Settingsv2() {
         {/* Player Count Adjustment */}
         <Text style={styles.sectionTitle}>Select player count</Text>
         <View style={styles.playerCountContainer}>
+          <Text style={styles.playerCountLabel}>Players in Lobby:</Text>
           <View style={styles.playerCountControls}>
             <TouchableOpacity
               style={styles.controlButton}
@@ -85,7 +87,7 @@ export default function Settingsv2() {
               onChangeText={text => {
                 const value = parseInt(text, 10);
                 if (!isNaN(value)) {
-                  setPlayerCount(Math.max(1, Math.min(value, 99)));
+                  setPlayerCount(Math.max(1, Math.min(value, 24)));
                 }
               }}
             />
@@ -106,14 +108,30 @@ export default function Settingsv2() {
   );
 }
 
-function Switch({ selected }: { selected: boolean }) {
+function AnimatedSwitch({ selected }: { selected: boolean }) {
+  const translateX = useRef(new Animated.Value(selected ? 48 : 0)).current;
+
+  React.useEffect(() => {
+    Animated.timing(translateX, {
+      toValue: selected ? 48 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [selected, translateX]);
+
   return (
     <View
       style={[
         styles.switch,
         selected ? styles.switchSelected : styles.switchUnselected,
       ]}>
-      <View style={styles.switchHandle}>
+      <Animated.View
+        style={[
+          styles.switchHandle,
+          {
+            transform: [{ translateX }],
+          },
+        ]}>
         {selected && (
           <Svg width="12" height="9" viewBox="0 0 12 9" fill="none">
             <Path
@@ -122,7 +140,7 @@ function Switch({ selected }: { selected: boolean }) {
             />
           </Svg>
         )}
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -174,25 +192,34 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     marginRight: 16,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   switchLabelText: {
     fontSize: 14,
     color: '#000000',
   },
   switch: {
-    width: 80,
+    width: 90,
     height: 40,
     borderRadius: 20,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
     justifyContent: 'center',
-    paddingHorizontal: 8,
+    backgroundColor: '#E6E0E9',
+    paddingHorizontal: 4,
   },
+
   switchSelected: {
-    backgroundColor: '#090909',
-    alignItems: 'flex-end',
+    backgroundColor: '#70C25C',
   },
+
   switchUnselected: {
     backgroundColor: '#E6E0E9',
-    alignItems: 'flex-start',
   },
   switchHandle: {
     width: 32,
@@ -201,6 +228,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 20,
@@ -218,6 +250,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F9F9',
     alignItems: 'center',
     width: '100%',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   playerCountLabel: {
     fontSize: 34,
@@ -238,6 +274,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#AE5CC2',
     borderRadius: 8,
     marginHorizontal: 8,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   controlButtonText: {
     fontSize: 34,
@@ -262,6 +302,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 12,
     marginTop: 16,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   confirmText: {
     fontSize: 18,
