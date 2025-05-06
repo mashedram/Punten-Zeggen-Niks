@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import { AnimatedSwitch } from '@/components/AnimatedSwitch';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,11 +8,13 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  Animated,
 } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 
 const { height } = Dimensions.get('window');
+
+const MIN_PLAYER_COUNT = 1;
+const MAX_PLAYER_COUNT = 24;
 
 export default function Settingsv2() {
   const [playerCount, setPlayerCount] = useState(1);
@@ -24,17 +27,18 @@ export default function Settingsv2() {
   ]);
 
   const toggleSwitch = (index: number) => {
-    setSwitchStates(prevStates =>
-      prevStates.map((state, i) => (i === index ? !state : state)),
-    );
+    setSwitchStates(prevStates => {
+      prevStates[index] = !prevStates[index];
+      return [...prevStates];
+    });
   };
 
   const incrementPlayerCount = () => {
-    setPlayerCount(prev => Math.min(prev + 1, 99));
+    setPlayerCount(prev => Math.min(prev + 1, MAX_PLAYER_COUNT));
   };
 
   const decrementPlayerCount = () => {
-    setPlayerCount(prev => Math.max(prev - 1, 1));
+    setPlayerCount(prev => Math.max(prev - 1, MIN_PLAYER_COUNT));
   };
 
   return (
@@ -86,7 +90,12 @@ export default function Settingsv2() {
               onChangeText={text => {
                 const value = parseInt(text, 10);
                 if (!isNaN(value)) {
-                  setPlayerCount(Math.max(1, Math.min(value, 24)));
+                  setPlayerCount(
+                    Math.max(
+                      MIN_PLAYER_COUNT,
+                      Math.min(value, MAX_PLAYER_COUNT),
+                    ),
+                  );
                 }
               }}
             />
@@ -103,43 +112,6 @@ export default function Settingsv2() {
           <Text style={styles.confirmText}>Confirm</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
-  );
-}
-
-function AnimatedSwitch({ selected }: { selected: boolean }) {
-  const translateX = useRef(new Animated.Value(selected ? 48 : 0)).current;
-
-  React.useEffect(() => {
-    Animated.timing(translateX, {
-      toValue: selected ? 48 : 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  }, [selected, translateX]);
-
-  return (
-    <View
-      style={[
-        styles.switch,
-        selected ? styles.switchSelected : styles.switchUnselected,
-      ]}>
-      <Animated.View
-        style={[
-          styles.switchHandle,
-          {
-            transform: [{ translateX }],
-          },
-        ]}>
-        {selected && (
-          <Svg width="12" height="9" viewBox="0 0 12 9" fill="none">
-            <Path
-              d="M4.36641 8.99994L0.566406 5.19994L1.51641 4.24994L4.36641 7.09994L10.4831 0.983276L11.4331 1.93328L4.36641 8.99994Z"
-              fill="#090909"
-            />
-          </Svg>
-        )}
-      </Animated.View>
     </View>
   );
 }
@@ -200,39 +172,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000000',
   },
-  switch: {
-    width: 90,
-    height: 40,
-    borderRadius: 20,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    justifyContent: 'center',
-    backgroundColor: '#E6E0E9',
-    paddingHorizontal: 4,
-  },
 
-  switchSelected: {
-    backgroundColor: '#70C25C',
-  },
-
-  switchUnselected: {
-    backgroundColor: '#E6E0E9',
-  },
-  switchHandle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
-  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
