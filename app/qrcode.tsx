@@ -1,7 +1,7 @@
+import { QrCode } from '@/components/QrCode';
 import { Link } from 'expo-router';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
 
 export default function Qrcodev2() {
   return (
@@ -14,7 +14,7 @@ export default function Qrcodev2() {
 
       {/* Witte kaart voor QR */}
       <View style={styles.card}>
-        <QRCode size={512} value="https://localhost:8081" />
+        <QrCode code={'test'} int={512} />
       </View>
 
       {/* Scan tekst */}
@@ -69,8 +69,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   qrImage: {
-    width: '100%', // Zorg ervoor dat de afbeelding zich aanpast aan de breedte van de kaart
-    height: '100%', // Zorg ervoor dat de afbeelding zich aanpast aan de hoogte van de kaart
+    width: '100%',
+    height: '100%',
     borderRadius: 10,
   },
   scanTextBox: {
