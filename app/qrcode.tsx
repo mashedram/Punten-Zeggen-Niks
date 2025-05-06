@@ -6,25 +6,20 @@ import { View, Text, StyleSheet } from 'react-native';
 export default function Qrcodev2() {
   return (
     <View style={styles.container}>
-      {/* Achtergrondkleur */}
       <View style={styles.background} />
 
-      {/* Titel */}
       <Text style={styles.title}>QR CODE</Text>
 
-      {/* Witte kaart voor QR */}
       <View style={styles.card}>
         <QrCode code={'test'} int={512} />
       </View>
 
-      {/* Scan tekst */}
       <Link href="/lobby">
         <View style={styles.scanTextBox}>
           <Text style={styles.scanText}>Terug naar lobby</Text>
         </View>
       </Link>
 
-      {/* Onderaan navigatiebalk */}
       <View style={styles.bottomBar} />
     </View>
   );
