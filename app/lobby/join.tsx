@@ -1,8 +1,10 @@
+import CodeInput from '@/components/CodeInput'; // Aangepaste inputcomponent voor PIN-code
+import { useLobby } from '@/hooks/useLobby'; // Lobby hook voor game-join functionaliteit
+import { useRouter } from 'expo-router'; // Navigatie hook van Expo Router
 import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   Pressable,
   StyleSheet,
   Alert,
@@ -12,18 +14,13 @@ import {
   Platform,
 } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window'); // Voor eventueel gebruik van schermdimensies
 
 export default function EnterPinScreen() {
-  const [pin, setPin] = useState('');
+  const lobby = useLobby(); // Lobby functionaliteit ophalen
+  const router = useRouter(); // Navigatie initialiseren
 
-  const handleSubmit = () => {
-    if (pin.length === 5) {
-      Alert.alert('PIN accepted', `Entered PIN: ${pin}`);
-    } else {
-      Alert.alert('Fout', 'De PIN moet 5 cijfers bevatten.');
-    }
-  };
+  const [code, setCode] = useState(''); // State voor de ingevoerde code (PIN)
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -31,30 +28,49 @@ export default function EnterPinScreen() {
         style={styles.screen}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.card}>
-          <TextInput
+          {/* Invoerveld voor de PIN-code */}
+          <CodeInput
+            code={code}
+            onChange={code => setCode(code as string)}
             style={styles.input}
-            placeholder="Game PIN"
+            placeholder="Enter game PIN"
             placeholderTextColor="#888"
-            keyboardType="numeric"
-            maxLength={5}
-            value={pin}
-            onChangeText={setPin}
           />
-          <Pressable style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Enter</Text>
+
+          {/* Knop om de ingevoerde code te wissen */}
+          <Pressable style={styles.clearButton} onPress={() => setCode('')}>
+            <Text style={styles.clearButtonText}>Code wissen</Text>
+          </Pressable>
+
+          {/* Knop om spel te joinen - alleen actief als er een code is ingevuld */}
+          <Pressable
+            style={[styles.button, !code && styles.buttonDisabled]}
+            onPress={() => {
+              if (!code.trim()) {
+                Alert.alert('Fout', 'Voer een PIN in om verder te gaan.');
+              } else {
+                lobby.join(code.trim()); // Join het spel met de ingevoerde code
+                router.push('/lobby'); // Navigeer naar de lobby-pagina
+              }
+            }}
+            disabled={!code.trim()} // Schakel knop uit als code leeg of alleen spaties is
+          >
+            <Text style={styles.buttonText}>Spel deelnemen</Text>
           </Pressable>
         </View>
-        {/* UI-component onderin (zoals Figma design) */}
+
+        {/* Decoratief onderste blok */}
         <View style={styles.rectangle47Container} />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
+// Stijlen voor componenten
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#5CA3C2',
+    backgroundColor: '#5CA3C2', // Blauwgroene achtergrond
   },
   screen: {
     flex: 1,
@@ -92,9 +108,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   button: {
-    backgroundColor: '#7ACF71',
+    backgroundColor: '#7ACF71', // Groene kleur voor actieve knop
     paddingVertical: 16,
-    paddingHorizontal: '10%',
     borderRadius: 12,
     width: '100%',
     alignItems: 'center',
@@ -103,11 +118,33 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
+    marginBottom: 24,
+  },
+  buttonDisabled: {
+    backgroundColor: '#A9A9A9', // Grijze kleur voor uitgeschakelde knop
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  clearButton: {
+    backgroundColor: '#FF6F61', // Rode knop voor wissen
+    paddingVertical: 12,
+    borderRadius: 12,
+    width: '100%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+    marginBottom: 16,
+  },
+  clearButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   rectangle47Container: {
     position: 'absolute',
