@@ -16,6 +16,9 @@ import {
   ImageBackground,
   Alert,
   Image,
+  SafeAreaView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { useState } from 'react';
@@ -50,7 +53,7 @@ export default function LobbyPage() {
   }
 
   return (
-    <ThemedView style={stylesheet.BackgroundContainer}>
+    <SafeAreaView style={stylesheet.BackgroundContainer}>
       <View style={stylesheet.Code}>
         <Text style={stylesheet.myVar}>{lobby.get()?.code}</Text>
       </View>
@@ -98,17 +101,17 @@ export default function LobbyPage() {
         </Text>
       </View>
 
-      <ThemedView>
+      <SafeAreaView>
         {activeLobby.players.map(player => (
           <View key={player.id}>
             <ThemedText>Player: {player.id}</ThemedText>
           </View>
         ))}
-      </ThemedView>
+      </SafeAreaView>
 
-      <View style={stylesheet.new}>
+      <View style={stylesheet.bottomCard}>
         <TouchableOpacity style={stylesheet.Container}>
-          <Text style={stylesheet.Play}>play</Text>
+          <Text style={stylesheet.Play}>Play</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={stylesheet.Container2}
@@ -116,10 +119,10 @@ export default function LobbyPage() {
             lobby.leave();
             router.navigate('/');
           }}>
-          <text style={stylesheet.Play}>return</text>
+          <Text style={stylesheet.Play}>Return</Text>
         </TouchableOpacity>
       </View>
-    </ThemedView>
+    </SafeAreaView>
   );
 }
 
@@ -132,11 +135,24 @@ const stylesheet = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     // display: "flex",
     // flexDirection: "column",
     // alignItems: "flex-start",
     // color: "rgba(92, 163, 194, 1)"
   },
+
+  bottomCard: {
+    width: '28%',
+    top: 30,
+    backgroundColor: 'white',
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    alignItems: 'center',
+  },
+
   Code: {
     marginVertical: 10,
     position: 'relative',
@@ -164,7 +180,7 @@ const stylesheet = StyleSheet.create({
     position: 'relative',
     flexShrink: 0,
     height: 45,
-    width: 197,
+    width: '100%',
     paddingTop: 4,
     paddingBottom: 3,
     backgroundColor: 'rgba(112, 194, 92, 1)',
@@ -178,10 +194,11 @@ const stylesheet = StyleSheet.create({
   },
 
   Container2: {
+    width: '100%',
+    height: 45,
     position: 'relative',
     flexShrink: 0,
-    height: 45,
-    width: 197,
+    flexGrow: 1,
     paddingTop: 4,
     paddingBottom: 3,
     backgroundColor: 'rgba(71, 72, 73, 1)',
@@ -190,7 +207,7 @@ const stylesheet = StyleSheet.create({
     justifyContent: 'center',
     columnGap: 10,
     paddingHorizontal: 59,
-    borderRadius: 12,
+    borderRadius: 15,
   },
 
   Play: {
@@ -198,8 +215,7 @@ const stylesheet = StyleSheet.create({
     flexShrink: 0,
     textAlign: 'left',
     color: 'rgba(255, 255, 255, 1)',
-    fontFamily: 'Inter',
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 700,
   },
 
@@ -209,7 +225,7 @@ const stylesheet = StyleSheet.create({
     flexShrink: 0,
     height: 35,
     width: 340,
-    backgroundColor: 'rgba(130, 134, 138, 1)',
+    backgroundColor: 'rgb(179,179,179)',
     shadowColor: 'rgba(0, 0, 0, 0.25)',
     shadowOffset: {
       width: 0,
@@ -376,10 +392,5 @@ const stylesheet = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 20,
-  },
-
-  new: {
-    display: 'flex',
-    flex: 1,
   },
 });
