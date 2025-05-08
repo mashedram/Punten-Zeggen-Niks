@@ -1,3 +1,12 @@
+/**
+ * Schermcomponent voor het invoeren van een game PIN-code.
+ * Gebruikt een aangepaste CodeInput-component, en laat de gebruiker
+ * deelnemen aan een lobby via de useLobby hook.
+ * Navigatie verloopt via Expo Router.
+ *
+ * @returns {JSX.Element} De weergave van het PIN-invoerscherm.
+ */
+
 import CodeInput from '@/components/CodeInput'; // Aangepaste inputcomponent voor PIN-code
 import { useLobby } from '@/hooks/useLobby'; // Lobby hook voor game-join functionaliteit
 import { useRouter } from 'expo-router'; // Navigatie hook van Expo Router
@@ -16,11 +25,18 @@ import {
 
 const { width, height } = Dimensions.get('window'); // Voor eventueel gebruik van schermdimensies
 
-export default function EnterPinScreen() {
-  const lobby = useLobby(); // Lobby functionaliteit ophalen
-  const router = useRouter(); // Navigatie initialiseren
+function EnterPinScreen() {
+  /** Lobby functionaliteit ophalen */
+  const lobby = useLobby();
 
-  const [code, setCode] = useState(''); // State voor de ingevoerde code (PIN)
+  /** Navigatie initialiseren via Expo Router */
+  const router = useRouter();
+
+  /**
+   * State voor de ingevoerde code (PIN)
+   * @type {[string, React.Dispatch<React.SetStateAction<string>>]}
+   */
+  const [code, setCode] = useState('');
 
   return (
     <SafeAreaView style={styles.safeArea}>
