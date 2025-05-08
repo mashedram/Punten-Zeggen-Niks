@@ -23,8 +23,6 @@ import {
   Platform,
 } from 'react-native';
 
-const { width, height } = Dimensions.get('window'); // Voor eventueel gebruik van schermdimensies
-
 function EnterPinScreen() {
   /** Lobby functionaliteit ophalen */
   const lobby = useLobby();
