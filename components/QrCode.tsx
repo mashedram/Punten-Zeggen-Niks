@@ -2,7 +2,7 @@ import QRCode from 'react-native-qrcode-svg';
 
 export interface QrCodeProps {
   code: string;
-  size: 512;
+  size: number;
 }
 
 export function QrCode(props: QrCodeProps) {

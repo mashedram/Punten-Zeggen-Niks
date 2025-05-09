@@ -1,5 +1,6 @@
 import { CreateButton } from '@/components/Home_page/CreateButton';
 import { JoinButton } from '@/components/Home_page/JoinButton';
+import { Image } from 'react-native';
 
 import {
   View,
@@ -16,20 +17,13 @@ const { width } = Dimensions.get('window');
 export default function HomePage() {
   return (
     <SafeAreaView style={styles.container}>
-      {/* Main Content */}
       <View style={styles.mainContent}>
-        <View style={styles.profileBox} />
-        <View style={styles.levelInfo}>
-          <Text style={styles.levelNumber}>05</Text>
-          <Text style={styles.levelLabel}>LEVEL</Text>
-        </View>
-        <View style={styles.progressBar}>
-          <View style={styles.progressFill} />
-        </View>
-        <Text style={styles.progressText}>133 / 200</Text>
+        <Image
+          source={require('../assets/images/Socket.png')}
+          style={styles.profileImage}
+        />
       </View>
 
-      {/* Bottom Card */}
       <View style={styles.bottomCard}>
         <JoinButton />
         <CreateButton />
@@ -87,7 +81,7 @@ const styles = StyleSheet.create({
   },
 
   batteryLevel: {
-    width: '50%', // pas aan op basis van percentage
+    width: '50%',
     height: '100%',
     backgroundColor: 'black',
     borderRadius: 2,
@@ -106,14 +100,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-  },
-  profileBox: {
-    width: width * 0.4,
-    maxWidth: 150,
-    aspectRatio: 1,
-    backgroundColor: '#D9D9D9',
-    borderRadius: 100,
-    elevation: 4,
   },
   levelInfo: {
     alignItems: 'flex-start',
@@ -192,5 +178,15 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 2,
     borderColor: 'white',
+  },
+  profileImage: {
+    width: Math.min(width * 0.9, 400),
+    resizeMode: 'contain',
+    marginVertical: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 });
