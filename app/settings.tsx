@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
+import { Link } from 'expo-router';
 
 const { height } = Dimensions.get('window');
 
@@ -46,12 +47,14 @@ export default function Settingsv2() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton}>
-          <Svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <Path
-              d="M7.04199 15.6667L16.3753 25.0001L14.0003 27.3334L0.666992 14.0001L14.0003 0.666748L16.3753 3.00008L7.04199 12.3334H27.3337V15.6667H7.04199Z"
-              fill="white"
-            />
-          </Svg>
+          <Link href="/lobby">
+            <Svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <Path
+                d="M7.04199 15.6667L16.3753 25.0001L14.0003 27.3334L0.666992 14.0001L14.0003 0.666748L16.3753 3.00008L7.04199 12.3334H27.3337V15.6667H7.04199Z"
+                fill="white"
+              />
+            </Svg>
+          </Link>
         </TouchableOpacity>
         <Text style={styles.headerText}>Settings</Text>
       </View>
