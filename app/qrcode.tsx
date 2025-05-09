@@ -11,7 +11,7 @@ export default function Qrcodev2() {
       <Text style={styles.title}>QR CODE</Text>
 
       <View style={styles.card}>
-        <QrCode code={'test'} int={512} />
+        <QrCode code={'test'} size={512} />
       </View>
 
       <Link href="/lobby">
