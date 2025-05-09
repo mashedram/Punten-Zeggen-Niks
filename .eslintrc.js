@@ -8,4 +8,9 @@ module.exports = {
   rules: {
     'no-undef': 0,
   },
+  settings: {
+    'import/resolver': {
+      typescript: {},
+    },
+  },
 };
