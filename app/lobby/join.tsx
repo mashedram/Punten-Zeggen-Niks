@@ -23,7 +23,7 @@ import {
   Platform,
 } from 'react-native';
 
-function EnterPinScreen() {
+export default function EnterPinScreen() {
   /** Lobby functionaliteit ophalen */
   const lobby = useLobby();
 
