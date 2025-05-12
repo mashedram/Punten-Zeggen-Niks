@@ -1,30 +1,36 @@
 import { useThemeColor } from '@/hooks/useThemeColor';
 import React from 'react';
-import { StyleSheet, TextInput, TextInputProps } from 'react-native';
+import {
+  ButtonProps,
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+} from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
 export type CodeInputProps = TextInputProps & {
   lightColor?: string;
   darkColor?: string;
-  onSubmit: (code: string) => void;
+  code: string;
+  onChange: (code: string) => void;
 };
 
 const CodeInput = ({
   lightColor,
   darkColor,
-  onSubmit,
+  onChange,
+  code,
   ...rest
 }: CodeInputProps) => {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
-  const [number, setNumber] = React.useState('');
 
   const onChangeCode = (text: string) => {
     const cleanedValue = text.replace(/[^0-9]/g, '');
     if (cleanedValue.length > 6) {
-      setNumber(cleanedValue.slice(0, 6));
+      onChange(cleanedValue.slice(0, 6));
       return;
     }
-    setNumber(cleanedValue);
+    onChange(cleanedValue);
   };
 
   return (
@@ -33,11 +39,10 @@ const CodeInput = ({
         <TextInput
           style={[{ color }, styles.input]}
           keyboardType="numeric"
-          value={number}
+          value={code}
           onChangeText={onChangeCode}
           {...rest}
         />
-        <button onClick={() => onSubmit(number)}>Join</button>
       </SafeAreaView>
     </SafeAreaProvider>
   );

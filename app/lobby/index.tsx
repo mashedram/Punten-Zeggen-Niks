@@ -1,18 +1,15 @@
 import { SettingsButton } from '@/components/lobby_host/SettingsButton';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useLobby } from '@/hooks/useLobby';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
+import { StyleSheet } from 'react-native';
+import { useState } from 'react';
+
 import {
-  Button,
-  ScrollView,
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
   ImageBackground,
   Alert,
   Image,
@@ -21,6 +18,8 @@ import {
   StatusBar,
 } from 'react-native';
 import { StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { QrButton } from '@/components/lobby_host/QrButton';
 
 export default function LobbyPage() {
   const lobby = useLobby();
@@ -46,6 +45,9 @@ export default function LobbyPage() {
   return (
     <SafeAreaView style={stylesheet.BackgroundContainer}>
       <View style={stylesheet.Code}>
+        <View style={stylesheet.QrButton}>
+          <QrButton />
+        </View>
         <Text style={stylesheet.myVar}>{lobby.get()?.code}</Text>
       </View>
 
@@ -83,9 +85,12 @@ export default function LobbyPage() {
           />
         </View>
         <View style={stylesheet.check} />
-        <Text style={stylesheet.title}>
-          Players: {activeLobby.players.length}/8
-        </Text>
+        <View style={stylesheet.settingsAndPlayers}>
+          <SettingsButton />
+          <Text style={stylesheet.title}>
+            Players: {activeLobby.players.length}/8
+          </Text>
+        </View>
       </View>
 
       <SafeAreaView>
@@ -144,14 +149,16 @@ const stylesheet = StyleSheet.create({
     width: 394,
     backgroundColor: 'rgba(71, 72, 73, 1)',
     display: 'flex',
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    columnGap: 10,
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
     borderRadius: 8,
   },
 
   myVar: {
     position: 'relative',
+    marginRight: 125,
     flexShrink: 0,
     textAlign: 'left',
     color: 'rgba(255, 255, 255, 1)',
@@ -207,6 +214,7 @@ const stylesheet = StyleSheet.create({
     color: 'rgb(255, 255, 255)',
     position: 'relative',
     flexShrink: 0,
+    marginTop: 10,
     height: 35,
     width: 340,
     backgroundColor: 'rgb(179,179,179)',
@@ -258,15 +266,6 @@ const stylesheet = StyleSheet.create({
     paddingVertical: 0,
   },
 
-  group43: {
-    position: 'absolute',
-    flexShrink: 0,
-    top: 53,
-    height: 274,
-    left: 13,
-    width: 344,
-  },
-
   list: {
     position: 'absolute',
     flexShrink: 0,
@@ -303,6 +302,7 @@ const stylesheet = StyleSheet.create({
   crownicondesignontransparentbackgroundPNGremovebgpreview2: {
     position: 'absolute',
     flexShrink: 0,
+    marginTop: 10,
     top: 18,
     left: 17,
     width: 20,
@@ -322,19 +322,24 @@ const stylesheet = StyleSheet.create({
     alignItems: 'flex-start',
     rowGap: 0,
   },
-
+  settingsAndPlayers: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+    marginLeft: 10,
+    marginRight: 190,
+    marginTop: -275,
+  },
   title: {
-    position: 'absolute',
-    flexShrink: 0,
-    top: 17,
-    left: 135,
-    width: 214,
-    height: 24,
-    textAlign: 'left',
+    textAlign: 'center',
     color: 'rgba(0, 0, 0, 1)',
     fontFamily: 'Inter',
     fontSize: 20,
-    fontWeight: 400,
+    fontWeight: '400',
+    marginLeft: 10,
   },
 
   rectangle35Container: {
@@ -365,5 +370,8 @@ const stylesheet = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 20,
+  },
+  QrButton: {
+    marginRight: 10,
   },
 });

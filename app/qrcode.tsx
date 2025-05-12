@@ -1,7 +1,9 @@
 import { QrCode } from '@/components/QrCode';
 import { Link } from 'expo-router';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 export default function Qrcodev2() {
   return (
@@ -11,7 +13,7 @@ export default function Qrcodev2() {
       <Text style={styles.title}>QR CODE</Text>
 
       <View style={styles.card}>
-        <QrCode code={'test'} int={512} />
+        <QrCode code={'test'} size={Math.min(width * 0.8, 300)} />
       </View>
 
       <Link href="/lobby">
@@ -19,8 +21,6 @@ export default function Qrcodev2() {
           <Text style={styles.scanText}>Terug naar lobby</Text>
         </View>
       </Link>
-
-      <View style={styles.bottomBar} />
     </View>
   );
 }
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#5CA3C2',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 60,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
   },
   background: {
     ...StyleSheet.absoluteFillObject,
@@ -39,39 +39,28 @@ const styles = StyleSheet.create({
   },
   title: {
     color: 'white',
-    fontSize: 32,
+    fontSize: width > 400 ? 32 : 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textShadowColor: 'rgba(0, 0, 0, 0.25)',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 10,
   },
-  backButton: {
-    position: 'absolute',
-    top: 66,
-    left: 16,
-    padding: 8,
-  },
   card: {
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 10,
-    width: 323,
-    height: 323,
+    width: Math.min(width * 0.9, 350),
+    height: Math.min(width * 0.9, 350),
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 50,
     elevation: 5,
-  },
-  qrImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 10,
   },
   scanTextBox: {
     backgroundColor: 'white',
     borderRadius: 10,
-    marginTop: 24,
+    marginTop: 80,
     paddingHorizontal: 20,
     paddingVertical: 10,
     shadowColor: '#000',
@@ -81,7 +70,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   scanText: {
-    fontSize: 17,
+    fontSize: width > 400 ? 17 : 14,
     fontWeight: 'bold',
     color: 'black',
     textAlign: 'center',
@@ -89,7 +78,7 @@ const styles = StyleSheet.create({
   bottomBar: {
     position: 'absolute',
     bottom: 0,
-    height: 100,
+    height: height * 0.1,
     width: '100%',
     backgroundColor: 'white',
     borderTopLeftRadius: 36,
