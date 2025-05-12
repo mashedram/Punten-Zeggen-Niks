@@ -21,25 +21,16 @@ import {
   StatusBar,
 } from 'react-native';
 import { StyleSheet } from 'react-native';
-import { useState } from 'react';
 
 export default function LobbyPage() {
   const lobby = useLobby();
   const router = useRouter();
-
   const activeLobby = lobby.get();
-
-  const [notPressed, pressed] = useState(true);
 
   const handlePress = () => {
     Alert.alert('Je hebt op de afbeelding gedrukt!');
-    pressed(!notPressed);
   };
-  const items: { id: number; name: string }[] = [
-    { id: 1, name: 'naam' },
-    // { id: 2, name: '' },
-    // { id: 3, name: '' }
-  ];
+  const items: { id: number; name: string }[] = [{ id: 1, name: 'naam' }];
 
   if (!activeLobby) {
     return (
@@ -72,7 +63,6 @@ export default function LobbyPage() {
       <View style={stylesheet.spelerlijstContainer}>
         <View style={stylesheet.titlebar} />
         <View style={stylesheet.list}>
-          {/* Visualwind:: can be replaced with <Itembox type={"logo"} /> */}
           <View style={stylesheet.itembox}>
             {items.map(item => (
               <Text
@@ -91,10 +81,7 @@ export default function LobbyPage() {
               uri: 'https://cdn-icons-png.flaticon.com/512/57/57113.png',
             }}
           />
-
-          <View style={stylesheet.plus} />
         </View>
-        {/* Visualwind:: can be replaced with <Check /> */}
         <View style={stylesheet.check} />
         <Text style={stylesheet.title}>
           Players: {activeLobby.players.length}/8
@@ -136,10 +123,6 @@ const stylesheet = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    // display: "flex",
-    // flexDirection: "column",
-    // alignItems: "flex-start",
-    // color: "rgba(92, 163, 194, 1)"
   },
 
   bottomCard: {
@@ -166,6 +149,7 @@ const stylesheet = StyleSheet.create({
     columnGap: 10,
     borderRadius: 8,
   },
+
   myVar: {
     position: 'relative',
     flexShrink: 0,
@@ -261,6 +245,7 @@ const stylesheet = StyleSheet.create({
     paddingHorizontal: 0,
     borderRadius: 8,
   },
+
   titlebar: {
     position: 'relative',
     flexShrink: 0,
@@ -301,9 +286,7 @@ const stylesheet = StyleSheet.create({
     top: 12,
     left: -4,
     width: 340,
-
     shadowColor: 'rgba(255, 255, 255, 0.25)',
-
     shadowRadius: 4,
     display: 'flex',
     alignItems: 'center',
@@ -316,6 +299,7 @@ const stylesheet = StyleSheet.create({
     position: 'relative',
     flexShrink: 0,
   },
+
   crownicondesignontransparentbackgroundPNGremovebgpreview2: {
     position: 'absolute',
     flexShrink: 0,
@@ -326,19 +310,6 @@ const stylesheet = StyleSheet.create({
     color: 'rgb(255, 255, 255)',
   },
 
-  plus: {
-    position: 'absolute',
-    flexShrink: 0,
-    top: 139,
-    height: 40,
-    left: 19,
-    width: 40,
-    transform: 'rotateZ(-134.62deg)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    rowGap: 0,
-  },
   check: {
     position: 'absolute',
     flexShrink: 0,
@@ -351,6 +322,7 @@ const stylesheet = StyleSheet.create({
     alignItems: 'flex-start',
     rowGap: 0,
   },
+
   title: {
     position: 'absolute',
     flexShrink: 0,
@@ -364,6 +336,7 @@ const stylesheet = StyleSheet.create({
     fontSize: 20,
     fontWeight: 400,
   },
+
   rectangle35Container: {
     display: 'flex',
     position: 'relative',
