@@ -4,8 +4,6 @@ import { useLobby } from '@/hooks/useLobby';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { useState } from 'react';
-
 import {
   View,
   Text,
@@ -17,8 +15,6 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import { StyleSheet } from 'react-native';
-import { useState } from 'react';
 import { QrButton } from '@/components/lobby_host/QrButton';
 
 export default function LobbyPage() {
