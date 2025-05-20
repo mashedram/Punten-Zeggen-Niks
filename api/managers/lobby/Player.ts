@@ -3,6 +3,10 @@ import { z } from 'zod';
 import { PlayerToken } from './PlayerToken';
 import { LOBBY_CONSTANTS } from './LobbyManager';
 import { Lobby } from './Lobby';
+import {
+  PlayerGameData as PlayerGameData,
+  PlayerGameDataSchema as PlayerGameDataSchema,
+} from '@/api/game/player/PlayerGameData';
 
 /**
  * A type that defines a player event
@@ -18,6 +22,8 @@ export type PlayerEvent<T> = {
  */
 export const playerDataSchema = z.object({
   id: z.string(),
+  isAdmin: z.boolean(),
+  gameData: PlayerGameDataSchema,
 });
 
 /**
@@ -37,27 +43,37 @@ export enum ConnectionState {
 }
 
 export class Player {
-  private id: string;
-  private authToken: string;
-  private lobby: Lobby;
+  private _id: string;
+  private _authToken: string;
+  private _isAdmin: boolean;
+  private _lobby: Lobby;
+
+  private _gameData: PlayerGameData = {
+    gameId: undefined,
+  };
 
   private connectionState: ConnectionState = ConnectionState.Disconnected;
   private disconnectTimeout: NodeJS.Timeout | null = null;
 
   private emitter: EventEmitter = new EventEmitter();
 
-  constructor(id: string, lobby: Lobby) {
-    this.id = id;
-    this.authToken = crypto.randomUUID();
-    this.lobby = lobby;
+  constructor(id: string, isAdmin: boolean, lobby: Lobby) {
+    this._id = id;
+    this._isAdmin = isAdmin;
+    this._authToken = crypto.randomUUID();
+    this._lobby = lobby;
   }
 
   public getId(): string {
-    return this.id;
+    return this._id;
   }
 
   public checkAuthToken(token: string): boolean {
-    return this.authToken === token;
+    return this._authToken === token;
+  }
+
+  public setGameData(gameData: PlayerGameData) {
+    this._gameData = gameData;
   }
 
   /**
@@ -71,11 +87,19 @@ export class Player {
   }
 
   public sync(): void {
-    this.lobby.syncOthers(this);
+    this._lobby.syncOthers(this);
   }
 
   public getToken(): PlayerToken {
-    return new PlayerToken(this.lobby.getCode(), this.authToken);
+    return new PlayerToken(this._lobby.getCode(), this._authToken);
+  }
+
+  public isAdmin(): boolean {
+    return this._isAdmin;
+  }
+
+  public setAdmin(value: boolean) {
+    this._isAdmin = value;
   }
 
   public setConnected(state: ConnectionState) {
@@ -88,7 +112,7 @@ export class Player {
 
     if (state === ConnectionState.Disconnected) {
       this.disconnectTimeout = setTimeout(() => {
-        this.lobby.removePlayer(this.getId());
+        this._lobby.removePlayer(this.getId());
       }, LOBBY_CONSTANTS.DISCONNECT_TIMEOUT_MS);
     }
   }
@@ -99,7 +123,9 @@ export class Player {
 
   public getPublicData(): PlayerData {
     return {
-      id: this.id,
+      id: this._id,
+      isAdmin: this._isAdmin,
+      gameData: this._gameData,
     };
   }
 
