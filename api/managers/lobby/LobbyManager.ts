@@ -1,5 +1,4 @@
 import { Lobby } from './Lobby';
-import { Player } from './Player';
 import { PlayerToken } from './PlayerToken';
 
 export const LOBBY_CONSTANTS = {

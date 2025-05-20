@@ -8,6 +8,11 @@ import {
   priviligedPlayerDataSchema,
 } from './Player';
 import { PlayerToken } from './PlayerToken';
+import {
+  LobbyGameData,
+  LobbyGameDataSchema,
+} from '@/api/game/lobby/LobbyGameData';
+import { GameType, GameTypes } from '@/api/game/GameType';
 
 function generateRandomCode(length: number): string {
   let value = '';
@@ -24,6 +29,7 @@ function generateRandomCode(length: number): string {
  */
 export const lobbyDataSchema = z.object({
   code: z.string(),
+  game: LobbyGameDataSchema,
   self: priviligedPlayerDataSchema,
   players: z.array(playerDataSchema),
 });
@@ -34,8 +40,12 @@ export class Lobby {
   private manager: LobbyManager;
 
   code: string;
-  private players: { [id: string]: Player } = {};
-  private playerIdCounter = 0;
+  private _gameType: GameType<never, never> | undefined;
+  private _gameData: LobbyGameData = {
+    gameId: undefined,
+  };
+  private _players: { [id: string]: Player } = {};
+  private _playerIdCounter = 0;
 
   constructor(manager: LobbyManager) {
     this.manager = manager;
@@ -46,7 +56,7 @@ export class Lobby {
    * Called when the lobby is about to be removed
    */
   public onRemoval(): void {
-    for (const player of Object.values(this.players)) {
+    for (const player of Object.values(this._players)) {
       player.onRemoval();
     }
   }
@@ -57,9 +67,25 @@ export class Lobby {
     return this.code;
   }
 
+  public getGameType(): LobbyGameData {
+    return this._gameData;
+  }
+
+  public setGame(gameId: string) {
+    const type = GameTypes.find(g => g.id === gameId);
+    if (!type) throw new Error('Game not found');
+    this._gameType = type as GameType<never, never>;
+    this._gameData = type.createLobbyData();
+    for (const player of Object.values(this._players)) {
+      player.setGameData(type.createPlayerData(player));
+    }
+    this.sync();
+  }
+
   public getDataForPlayer(player: Player): LobbyData {
     return {
       code: this.code,
+      game: this._gameData,
       self: player.getPrivilegedData(),
       players: this.getActivePlayers()
         .filter(p => p !== player)
@@ -73,6 +99,13 @@ export class Lobby {
       type: LOBBY_CONSTANTS.LOBBY_STATE_EVENT,
       content: data,
     };
+  }
+
+  public sync() {
+    for (const player of this.getActivePlayers()) {
+      const event = this.createSyncEventFor(player);
+      player.emit(event);
+    }
   }
 
   public syncWith(player: Player) {
@@ -89,7 +122,7 @@ export class Lobby {
   }
 
   public getPlayer(playerToken: PlayerToken): Player | undefined {
-    return Object.values(this.players).find(p =>
+    return Object.values(this._players).find(p =>
       p.checkAuthToken(playerToken.getPlayerAuthToken()),
     );
   }
@@ -98,27 +131,39 @@ export class Lobby {
    * @returns all players that are currently in the lobby and are active (connected, not inactive, etc.)
    */
   public getActivePlayers(): Player[] {
-    return Object.values(this.players).filter(
+    return Object.values(this._players).filter(
       p => p.getConnectionState() === ConnectionState.Connected,
     );
   }
 
   public createPlayer(): Player {
-    const id = this.playerIdCounter++;
-    const player = new Player(id.toString(), this);
-    this.players[player.getId()] = player;
+    const id = this._playerIdCounter++;
+    const player = new Player(id.toString(), false, this);
+    if (this._gameType) {
+      player.setGameData(this._gameType.createPlayerData(player));
+    }
+    this._players[player.getId()] = player;
     return player;
   }
 
   public removePlayer(id: string) {
-    const player = this.players[id];
+    const player = this._players[id];
     if (!player) return;
 
     player.onRemoval();
-    delete this.players[id];
+    delete this._players[id];
 
-    if (Object.keys(this.players).length === 0) {
+    if (Object.keys(this._players).length === 0) {
       this.manager.deleteLobby(this.getCode());
+      return;
+    }
+
+    if (
+      player.isAdmin() &&
+      !Object.values(this._players).some(p => p.isAdmin())
+    ) {
+      const newAdmin = Object.values(this._players).find(p => !p.isAdmin());
+      newAdmin?.setAdmin(true);
     }
   }
 }

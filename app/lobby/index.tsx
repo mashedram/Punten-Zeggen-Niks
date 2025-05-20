@@ -1,7 +1,12 @@
 import { SettingsButton } from '@/components/lobby_host/SettingsButton';
 import { ThemedText } from '@/components/ThemedText';
 import { useLobby } from '@/hooks/useLobby';
-import { Link, useRouter } from 'expo-router';
+import {
+  ExternalPathString,
+  Link,
+  Redirect,
+  useRouter,
+} from 'expo-router';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import {
@@ -25,7 +30,10 @@ export default function LobbyPage() {
   const handlePress = () => {
     Alert.alert('Je hebt op de afbeelding gedrukt!');
   };
-  const items: { id: number; name: string }[] = [{ id: 1, name: 'naam' }];
+  const items: { id: number; name: string }[] = [
+    { id: 1, name: 'naam' },
+    { id: 2, name: 'naam2' },
+  ];
 
   if (!activeLobby) {
     return (
@@ -37,6 +45,16 @@ export default function LobbyPage() {
       </View>
     );
   }
+
+  if (activeLobby.game.gameId) {
+    return (
+      <Redirect href={`/${activeLobby.game.gameId}` as ExternalPathString} />
+    );
+  }
+
+  const canStart =
+    process.env.NODE_ENV === 'development' ||
+    (activeLobby.players.length >= 2 && activeLobby.self.isAdmin);
 
   return (
     <SafeAreaView style={stylesheet.BackgroundContainer}>
@@ -98,7 +116,17 @@ export default function LobbyPage() {
       </SafeAreaView>
 
       <View style={stylesheet.bottomCard}>
-        <TouchableOpacity style={stylesheet.Container}>
+        <TouchableOpacity
+          style={
+            canStart
+              ? stylesheet.Container
+              : stylesheet.PlayButtonContainerDisabled
+          }
+          onPress={() => {
+            if (activeLobby.game.gameId) return;
+            lobby.setGame(StrategoGameId);
+          }}
+          disabled={!canStart}>
           <Text style={stylesheet.Play}>Play</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -171,6 +199,23 @@ const stylesheet = StyleSheet.create({
     paddingTop: 4,
     paddingBottom: 3,
     backgroundColor: 'rgba(112, 194, 92, 1)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    columnGap: 10,
+    paddingHorizontal: 59,
+    borderRadius: 12,
+    marginVertical: 10,
+  },
+
+  PlayButtonContainerDisabled: {
+    position: 'relative',
+    flexShrink: 0,
+    height: 45,
+    width: '100%',
+    paddingTop: 4,
+    paddingBottom: 3,
+    backgroundColor: 'rgb(82, 82, 82)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
