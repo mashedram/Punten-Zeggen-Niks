@@ -36,7 +36,6 @@ export const priviligedPlayerDataSchema = playerDataSchema.extend({
 
 export type PlayerData = z.infer<typeof playerDataSchema>;
 export type PriviligedPlayerData = z.infer<typeof priviligedPlayerDataSchema>;
-
 export enum ConnectionState {
   Connected,
   Disconnected,

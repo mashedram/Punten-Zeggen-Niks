@@ -143,6 +143,7 @@ export class Lobby {
       player.setGameData(this._gameType.createPlayerData(player));
     }
     this._players[player.getId()] = player;
+    this.manager.emit('playerCreated', this, player);
     return player;
   }
 
@@ -150,6 +151,7 @@ export class Lobby {
     const player = this._players[id];
     if (!player) return;
 
+    this.manager.emit('playerRemoving', this, player);
     player.onRemoval();
     delete this._players[id];
 
