@@ -14,14 +14,25 @@ import { useMMKVString } from 'react-native-mmkv';
 
 type LobbyEventCallback = (event: PlayerEvent<unknown>) => void;
 
-export interface LobbyState {
-  get: () => LobbyData | null;
-  setEventHandler: (callback: LobbyEventCallback) => void;
-  join: (code: string) => void;
-  create: () => void;
-  leave: () => void;
-  setGame: (gameId: string) => void;
-}
+export type LobbyState =
+  | {
+      loading: false;
+      inLobby: true;
+      getToken: () => string;
+      get: () => LobbyData | null;
+      setEventHandler: (callback: LobbyEventCallback) => void;
+      leave: () => void;
+      setGame: (gameId: string) => void;
+    }
+  | {
+      loading: false;
+      inLobby: false;
+      join: (code: string) => void;
+      create: () => void;
+    }
+  | {
+      loading: true;
+    };
 
 const PlayerDataContext = createContext<LobbyState | null>(null);
 
@@ -118,11 +129,34 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
     eventCallbackRef.current = callback;
   }, []);
 
+  if (!token) {
+    return (
+      <PlayerDataContext.Provider
+        value={{
+          loading: false,
+          inLobby: false,
+          join: joinLobbyCallback,
+          create: createLobbyCallback,
+        }}>
+        {children}
+      </PlayerDataContext.Provider>
+    );
+  }
+
+  if (!lobbyState) {
+    return (
+      <PlayerDataContext.Provider value={{ loading: true }}>
+        {children}
+      </PlayerDataContext.Provider>
+    );
+  }
+
   const state: LobbyState = {
+    loading: false,
+    inLobby: true,
+    getToken: () => token,
     get: getLobby,
     setEventHandler: setEventHandler,
-    join: joinLobbyCallback,
-    create: createLobbyCallback,
     leave: leaveLobbyCallback,
     setGame: setGameCallback,
   };

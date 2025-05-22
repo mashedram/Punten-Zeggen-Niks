@@ -75,6 +75,10 @@ export class Player {
     this._gameData = gameData;
   }
 
+  public getGameData<T extends PlayerGameData>(): T {
+    return this._gameData as T;
+  }
+
   /**
    * Called when the player is about to be removed
    */
@@ -86,6 +90,10 @@ export class Player {
   }
 
   public sync(): void {
+    this._lobby.syncWith(this);
+  }
+
+  public syncToOthers(): void {
     this._lobby.syncOthers(this);
   }
 

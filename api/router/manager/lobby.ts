@@ -1,4 +1,4 @@
-import { lobbyManager, LobbyManager } from '@/api/managers/lobby/LobbyManager';
+import { lobbyManager } from '@/api/managers/lobby/LobbyManager';
 import { ConnectionState } from '@/api/managers/lobby/Player';
 import { PlayerToken } from '@/api/managers/lobby/PlayerToken';
 import { publicProcedure, router } from '@/api/server';
@@ -51,12 +51,12 @@ export const lobbyRouter = router({
       yield lobby.createSyncEventFor(player);
 
       player.setConnected(ConnectionState.Connected);
-      player.sync();
+      player.syncToOthers();
 
       if (signal) {
         signal.addEventListener('abort', () => {
           player.setConnected(ConnectionState.Disconnected);
-          player.sync();
+          player.syncToOthers();
         });
       } else {
         console.warn(
