@@ -3,9 +3,6 @@ import { ThemedText } from '@/components/ThemedText';
 import { useLobby } from '@/hooks/useLobby';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet } from 'react-native';
-import { useState } from 'react';
-
 import {
   View,
   Text,
@@ -19,6 +16,7 @@ import {
 } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { QrButton } from '@/components/lobby_host/QrButton';
 
 export default function LobbyPage() {
@@ -29,7 +27,16 @@ export default function LobbyPage() {
   const handlePress = () => {
     Alert.alert('Je hebt op de afbeelding gedrukt!');
   };
-  const items: { id: number; name: string }[] = [{ id: 1, name: 'naam' }];
+
+  type Item = {
+    id: number;
+    name: string;
+    host: boolean;
+  };
+
+  const [items, setItems] = useState<Item[]>([
+    { id: 1, name: 'naam', host: true },
+  ]);
 
   if (!activeLobby) {
     return (
@@ -44,45 +51,41 @@ export default function LobbyPage() {
 
   return (
     <SafeAreaView style={stylesheet.BackgroundContainer}>
-      <View style={stylesheet.Code}>
+      <View style={stylesheet.CodeContainer}>
         <View style={stylesheet.QrButton}>
           <QrButton />
         </View>
-        <Text style={stylesheet.myVar}>{lobby.get()?.code}</Text>
+        <Text style={stylesheet.Cijfercode}>{lobby.get()?.code}</Text>
       </View>
 
-      <View style={stylesheet.rectangle35Container}>
+      <View style={stylesheet.StrategoContainer}>
         <TouchableOpacity onPress={handlePress}>
           <Image
-            source={{
-              uri: 'https://s1.mzstatic.com/us/r1000/083/Purple/v4/3c/e0/1b/3ce01b78-4114-f175-b78a-812ea1b32c86/mzl.ucksqmgs.png',
-            }}
-            style={stylesheet.strategoIContainer}
+            source={require('@/assets/images/stratego.png')}
+            style={stylesheet.StrategoImage}
           />
         </TouchableOpacity>
       </View>
 
-      <View style={stylesheet.spelerlijstContainer}>
-        <View style={stylesheet.titlebar} />
+      <View style={stylesheet.SpelerlijstContainer}>
         <View style={stylesheet.list}>
-          <View style={stylesheet.itembox}>
+          <View style={stylesheet.NaamBox}>
             {items.map(item => (
-              <Text
-                key={item.id}
-                style={[stylesheet.NaamContainer, { marginBottom: 10 }]}>
-                {item.name}
-              </Text>
+              <>
+                <Text
+                  key={item.id}
+                  style={[stylesheet.NaamTekst, { marginBottom: 10 }]}>
+                  {item.name}
+                </Text>
+                {item.host && (
+                  <ImageBackground
+                    style={stylesheet.CrownImage}
+                    source={require('@/assets/images/CrownImage.png')}
+                  />
+                )}
+              </>
             ))}
           </View>
-
-          <ImageBackground
-            style={
-              stylesheet.crownicondesignontransparentbackgroundPNGremovebgpreview2
-            }
-            source={{
-              uri: 'https://cdn-icons-png.flaticon.com/512/57/57113.png',
-            }}
-          />
         </View>
         <View style={stylesheet.check} />
         <View style={stylesheet.settingsAndPlayers}>
@@ -102,16 +105,16 @@ export default function LobbyPage() {
       </SafeAreaView>
 
       <View style={stylesheet.bottomCard}>
-        <TouchableOpacity style={stylesheet.Container}>
-          <Text style={stylesheet.Play}>Play</Text>
+        <TouchableOpacity style={stylesheet.PlayButtonContainer}>
+          <Text style={stylesheet.PlayText}>Start</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={stylesheet.Container2}
+          style={stylesheet.ReturnButtonContainer}
           onPress={() => {
             lobby.leave();
             router.navigate('/');
           }}>
-          <Text style={stylesheet.Play}>Return</Text>
+          <Text style={stylesheet.PlayText}>Return</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -141,7 +144,7 @@ const stylesheet = StyleSheet.create({
     alignItems: 'center',
   },
 
-  Code: {
+  CodeContainer: {
     marginVertical: 10,
     position: 'relative',
     flexShrink: 0,
@@ -156,7 +159,7 @@ const stylesheet = StyleSheet.create({
     borderRadius: 8,
   },
 
-  myVar: {
+  Cijfercode: {
     position: 'relative',
     marginRight: 125,
     flexShrink: 0,
@@ -167,7 +170,7 @@ const stylesheet = StyleSheet.create({
     fontWeight: 400,
   },
 
-  Container: {
+  PlayButtonContainer: {
     position: 'relative',
     flexShrink: 0,
     height: 45,
@@ -184,7 +187,7 @@ const stylesheet = StyleSheet.create({
     marginVertical: 10,
   },
 
-  Container2: {
+  ReturnButtonContainer: {
     width: '100%',
     height: 45,
     position: 'relative',
@@ -201,7 +204,7 @@ const stylesheet = StyleSheet.create({
     borderRadius: 15,
   },
 
-  Play: {
+  PlayText: {
     position: 'relative',
     flexShrink: 0,
     textAlign: 'left',
@@ -210,7 +213,7 @@ const stylesheet = StyleSheet.create({
     fontWeight: 700,
   },
 
-  NaamContainer: {
+  NaamTekst: {
     color: 'rgb(255, 255, 255)',
     position: 'relative',
     flexShrink: 0,
@@ -231,7 +234,7 @@ const stylesheet = StyleSheet.create({
     borderRadius: 20,
   },
 
-  spelerlijstContainer: {
+  SpelerlijstContainer: {
     position: 'relative',
     flexShrink: 0,
     height: 314,
@@ -254,18 +257,6 @@ const stylesheet = StyleSheet.create({
     borderRadius: 8,
   },
 
-  titlebar: {
-    position: 'relative',
-    flexShrink: 0,
-    width: 357,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    rowGap: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 0,
-  },
-
   list: {
     position: 'absolute',
     flexShrink: 0,
@@ -279,7 +270,7 @@ const stylesheet = StyleSheet.create({
     paddingVertical: 0,
   },
 
-  itembox: {
+  NaamBox: {
     position: 'absolute',
     flexShrink: 0,
     top: 12,
@@ -299,12 +290,11 @@ const stylesheet = StyleSheet.create({
     flexShrink: 0,
   },
 
-  crownicondesignontransparentbackgroundPNGremovebgpreview2: {
-    position: 'absolute',
+  CrownImage: {
     flexShrink: 0,
-    marginTop: 10,
-    top: 18,
-    left: 17,
+    marginTop: -25,
+    top: -13,
+    left: -129,
     width: 20,
     height: 20,
     color: 'rgb(255, 255, 255)',
@@ -342,7 +332,7 @@ const stylesheet = StyleSheet.create({
     marginLeft: 10,
   },
 
-  rectangle35Container: {
+  StrategoContainer: {
     display: 'flex',
     position: 'relative',
     alignItems: 'center',
@@ -364,7 +354,7 @@ const stylesheet = StyleSheet.create({
     marginVertical: 10,
   },
 
-  strategoIContainer: {
+  StrategoImage: {
     position: 'relative',
     flexGrow: 1,
     width: 100,

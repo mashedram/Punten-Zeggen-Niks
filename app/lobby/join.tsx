@@ -21,6 +21,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 
 export default function EnterPinScreen() {
@@ -53,7 +54,7 @@ export default function EnterPinScreen() {
 
           {/* Knop om de ingevoerde code te wissen */}
           <Pressable style={styles.clearButton} onPress={() => setCode('')}>
-            <Text style={styles.clearButtonText}>Code wissen</Text>
+            <Text style={styles.clearButtonText}>Delete</Text>
           </Pressable>
 
           {/* Knop om spel te joinen - alleen actief als er een code is ingevuld */}
@@ -69,12 +70,21 @@ export default function EnterPinScreen() {
             }}
             disabled={!code.trim()} // Schakel knop uit als code leeg of alleen spaties is
           >
-            <Text style={styles.buttonText}>Spel deelnemen</Text>
+            <Text style={styles.buttonText}>Enter Lobby</Text>
           </Pressable>
         </View>
 
         {/* Decoratief onderste blok */}
-        <View style={styles.rectangle47Container} />
+        <View style={styles.rectangle47Container}>
+          <TouchableOpacity
+            style={styles.ReturnButtonContainer}
+            onPress={() => {
+              lobby.leave();
+              router.navigate('/');
+            }}>
+            <Text style={styles.PlayText}>Return</Text>
+          </TouchableOpacity>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -82,6 +92,34 @@ export default function EnterPinScreen() {
 
 // Stijlen voor componenten
 const styles = StyleSheet.create({
+  ReturnButtonContainer: {
+    width: '20%',
+    height: 45,
+    position: 'absolute',
+    left: '40%',
+    bottom: 35,
+    flexShrink: 0,
+    flexGrow: 1,
+    paddingTop: 4,
+    paddingBottom: 3,
+    backgroundColor: 'rgba(71, 72, 73, 1)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    columnGap: 10,
+    paddingHorizontal: 59,
+    borderRadius: 15,
+  },
+
+  PlayText: {
+    position: 'relative',
+    flexShrink: 0,
+    textAlign: 'left',
+    color: 'rgba(255, 255, 255, 1)',
+    fontSize: 16,
+    fontWeight: 700,
+  },
+
   safeArea: {
     flex: 1,
     backgroundColor: '#5CA3C2', // Blauwgroene achtergrond

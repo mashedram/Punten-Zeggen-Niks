@@ -23,15 +23,16 @@ const styles = StyleSheet.create({
   createButton: {
     width: '100%',
     height: 45,
-    backgroundColor: 'white',
+    backgroundColor: 'rgb(214, 214, 214)',
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 10,
   },
 
   createText: {
     color: '#665858',
-    marginTop: 16,
+    // marginTop: 16,
     fontWeight: '700',
     fontSize: 16,
   },
