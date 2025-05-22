@@ -1,13 +1,6 @@
-import EventEmitter from 'events';
 import { Lobby } from './Lobby';
 import { PlayerToken } from './PlayerToken';
-
-type LobbyEventMap = {
-  lobbyCreated: [lobby: Lobby];
-  lobbyRemoving: [lobby: Lobby];
-  playerCreated: [lobby: Lobby, player: Player];
-  playerRemoving: [lobby: Lobby, player: Player];
-};
+import { Player } from './Player';
 
 export const LOBBY_CONSTANTS = {
   LOBBY_CODE_LENGTH: 6,
@@ -15,14 +8,12 @@ export const LOBBY_CONSTANTS = {
   LOBBY_STATE_EVENT: 'lobby-state',
 };
 
-export class LobbyManager extends EventEmitter<LobbyEventMap> {
+export class LobbyManager {
   private lobbies: { [key: string]: Lobby } = {};
 
   public createLobby(): Lobby {
     const lobby = new Lobby(this);
     this.lobbies[lobby.getCode()] = lobby;
-    this.emit('lobbyCreated', lobby);
-
     return lobby;
   }
 
@@ -33,9 +24,6 @@ export class LobbyManager extends EventEmitter<LobbyEventMap> {
   public deleteLobby(code: string): void {
     const lobby = this.lobbies[code];
     if (!lobby) return;
-
-    this.emit('lobbyRemoving', lobby);
-
     lobby.onRemoval();
     delete this.lobbies[code];
   }
@@ -44,6 +32,14 @@ export class LobbyManager extends EventEmitter<LobbyEventMap> {
     const lobby = this.getLobby(token.getLobbyCode());
 
     return lobby;
+  }
+
+  public getPlayer(token: PlayerToken): [Lobby, Player] | undefined {
+    const lobby = this.getLobby(token.getLobbyCode());
+    if (!lobby) return undefined;
+    const player = lobby.getPlayer(token);
+    if (!player) return undefined;
+    return [lobby, player];
   }
 }
 

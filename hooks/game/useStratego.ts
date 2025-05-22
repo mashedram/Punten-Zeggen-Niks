@@ -1,10 +1,14 @@
-import { ExpoRouter, Router, useRouter } from 'expo-router';
-import { LobbyState, useLobby } from '../useLobby';
-import { StategoPlayerGameData } from '@/api/game/player/PlayerGameData';
-import { StategoLobbyGameData } from '@/api/game/lobby/LobbyGameData';
-import { StrategoGameId } from '@/api/game/GameType';
+import { useTRPC } from '@/api/query';
+import { LobbyState } from '../useLobby';
+import {
+  type StrategoPlayerGameData,
+  type StrategoLobbyGameData,
+  StrategoGameId,
+} from '@/api/managers/statego/StrategoGame';
+import { useCallback } from 'react';
 
 export enum InitalizationFailureReason {
+  Loading,
   NotInLobby,
   GameNotRunning,
 }
@@ -16,12 +20,26 @@ export type StategoState =
     }
   | {
       initialized: true;
-      lobby: StategoLobbyGameData;
-      self: StategoPlayerGameData;
-      otherPlayers: StategoPlayerGameData[];
+      lobby: StrategoLobbyGameData;
+      self: StrategoPlayerGameData;
+      otherPlayers: StrategoPlayerGameData[];
     };
 
 export function useStratego(lobby: LobbyState): StategoState {
+  if (lobby.loading) {
+    return {
+      initialized: false,
+      reason: InitalizationFailureReason.Loading,
+    };
+  }
+
+  if (!lobby.inLobby) {
+    return {
+      initialized: false,
+      reason: InitalizationFailureReason.NotInLobby,
+    };
+  }
+
   const data = lobby.get();
 
   if (!data) {

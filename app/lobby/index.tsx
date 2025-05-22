@@ -21,10 +21,20 @@ import {
   StatusBar,
 } from 'react-native';
 import { QrButton } from '@/components/lobby_host/QrButton';
+import { StrategoGameId } from '@/api/managers/statego/StrategoGame';
 
 export default function LobbyPage() {
   const lobby = useLobby();
   const router = useRouter();
+
+  if (lobby.loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (!lobby.inLobby) {
+    return <Redirect href="/" />;
+  }
+
   const activeLobby = lobby.get();
 
   const handlePress = () => {

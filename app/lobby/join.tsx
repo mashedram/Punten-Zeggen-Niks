@@ -9,7 +9,7 @@
 
 import CodeInput from '@/components/CodeInput'; // Aangepaste inputcomponent voor PIN-code
 import { useLobby } from '@/hooks/useLobby'; // Lobby hook voor game-join functionaliteit
-import { useRouter } from 'expo-router'; // Navigatie hook van Expo Router
+import { Redirect, useRouter } from 'expo-router'; // Navigatie hook van Expo Router
 import React, { useState } from 'react';
 import {
   View,
@@ -35,6 +35,14 @@ export default function EnterPinScreen() {
    * @type {[string, React.Dispatch<React.SetStateAction<string>>]}
    */
   const [code, setCode] = useState('');
+
+  if (lobby.loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (lobby.inLobby) {
+    return <Redirect href="/lobby" />;
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>

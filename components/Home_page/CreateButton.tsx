@@ -10,7 +10,10 @@ export const CreateButton = () => {
   return (
     <TouchableOpacity
       style={styles.createButton}
+      disabled={lobby.loading}
       onPress={() => {
+        if (lobby.loading) return;
+        if (lobby.inLobby) return;
         lobby.create();
         router.navigate('/lobby');
       }}>

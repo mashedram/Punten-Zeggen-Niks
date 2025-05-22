@@ -13,6 +13,12 @@ import {
   LobbyGameDataSchema,
 } from '@/api/game/lobby/LobbyGameData';
 import { GameType, GameTypes } from '@/api/game/GameType';
+import EventEmitter from 'events';
+
+type LobbyEventMap = {
+  playerCreated: [lobby: Lobby, player: Player];
+  playerRemoving: [lobby: Lobby, player: Player];
+};
 
 function generateRandomCode(length: number): string {
   let value = '';
@@ -36,11 +42,11 @@ export const lobbyDataSchema = z.object({
 
 export type LobbyData = z.infer<typeof lobbyDataSchema>;
 
-export class Lobby {
+export class Lobby extends EventEmitter<LobbyEventMap> {
   private manager: LobbyManager;
 
   code: string;
-  private _gameType: GameType<never, never> | undefined;
+  private _gameType?: GameType<never, never>;
   private _gameData: LobbyGameData = {
     gameId: undefined,
   };
@@ -48,6 +54,7 @@ export class Lobby {
   private _playerIdCounter = 0;
 
   constructor(manager: LobbyManager) {
+    super();
     this.manager = manager;
     this.code = generateRandomCode(LOBBY_CONSTANTS.LOBBY_CODE_LENGTH);
   }
@@ -71,13 +78,17 @@ export class Lobby {
     return this._gameData;
   }
 
+  public getGameData<T extends LobbyGameData>(): T {
+    return this._gameData as T;
+  }
+
   public setGame(gameId: string) {
     const type = GameTypes.find(g => g.id === gameId);
     if (!type) throw new Error('Game not found');
-    this._gameType = type as GameType<never, never>;
+    this._gameType = type as unknown as GameType<never, never>;
     this._gameData = type.createLobbyData();
     for (const player of Object.values(this._players)) {
-      player.setGameData(type.createPlayerData(player));
+      player.setGameData(type.createPlayerData(this, player));
     }
     this.sync();
   }
@@ -127,6 +138,10 @@ export class Lobby {
     );
   }
 
+  public getPlayers(): Player[] {
+    return Object.values(this._players);
+  }
+
   /**
    * @returns all players that are currently in the lobby and are active (connected, not inactive, etc.)
    */
@@ -140,10 +155,10 @@ export class Lobby {
     const id = this._playerIdCounter++;
     const player = new Player(id.toString(), false, this);
     if (this._gameType) {
-      player.setGameData(this._gameType.createPlayerData(player));
+      player.setGameData(this._gameType.createPlayerData(this, player));
     }
     this._players[player.getId()] = player;
-    this.manager.emit('playerCreated', this, player);
+    this.emit('playerCreated', this, player);
     return player;
   }
 
@@ -151,7 +166,7 @@ export class Lobby {
     const player = this._players[id];
     if (!player) return;
 
-    this.manager.emit('playerRemoving', this, player);
+    this.emit('playerRemoving', this, player);
     player.onRemoval();
     delete this._players[id];
 

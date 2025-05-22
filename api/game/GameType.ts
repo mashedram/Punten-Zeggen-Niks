@@ -1,26 +1,14 @@
-import { PlayerGameData, StategoPlayerGameData } from './player/PlayerGameData';
-import { LobbyGameData, StategoLobbyGameData } from './lobby/LobbyGameData';
+import { Lobby } from '../managers/lobby/Lobby';
 import { Player } from '../managers/lobby/Player';
+import { StrategoGameType } from '../managers/statego/StrategoGame';
+import { LobbyGameData } from './lobby/LobbyGameData';
+import { PlayerGameData } from './player/PlayerGameData';
 
 export type GameType<P extends PlayerGameData, L extends LobbyGameData> = {
   id: string;
   createLobbyData: () => L;
-  createPlayerData: (player: Player) => P;
-};
-
-export const StrategoGameId = 'stratego';
-export const StrategoGameType: GameType<
-  StategoPlayerGameData,
-  StategoLobbyGameData
-> = {
-  id: StrategoGameId,
-  createLobbyData: () => ({
-    gameId: StrategoGameId,
-  }),
-  createPlayerData: () => ({
-    gameId: StrategoGameId,
-    roleCard: 'mineur',
-  }),
+  createPlayerData: (lobbyData: Lobby, player: Player) => P;
+  registerEvents: (lobby: Lobby) => void;
 };
 
 export const GameTypes = [StrategoGameType];
