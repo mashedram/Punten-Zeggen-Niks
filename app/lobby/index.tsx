@@ -5,10 +5,10 @@ import {
   ExternalPathString,
   Link,
   Redirect,
+  useRootNavigationState,
   useRouter,
 } from 'expo-router';
 import React from 'react';
-import { StyleSheet } from 'react-native';
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { QrButton } from '@/components/lobby_host/QrButton';
 import { StrategoGameId } from '@/api/managers/statego/StrategoGame';
 
