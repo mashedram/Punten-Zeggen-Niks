@@ -1,5 +1,13 @@
+import EventEmitter from 'events';
 import { Lobby } from './Lobby';
 import { PlayerToken } from './PlayerToken';
+
+type LobbyEventMap = {
+  lobbyCreated: [lobby: Lobby];
+  lobbyRemoving: [lobby: Lobby];
+  playerCreated: [lobby: Lobby, player: Player];
+  playerRemoving: [lobby: Lobby, player: Player];
+};
 
 export const LOBBY_CONSTANTS = {
   LOBBY_CODE_LENGTH: 6,
@@ -7,12 +15,13 @@ export const LOBBY_CONSTANTS = {
   LOBBY_STATE_EVENT: 'lobby-state',
 };
 
-export class LobbyManager {
+export class LobbyManager extends EventEmitter<LobbyEventMap> {
   private lobbies: { [key: string]: Lobby } = {};
 
   public createLobby(): Lobby {
     const lobby = new Lobby(this);
     this.lobbies[lobby.getCode()] = lobby;
+    this.emit('lobbyCreated', lobby);
 
     return lobby;
   }
@@ -25,6 +34,8 @@ export class LobbyManager {
     const lobby = this.lobbies[code];
     if (!lobby) return;
 
+    this.emit('lobbyRemoving', lobby);
+
     lobby.onRemoval();
     delete this.lobbies[code];
   }
@@ -35,3 +46,5 @@ export class LobbyManager {
     return lobby;
   }
 }
+
+export const lobbyManager = new LobbyManager();

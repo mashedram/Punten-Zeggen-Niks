@@ -1,10 +1,8 @@
-import { LobbyManager } from '@/api/managers/lobby/LobbyManager';
+import { lobbyManager, LobbyManager } from '@/api/managers/lobby/LobbyManager';
 import { ConnectionState } from '@/api/managers/lobby/Player';
 import { PlayerToken } from '@/api/managers/lobby/PlayerToken';
 import { publicProcedure, router } from '@/api/server';
 import z from 'zod';
-
-const lobbyManager = new LobbyManager();
 
 export const lobbyRouter = router({
   joinLobby: publicProcedure
