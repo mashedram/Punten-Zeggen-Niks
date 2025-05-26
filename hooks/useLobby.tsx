@@ -77,6 +77,9 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
 
         eventCallbackRef.current(event as PlayerEvent<unknown>);
       },
+      onError: error => {
+        setToken(undefined);
+      },
     }),
   );
 

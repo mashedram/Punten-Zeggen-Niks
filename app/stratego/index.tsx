@@ -1,34 +1,23 @@
 import { useTRPC } from '@/api/query';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import {
   InitalizationFailureReason,
   useStratego,
 } from '@/hooks/game/useStratego';
 import { useLobby } from '@/hooks/useLobby';
 import { useMutation } from '@tanstack/react-query';
-import { Redirect, useRootNavigationState, useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { Redirect } from 'expo-router';
+import { useState } from 'react';
 import { Button, Text, TextInput, View } from 'react-native';
 
 export default function Game() {
   const lobby = useLobby();
   const trpc = useTRPC();
   const stratego = useStratego(lobby);
-  const textInputRef = useRef();
 
   const [attackCode, setAttackCode] = useState('');
-  const [lastAttackResult, setLastAttackResult] = useState<
-    undefined | `invalid: ${string}`
-  >();
 
-  const attackMutation = useMutation(
-    trpc.stratego.attack.mutationOptions({
-      onError: error => {
-        setLastAttackResult(`invalid: ${error.message}`);
-      },
-    }),
-  );
+  const attackMutation = useMutation(trpc.stratego.attack.mutationOptions({}));
 
   if (!stratego.initialized) {
     if (stratego.reason === InitalizationFailureReason.NotInLobby) {
