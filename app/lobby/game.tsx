@@ -17,7 +17,7 @@ export default function StrategoGame() {
   const [selectedName, setSelectedName] = React.useState('Kies een speler');
   const namen = ['Bas', 'Jan', 'Oscar', 'Mark'];
   const [selectedRang, setSelectedRang] = React.useState('Kies een rang');
-  const rangen = ['Generaal', 'Spion', 'Sergeant', 'Bom'];
+  const rangen = ['Generaal', 'Verkenner', 'Sergeant', 'Bom'];
 
   return (
     <SafeAreaView style={styles.backgroundView}>
@@ -130,16 +130,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    margin: 0,
+    margin: -1.2,
     overflow: 'hidden',
   },
   SpelerCard: {
     position: 'relative',
     flexShrink: 0,
     width: '70%',
-    height: '39%',
+    height: '41%',
     borderRadius: 12,
-    marginBottom: 50,
+    marginBottom: 60,
   },
   SpelerCardSelect: {
     position: 'relative',
@@ -188,6 +188,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 12,
+  },
+  PopUpContainer: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
   },
   CaptainIconContainer: {
     position: 'absolute',
