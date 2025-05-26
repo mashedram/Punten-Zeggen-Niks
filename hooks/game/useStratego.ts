@@ -1,8 +1,8 @@
 import { useTRPC } from '@/api/query';
 import { LobbyState } from '../useLobby';
 import {
-  type StrategoPlayerGameData,
-  type StrategoLobbyGameData,
+  type PlayerDataStratego,
+  type LobbyDataStratego,
   StrategoGameId,
 } from '@/api/managers/statego/StrategoGame';
 import { useCallback } from 'react';
@@ -20,9 +20,9 @@ export type StategoState =
     }
   | {
       initialized: true;
-      lobby: StrategoLobbyGameData;
-      self: StrategoPlayerGameData;
-      otherPlayers: StrategoPlayerGameData[];
+      lobby: LobbyDataStratego;
+      self: PlayerDataStratego;
+      otherPlayers: PlayerDataStratego[];
     };
 
 export function useStratego(lobby: LobbyState): StategoState {

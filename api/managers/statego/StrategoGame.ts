@@ -1,34 +1,17 @@
+import { GameType } from '@/api/game/GameType';
+import { z } from 'zod';
+import { Lobby } from '../lobby/Lobby';
+import { Player } from '../lobby/Player';
+import { RoleCard, RoleCards } from './constants/RoleCards';
+import { AttackResult } from './constants/AttackResult';
+
 export const StrategoGameId = 'stratego';
-
-/////////////////
-/// CONSTANTS ///
-/////////////////
-
-type RoleCard = {
-  id: string;
-  name: string;
-  value: number;
-  overwrites?: string[];
-};
-
-const RoleCards: RoleCard[] = [
-  {
-    id: 'general',
-    name: 'Generaal',
-    value: 10,
-  },
-];
 
 //////////////////
 /// LOBBY DATA ///
 //////////////////
 
-import { GameType } from '@/api/game/GameType';
-import { z } from 'zod';
-import { Lobby } from '../lobby/Lobby';
-import { Player } from '../lobby/Player';
-
-export const StrategoLobbyGameDataSchema = z.object({
+export const LobbyDataSchemaStratego = z.object({
   gameId: z.literal(StrategoGameId),
   teams: z.array(
     z.object({
@@ -42,13 +25,13 @@ export const StrategoLobbyGameDataSchema = z.object({
     }),
   ),
 });
-export type StrategoLobbyGameData = z.infer<typeof StrategoLobbyGameDataSchema>;
+export type LobbyDataStratego = z.infer<typeof LobbyDataSchemaStratego>;
 
 ///////////////////
 /// PLAYER DATA ///
 ///////////////////
 
-export const StrategoPlayerGameDataSchema = z.object({
+export const PlayerDataSchemaStratego = z.object({
   gameId: z.literal(StrategoGameId),
   teamId: z.string(),
   roleCard: z.string().optional(),
@@ -60,57 +43,53 @@ export const StrategoPlayerGameDataSchema = z.object({
     })
     .optional(),
 });
-export type StrategoPlayerGameData = z.infer<
-  typeof StrategoPlayerGameDataSchema
->;
+export type PlayerDataStratego = z.infer<typeof PlayerDataSchemaStratego>;
 
 /////////////////
 /// GAME TYPE ///
 /////////////////
 
-export const StrategoGameType: GameType<
-  StrategoPlayerGameData,
-  StrategoLobbyGameData
-> = {
-  id: StrategoGameId,
-  createLobbyData: () => ({
-    gameId: StrategoGameId,
-    teams: [
-      {
-        id: 'red',
-        name: 'Rood',
-      },
-      {
-        id: 'blue',
-        name: 'Blauw',
-      },
-    ],
-    battleLog: [],
-  }),
-  createPlayerData: (lobby, player) => ({
-    gameId: StrategoGameId,
-    teamId: getNewPlayerTeam(lobby),
-    roleCard: undefined,
-    attackCode: generateAttackCode(),
-  }),
-  registerEvents: lobby => {},
-};
+export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
+  {
+    id: StrategoGameId,
+    createLobbyData: () => ({
+      gameId: StrategoGameId,
+      teams: [
+        {
+          id: 'red',
+          name: 'Rood',
+        },
+        {
+          id: 'blue',
+          name: 'Blauw',
+        },
+      ],
+      battleLog: [],
+    }),
+    createPlayerData: (lobby, player) => ({
+      gameId: StrategoGameId,
+      teamId: getNewPlayerTeam(lobby),
+      roleCard: undefined,
+      attackCode: generateAttackCode(),
+    }),
+    registerEvents: lobby => {},
+  };
 
 /////////////////
 /// FUNCTIONS ///
 /////////////////
 
-function getLobbyData(lobby: Lobby): StrategoLobbyGameData {
-  return lobby.getGameData<StrategoLobbyGameData>();
+function getLobbyData(lobby: Lobby): LobbyDataStratego {
+  return lobby.getGameData<LobbyDataStratego>();
 }
 
-function getPlayerData(player: Player): StrategoPlayerGameData {
-  return player.getGameData<StrategoPlayerGameData>();
+function getPlayerData(player: Player): PlayerDataStratego {
+  return player.getGameData<PlayerDataStratego>();
 }
 
 function getRoleCard(cardId?: string): RoleCard | undefined {
   if (!cardId) return undefined;
-  return RoleCards.find(card => card.id === cardId);
+  return RoleCards[cardId];
 }
 
 function getPlayerFromAttackCode(
@@ -158,13 +137,6 @@ function getNewPlayerTeam(lobby: Lobby): string {
   }
 
   return smallestTeam;
-}
-
-enum AttackResult {
-  AttackerWon,
-  DefenderWon,
-  Draw, // Both Die
-  Ignore, // Ignore
 }
 
 function performAttack(

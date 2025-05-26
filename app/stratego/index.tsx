@@ -19,6 +19,10 @@ export default function Game() {
 
   const attackMutation = useMutation(trpc.stratego.attack.mutationOptions({}));
 
+  if (lobby.loading || !lobby.inLobby) {
+    return;
+  }
+
   if (!stratego.initialized) {
     if (stratego.reason === InitalizationFailureReason.NotInLobby) {
       return <Redirect href="/" />;
