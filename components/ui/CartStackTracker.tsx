@@ -9,7 +9,7 @@ export const CartStackTracker = () => {
         <View style={styles.BlackBar}></View>
         <View style={styles.RedBar}></View>
       </View>
-      <Text style={styles.NumberText}>58</Text>
+      <Text style={styles.NumberText}>60</Text>
     </View>
   );
 };
