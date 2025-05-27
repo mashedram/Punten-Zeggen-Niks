@@ -1,4 +1,5 @@
 import { CartStackTracker } from '@/components/ui/CartStackTracker';
+import { PowerUpPopUp } from '@/components/ui/PowerUpPopUp';
 import React from 'react';
 import {
   View,
@@ -7,6 +8,7 @@ import {
   Platform,
   StatusBar,
   Image,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Svg, Circle } from 'react-native-svg';
@@ -18,104 +20,156 @@ export default function StrategoGame() {
   const namen = ['Bas', 'Jan', 'Oscar', 'Mark'];
   const [selectedRang, setSelectedRang] = React.useState('Kies een rang');
   const rangen = ['Generaal', 'Verkenner', 'Sergeant', 'Bom'];
+  const [PowerupsIndex, setPowerupsIndex] = React.useState<
+    number | undefined
+  >();
+  const [ingezettePowerupIndex, setIngezettePowerupIndex] = React.useState<
+    number | null
+  >(null);
+
+  const powerups = [
+    {
+      id: 'vergrootglas',
+      image: require('@/assets/images/Vergrootglas.jpg'),
+      name: 'Vergrootglas',
+      description: 'Onthul alle power-ups van de spelers in de omgeving.',
+    },
+    {
+      id: 'bomvest',
+      image: require('@/assets/images/Bomvest.jpg'),
+      name: 'Bomvest',
+      description: 'Bescherm jezelf tegen bommen voor 1 beurt.',
+    },
+    {
+      id: 'spion',
+      image: require('@/assets/images/SpionP.jpg'),
+      name: 'Spion',
+      description:
+        'Versla elke rang en niet alleen rang 10, uitzondering van de bom.',
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.backgroundView}>
-      <View style={styles.CardStackTrackerContainer}>
-        <CartStackTracker />
-      </View>
-      <View style={styles.CaptainIconContainer}>
-        <Svg
-          style={styles.CaptainEllipse}
-          width={20}
-          height={20}
-          viewBox="0 0 20 20"
-          fill="none">
-          <Circle cx={10} cy={10} r={10} fill="#FF2424" />
-        </Svg>
-        <Text style={styles.CaptainIcon}>🎖</Text>
-        <Text style={styles.CaptainUitroepteken}>!</Text>
-      </View>
-
-      <View style={styles.BattleLogButtonContainer}>
-        <View style={styles.BattlelogButton}>
-          <Text style={styles.BattleLogButtonArrow}>{'➔'} </Text>
+      <>
+        <View style={styles.CardStackTrackerContainer}>
+          <CartStackTracker />
         </View>
-      </View>
+        <View style={styles.CaptainIconContainer}>
+          <Svg
+            style={styles.CaptainEllipse}
+            width={20}
+            height={20}
+            viewBox="0 0 20 20"
+            fill="none">
+            <Circle cx={10} cy={10} r={10} fill="#FF2424" />
+          </Svg>
+          <Text style={styles.CaptainIcon}>🎖</Text>
+          <Text style={styles.CaptainUitroepteken}>!</Text>
+        </View>
 
-      {(true && (
-        <View style={styles.SelectScreenContainer}>
-          <Picker
-            style={styles.SelectFieldContainer}
-            selectedValue={selectedName}
-            onValueChange={(itemValue, itemIndex) =>
-              setSelectedName(itemValue)
-            }>
-            {namen.map(naam => (
-              <Picker.Item key={naam} label={naam} value={naam} />
-            ))}
-          </Picker>
-
-          <Picker
-            style={styles.SelectFieldContainer}
-            selectedValue={selectedRang}
-            onValueChange={(itemValue, itemIndex) =>
-              setSelectedRang(itemValue)
-            }>
-            {rangen.map(rang => (
-              <Picker.Item key={rang} label={rang} value={rang} />
-            ))}
-          </Picker>
-
-          <Image
-            source={require('@/assets/images/Generaal.png')}
-            style={styles.SpelerCardSelect}></Image>
-          <View style={styles.ConfirmButtom}>
-            <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
-              Confirm
-            </Text>
+        <View style={styles.BattleLogButtonContainer}>
+          <View style={styles.BattlelogButton}>
+            <Text style={styles.BattleLogButtonArrow}>{'➔'} </Text>
           </View>
         </View>
-      )) || (
-        <Image
-          source={require('@/assets/images/Spion.png')}
-          style={styles.SpelerCard}></Image>
-      )}
 
-      <View
-        style={{
-          transform: [{ translateY: isPowerCardOpen ? '5%' : '80%' }],
-          ...styles.PowerupBarContainer,
-        }}>
-        <View
-          style={styles.PowerCardTitleContainer}
-          onPointerDown={() => setPowerCardOpen(!isPowerCardOpen)}>
-          <Text
-            style={{
-              transform: [{ rotate: isPowerCardOpen ? '90deg' : '-90deg' }],
-              ...styles.PowerupArrow,
-            }}>
-            ➔
-          </Text>
-          <Text style={styles.PowerupsTekst}>Power-ups</Text>
+        {(false && (
+          <View style={styles.SelectScreenContainer}>
+            <Picker
+              style={styles.SelectFieldContainer}
+              selectedValue={selectedName}
+              onValueChange={(itemValue, itemIndex) =>
+                setSelectedName(itemValue)
+              }>
+              {namen.map(naam => (
+                <Picker.Item key={naam} label={naam} value={naam} />
+              ))}
+            </Picker>
+
+            <Picker
+              style={styles.SelectFieldContainer}
+              selectedValue={selectedRang}
+              onValueChange={(itemValue, itemIndex) =>
+                setSelectedRang(itemValue)
+              }>
+              {rangen.map(rang => (
+                <Picker.Item key={rang} label={rang} value={rang} />
+              ))}
+            </Picker>
+
+            <Image
+              source={require('@/assets/images/Generaal.png')}
+              style={styles.SpelerCardSelect}></Image>
+            <View style={styles.ConfirmButtom}>
+              <Text
+                style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
+                Confirm
+              </Text>
+            </View>
+          </View>
+        )) || (
+          <Image
+            source={require('@/assets/images/Spion.png')}
+            style={styles.SpelerCard}></Image>
+        )}
+        <View style={styles.PopUpContainer}>
+          {PowerupsIndex !== undefined && (
+            <PowerUpPopUp
+              name={powerups[PowerupsIndex].name}
+              description={powerups[PowerupsIndex].description}
+              image={powerups[PowerupsIndex].image}
+              onDelete={() => setPowerupsIndex(undefined)}
+              onInzet={() => {
+                setIngezettePowerupIndex(PowerupsIndex);
+                setPowerupsIndex(undefined);
+              }}
+            />
+          )}
         </View>
-        <View style={styles.PowerupCardContainer}>
-          <Image
-            style={styles.PowerupCard}
-            source={require('@/assets/images/Bomvest.jpg')}
-            width={100}
-            height={100}
-          />
-          <Image
-            style={styles.PowerupCard}
-            source={require('@/assets/images/SpionP.jpg')}
-          />
-          <Image
-            style={styles.PowerupCard}
-            source={require('@/assets/images/Vergrootglas.jpg')}
-          />
-        </View>
-      </View>
+
+        <Pressable
+          style={{
+            transform: [{ translateY: isPowerCardOpen ? '5%' : '80%' }],
+            ...styles.PowerupBarContainer,
+          }}
+          onPress={() => setPowerCardOpen(!isPowerCardOpen)}>
+          <View style={styles.PowerCardTitleContainer}>
+            <Text
+              style={{
+                transform: [{ rotate: isPowerCardOpen ? '90deg' : '-90deg' }],
+                ...styles.PowerupArrow,
+              }}>
+              ➔
+            </Text>
+            <Text style={styles.PowerupsTekst}>Power-ups</Text>
+          </View>
+          <View style={styles.PowerupCardContainer}>
+            {powerups.map((powerup, index) => (
+              <Pressable
+                key={powerup.id}
+                style={[
+                  styles.PowerupPressable,
+                  index === ingezettePowerupIndex && {
+                    borderWidth: 6,
+                    borderColor: '#70C25C',
+                    borderRadius: 16,
+                    shadowColor: 'rgba(0, 0, 0, 0.25)',
+                    shadowOffset: { width: 0, height: 8 },
+                    shadowRadius: 8,
+                    shadowOpacity: 8,
+                  },
+                ]}
+                onPress={event => {
+                  event.stopPropagation();
+                  if (isPowerCardOpen) setPowerupsIndex(index);
+                }}>
+                <Image source={powerup.image} style={styles.PowerupCard} />
+              </Pressable>
+            ))}
+          </View>
+        </Pressable>
+      </>
     </SafeAreaView>
   );
 }
@@ -190,9 +244,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   PopUpContainer: {
-    width: '100%',
+    width: '90%',
+    height: '35%',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
@@ -283,9 +338,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
   },
-  PowerupCard: {
+  PowerupPressable: {
     height: '90%',
     width: '30%',
+  },
+
+  PowerupCard: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'black',
   },
 
   SelectScreenContainer: {
