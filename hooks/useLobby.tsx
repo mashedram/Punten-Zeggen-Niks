@@ -1,7 +1,7 @@
 import type { LobbyData } from '@/api/managers/lobby/Lobby';
 import type { PlayerEvent } from '@/api/managers/lobby/Player';
 import { useTRPC } from '@/api/query';
-import { skipToken, useMutation } from '@tanstack/react-query';
+import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
 import React, {
   createContext,
@@ -14,13 +14,25 @@ import { useMMKVString } from 'react-native-mmkv';
 
 type LobbyEventCallback = (event: PlayerEvent<unknown>) => void;
 
-interface LobbyState {
-  get: () => LobbyData | null;
-  setEventHandler: (callback: LobbyEventCallback) => void;
-  join: (code: string) => void;
-  create: () => void;
-  leave: () => void;
-}
+export type LobbyState =
+  | {
+      loading: false;
+      inLobby: true;
+      getToken: () => string;
+      get: () => LobbyData | null;
+      setEventHandler: (callback: LobbyEventCallback) => void;
+      leave: () => void;
+      setGame: (gameId: string) => void;
+    }
+  | {
+      loading: false;
+      inLobby: false;
+      join: (code: string) => void;
+      create: () => void;
+    }
+  | {
+      loading: true;
+    };
 
 const PlayerDataContext = createContext<LobbyState | null>(null);
 
@@ -65,6 +77,9 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
 
         eventCallbackRef.current(event as PlayerEvent<unknown>);
       },
+      onError: error => {
+        setToken(undefined);
+      },
     }),
   );
 
@@ -82,6 +97,8 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
       },
     }),
   );
+
+  const setGameMutation = useMutation(tRPC.lobby.setGame.mutationOptions());
 
   const getLobby = useCallback(() => {
     return lobbyState;
@@ -103,16 +120,48 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
     setLobbyState(null);
   }, [setToken]);
 
+  const setGameCallback = useCallback(
+    (gameId: string) => {
+      if (!token) throw new Error('Not in a lobby');
+      setGameMutation.mutate({ token, gameId });
+    },
+    [token, setGameMutation],
+  );
+
   const setEventHandler = useCallback((callback: LobbyEventCallback) => {
     eventCallbackRef.current = callback;
   }, []);
 
+  if (!token) {
+    return (
+      <PlayerDataContext.Provider
+        value={{
+          loading: false,
+          inLobby: false,
+          join: joinLobbyCallback,
+          create: createLobbyCallback,
+        }}>
+        {children}
+      </PlayerDataContext.Provider>
+    );
+  }
+
+  if (!lobbyState) {
+    return (
+      <PlayerDataContext.Provider value={{ loading: true }}>
+        {children}
+      </PlayerDataContext.Provider>
+    );
+  }
+
   const state: LobbyState = {
+    loading: false,
+    inLobby: true,
+    getToken: () => token,
     get: getLobby,
     setEventHandler: setEventHandler,
-    join: joinLobbyCallback,
-    create: createLobbyCallback,
     leave: leaveLobbyCallback,
+    setGame: setGameCallback,
   };
 
   return (

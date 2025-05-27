@@ -1,5 +1,7 @@
 import { CreateButton } from '@/components/Home_page/CreateButton';
 import { JoinButton } from '@/components/Home_page/JoinButton';
+import { useLobby } from '@/hooks/useLobby';
+import { Redirect } from 'expo-router';
 import { Image } from 'react-native';
 
 import {
@@ -15,6 +17,12 @@ import {
 const { width } = Dimensions.get('window');
 
 export default function HomePage() {
+  const lobby = useLobby();
+
+  if (!lobby.loading && lobby.inLobby) {
+    return <Redirect href="/lobby" />;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.mainContent}>

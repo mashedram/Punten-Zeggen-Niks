@@ -1,8 +1,14 @@
 import { SettingsButton } from '@/components/lobby_host/SettingsButton';
 import { ThemedText } from '@/components/ThemedText';
 import { useLobby } from '@/hooks/useLobby';
-import { Link, useRouter } from 'expo-router';
-import React from 'react';
+import {
+  ExternalPathString,
+  Link,
+  Redirect,
+  useRootNavigationState,
+  useRouter,
+} from 'expo-router';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -15,13 +21,21 @@ import {
   StatusBar,
 } from 'react-native';
 import { StyleSheet } from 'react-native';
-import { useState } from 'react';
-import { useEffect } from 'react';
 import { QrButton } from '@/components/lobby_host/QrButton';
+import { StrategoGameId } from '@/api/managers/statego/StrategoGame';
 
 export default function LobbyPage() {
   const lobby = useLobby();
   const router = useRouter();
+
+  if (lobby.loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (!lobby.inLobby) {
+    return <Redirect href="/" />;
+  }
+
   const activeLobby = lobby.get();
 
   const handlePress = () => {
@@ -48,6 +62,16 @@ export default function LobbyPage() {
       </View>
     );
   }
+
+  if (activeLobby.game.gameId) {
+    return (
+      <Redirect href={`/${activeLobby.game.gameId}` as ExternalPathString} />
+    );
+  }
+
+  const canStart =
+    process.env.NODE_ENV === 'development' ||
+    (activeLobby.players.length >= 2 && activeLobby.self.isAdmin);
 
   return (
     <SafeAreaView style={stylesheet.BackgroundContainer}>

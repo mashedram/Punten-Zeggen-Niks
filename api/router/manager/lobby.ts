@@ -1,10 +1,8 @@
-import { LobbyManager } from '@/api/managers/lobby/LobbyManager';
+import { lobbyManager } from '@/api/managers/lobby/LobbyManager';
 import { ConnectionState } from '@/api/managers/lobby/Player';
 import { PlayerToken } from '@/api/managers/lobby/PlayerToken';
 import { publicProcedure, router } from '@/api/server';
 import z from 'zod';
-
-const lobbyManager = new LobbyManager();
 
 export const lobbyRouter = router({
   joinLobby: publicProcedure
@@ -19,8 +17,25 @@ export const lobbyRouter = router({
     }),
   createLobby: publicProcedure.output(z.string()).mutation(() => {
     const lobby = lobbyManager.createLobby();
-    return lobby.createPlayer().getToken().toString();
+    const player = lobby.createPlayer();
+    player.setAdmin(true);
+    return player.getToken().toString();
   }),
+  setGame: publicProcedure
+    .input(z.object({ token: z.string(), gameId: z.string() }))
+    .mutation(({ input }) => {
+      const token = PlayerToken.fromString(input.token);
+      const lobby = lobbyManager.getPlayerLobby(token);
+      if (!lobby) throw new Error('Lobby not found');
+
+      const player = lobby.getPlayer(token);
+      if (!player) throw new Error('Player not found');
+      if (!player.isAdmin()) throw new Error('Only admins can set the game');
+
+      lobby.setGame(input.gameId);
+      if (!lobby.getGameType()) throw new Error('Game not found');
+      lobby.sync();
+    }),
   listen: publicProcedure
     .input(z.object({ token: z.string() }))
     .subscription(async function* ({ input, signal }) {
@@ -36,12 +51,12 @@ export const lobbyRouter = router({
       yield lobby.createSyncEventFor(player);
 
       player.setConnected(ConnectionState.Connected);
-      player.sync();
+      player.syncToOthers();
 
       if (signal) {
         signal.addEventListener('abort', () => {
           player.setConnected(ConnectionState.Disconnected);
-          player.sync();
+          player.syncToOthers();
         });
       } else {
         console.warn(

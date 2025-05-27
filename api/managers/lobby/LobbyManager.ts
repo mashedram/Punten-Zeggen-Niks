@@ -1,6 +1,6 @@
 import { Lobby } from './Lobby';
-import { Player } from './Player';
 import { PlayerToken } from './PlayerToken';
+import { Player } from './Player';
 
 export const LOBBY_CONSTANTS = {
   LOBBY_CODE_LENGTH: 6,
@@ -14,7 +14,6 @@ export class LobbyManager {
   public createLobby(): Lobby {
     const lobby = new Lobby(this);
     this.lobbies[lobby.getCode()] = lobby;
-
     return lobby;
   }
 
@@ -25,7 +24,6 @@ export class LobbyManager {
   public deleteLobby(code: string): void {
     const lobby = this.lobbies[code];
     if (!lobby) return;
-
     lobby.onRemoval();
     delete this.lobbies[code];
   }
@@ -35,4 +33,14 @@ export class LobbyManager {
 
     return lobby;
   }
+
+  public getPlayer(token: PlayerToken): [Lobby, Player] | undefined {
+    const lobby = this.getLobby(token.getLobbyCode());
+    if (!lobby) return undefined;
+    const player = lobby.getPlayer(token);
+    if (!player) return undefined;
+    return [lobby, player];
+  }
 }
+
+export const lobbyManager = new LobbyManager();
