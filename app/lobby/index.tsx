@@ -129,7 +129,17 @@ export default function LobbyPage() {
       </SafeAreaView>
 
       <View style={stylesheet.bottomCard}>
-        <TouchableOpacity style={stylesheet.PlayButtonContainer}>
+        <TouchableOpacity
+          style={
+            canStart
+              ? stylesheet.PlayButtonContainer
+              : stylesheet.PlayButtonContainerDisabled
+          }
+          onPress={() => {
+            if (activeLobby.game.gameId) return;
+            lobby.setGame(StrategoGameId);
+          }}
+          disabled={!canStart}>
           <Text style={stylesheet.PlayText}>Start</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -202,6 +212,23 @@ const stylesheet = StyleSheet.create({
     paddingTop: 4,
     paddingBottom: 3,
     backgroundColor: 'rgba(112, 194, 92, 1)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    columnGap: 10,
+    paddingHorizontal: 59,
+    borderRadius: 12,
+    marginVertical: 10,
+  },
+
+  PlayButtonContainerDisabled: {
+    position: 'relative',
+    flexShrink: 0,
+    height: 45,
+    width: '100%',
+    paddingTop: 4,
+    paddingBottom: 3,
+    backgroundColor: 'rgb(82, 82, 82)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
