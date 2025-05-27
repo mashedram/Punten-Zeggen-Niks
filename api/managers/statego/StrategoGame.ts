@@ -2,10 +2,11 @@ import { GameType } from '@/api/game/GameType';
 import { z } from 'zod';
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { RoleCard, RoleCards } from './constants/RoleCards';
-import { AttackResult } from './constants/AttackResult';
+import { RoleCard, RoleCards } from '../../../constants/RoleCards';
+import { GameState } from '../../../constants/GameState';
 
 export const StrategoGameId = 'stratego';
+const numberOfCards = 60;
 
 //////////////////
 /// LOBBY DATA ///
@@ -17,8 +18,10 @@ export const LobbyDataSchemaStratego = z.object({
     z.object({
       id: z.string(),
       name: z.string(),
+      deck: z.number().int(),
     }),
   ),
+  gameState: z.enum(Object.values(GameState) as [string, ...string[]]),
   battleLog: z.array(
     z.object({
       playerName: z.string(),
@@ -58,12 +61,15 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         {
           id: 'red',
           name: 'Rood',
+          deck: numberOfCards,
         },
         {
           id: 'blue',
           name: 'Blauw',
+          deck: numberOfCards,
         },
       ],
+      gameState: String(GameState.playing),
       battleLog: [],
     }),
     createPlayerData: (lobby, player) => ({
@@ -139,49 +145,54 @@ function getNewPlayerTeam(lobby: Lobby): string {
   return smallestTeam;
 }
 
-function performAttack(
-  lobby: Lobby,
-  attacker: Player,
-  defender: Player,
-): AttackResult {
+function performAttack(lobby: Lobby, attacker: Player, defender: Player) {
   const attackerData = getPlayerData(attacker);
   const defenderData = getPlayerData(defender);
   const attackerCard = getRoleCard(attackerData.roleCard);
   const defenderCard = getRoleCard(defenderData.roleCard);
 
-  if (!attackerCard || !defenderCard) {
-    return AttackResult.Ignore;
-  }
-
-  if (attackerCard.value > defenderCard.value) {
-    return AttackResult.AttackerWon;
-  }
-
-  if (attackerCard.value < defenderCard.value) {
-    return AttackResult.DefenderWon;
-  }
-
-  return AttackResult.Draw;
-}
-
-function handleAttackResult(
-  attacker: Player,
-  defender: Player,
-  result: AttackResult,
-) {
-  if (result === AttackResult.Ignore) {
-    draw(attacker);
-    draw(defender);
+  // check for team conflict
+  if (attackerData.teamId === defenderData.teamId) {
+    console.warn('Cannot attack a player from the same team.');
     return;
   }
 
-  if (result === AttackResult.AttackerWon) {
+  // check if defender has a flag
+  if (defenderData.roleCard === 'flag') {
+    endGame(lobby, attackerData.teamId);
+    console.log(
+      `Team ${attackerData.teamId} has captured the flag of team ${defenderData.teamId}.`,
+    );
+    return;
+  }
+
+  // no role card for attacker or defender
+  if (!attackerCard || !defenderCard) {
+    draw(attacker);
+    draw(defender);
+    console.warn('Attacker or defender does not have a role card.');
+    return;
+  }
+
+  // Atacker wins
+  if (attackerCard.value > defenderCard.value) {
     win(attacker);
     defeat(defender);
-  } else if (result === AttackResult.DefenderWon) {
+  }
+
+  // Defender wins
+  if (attackerCard.value < defenderCard.value) {
     win(defender);
     defeat(attacker);
   }
+
+  // Both cards have the same value, resulting in a draw
+  // TODO: Implement edgecases
+  console.log(
+    `Both players have the same card value: ${attackerCard.value}. It's a draw.`,
+  );
+  draw(attacker);
+  draw(defender);
 }
 
 function draw(player: Player) {
@@ -203,15 +214,49 @@ function win(player: Player) {
 }
 
 function defeat(player: Player) {
-  const data = getPlayerData(player);
-  data.roleCard = undefined;
-  data.lastFightResult = {
-    index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
+  const playerData = getPlayerData(player);
+  playerData.roleCard = undefined;
+  const lobbyData = getLobbyData(player.getLobby());
+  lobbyData.teams.find(team => team.id === playerData.teamId)!.deck -= 1;
+  playerData.lastFightResult = {
+    index: playerData.lastFightResult
+      ? playerData.lastFightResult.index + 1
+      : 0,
     state: 'lose',
   };
   player.sync();
 }
 
+function checkWinConditions(lobby: Lobby) {
+  const lobbyData = getLobbyData(lobby);
+  const teams = lobbyData.teams;
+  if (teams.some(team => team.deck <= 0)) {
+    const emptyDeckTeam = teams.find(team => team.deck <= 0);
+    if (!checkActiveRoleCards(lobby, emptyDeckTeam!.id)) {
+      const winningTeamId = teams.find(team => team.deck > 0)?.id;
+      endGame(lobby, winningTeamId!);
+    }
+  }
+}
+
+function endGame(lobby: Lobby, winningTeamId: string) {
+  const lobbyData = getLobbyData(lobby);
+  lobbyData.gameState = String(GameState.ending);
+  lobby.sync();
+  console.log(`Game ended. Team ${winningTeamId} has won.`);
+}
+
+// Returns true if there are active platers with a role card in the given team
+function checkActiveRoleCards(lobby: Lobby, teamId: string): boolean {
+  const players = lobby
+    .getActivePlayers()
+    .filter(
+      player => player.getGameData<PlayerDataStratego>().teamId === teamId,
+    );
+  return players.some(
+    player => player.getGameData<PlayerDataStratego>().roleCard === undefined,
+  );
+}
 //////////////////////////
 /// EXTERNAL FUNCTIONS ///
 //////////////////////////
@@ -220,8 +265,7 @@ export const StrategoGame = {
   attack(lobby: Lobby, attacker: Player, attackCode: string) {
     const defender = getPlayerFromAttackCode(lobby, attackCode);
     if (!defender) throw new Error('Invalid attack code');
-
-    const result = performAttack(lobby, attacker, defender);
-    handleAttackResult(attacker, defender, result);
+    performAttack(lobby, attacker, defender);
+    checkWinConditions(lobby);
   },
 };
