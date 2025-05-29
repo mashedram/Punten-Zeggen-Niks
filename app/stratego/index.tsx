@@ -24,6 +24,7 @@ import {
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { PowerUpList } from '@/constants/PowerUpList';
+import { GameState } from '@/constants/GameState';
 
 export default function Game() {
   const lobby = useLobby();
@@ -89,7 +90,7 @@ export default function Game() {
           </View>
         </View>
 
-        {(isTeamLeader && (
+        {isTeamLeader && (
           <View style={styles.SelectScreenContainer}>
             <Picker
               style={styles.SelectFieldContainer}
@@ -123,11 +124,8 @@ export default function Game() {
               </Text>
             </View>
           </View>
-        )) || (
-          <Image
-            source={require('@/assets/images/Spion.png')}
-            style={styles.SpelerCard}></Image>
         )}
+
         <View style={styles.PopUpContainer}>
           {PowerUpsIndex !== undefined && (
             <PowerUpPopUp
@@ -165,6 +163,24 @@ export default function Game() {
             title="Attack"
             color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
           />
+          <view>
+            {stratego.lobby.gameState === GameState.playing && (
+              <Text>Game is running...</Text>
+            )}
+            {stratego.lobby.gameState === stratego.self.teamId &&
+              stratego.lobby.gameState !== GameState.playing && (
+                <Text>
+                  Je hebt gewonnen! Gefeliciteerd, {stratego.self.teamId} team!
+                </Text>
+              )}
+            {stratego.lobby.gameState !== stratego.self.teamId &&
+              stratego.lobby.gameState !== GameState.playing && (
+                <Text>
+                  Je hebt verloren. Volgende keer beter team{' '}
+                  {stratego.self.teamId}.
+                </Text>
+              )}
+          </view>
         </>
         {/* Einde test gedeelte gameloop */}
         <Pressable

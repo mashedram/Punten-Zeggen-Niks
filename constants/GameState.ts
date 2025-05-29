@@ -1,4 +1,6 @@
 export enum GameState {
   playing = 'playing',
-  ending = 'ending',
+  red_wins = 'red',
+  blue_wins = 'blue',
+  draw = 'draw',
 }

@@ -161,6 +161,11 @@ function performAttack(lobby: Lobby, attacker: Player, defender: Player) {
     console.warn('Cannot attack a player from the same team.');
     return;
   }
+  // check if game is still active
+  if (getLobbyData(lobby).gameState !== String(GameState.playing)) {
+    console.warn('Game is not active, cannot perform attack.');
+    return;
+  }
 
   // check if defender has a flag
   if (defenderData.roleCard === 'flag') {
@@ -246,7 +251,15 @@ function checkWinConditions(lobby: Lobby) {
 
 function endGame(lobby: Lobby, winningTeamId: string) {
   const lobbyData = getLobbyData(lobby);
-  lobbyData.gameState = String(GameState.ending);
+  if (winningTeamId === 'red') {
+    lobbyData.gameState = String(GameState.red_wins);
+  } else if (winningTeamId === 'blue') {
+    lobbyData.gameState = String(GameState.blue_wins);
+  } else {
+    // there is no state where a game can draw, but we handle it just in case
+    console.warn('Game ended in a draw, no winning team found.');
+    lobbyData.gameState = String(GameState.draw);
+  }
   lobby.sync();
   console.log(`Game ended. Team ${winningTeamId} has won.`);
 }
