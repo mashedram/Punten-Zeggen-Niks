@@ -1,13 +1,7 @@
 import { SettingsButton } from '@/components/lobby_host/SettingsButton';
 import { ThemedText } from '@/components/ThemedText';
 import { useLobby } from '@/hooks/useLobby';
-import {
-  ExternalPathString,
-  Link,
-  Redirect,
-  useRootNavigationState,
-  useRouter,
-} from 'expo-router';
+import { ExternalPathString, Link, Redirect, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   View,

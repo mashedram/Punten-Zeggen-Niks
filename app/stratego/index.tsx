@@ -35,7 +35,7 @@ export default function Game() {
   );
   const namen = ['Bas', 'Jan', 'Oscar', 'Mark'];
   const rangen = ['Generaal', 'Verkenner', 'Sergeant', 'Bom'];
-  const isTeamLeader = true; // This should be determined based on the lobby or player data
+  const isTeamLeader = false; // This should be determined based on the lobby or player data
 
   const [enemyAttackCode, setEnemyAttackCode] = useState('');
   const [isPowerCardOpen, setPowerCardOpen] = React.useState(false);
@@ -90,7 +90,7 @@ export default function Game() {
           </View>
         </View>
 
-        {isTeamLeader && (
+        {(isTeamLeader && (
           <View style={styles.SelectScreenContainer}>
             <Picker
               style={styles.SelectFieldContainer}
@@ -124,6 +124,10 @@ export default function Game() {
               </Text>
             </View>
           </View>
+        )) || (
+          <Image
+            source={require('@/assets/images/Spion.png')}
+            style={styles.SpelerCard}></Image>
         )}
 
         <View style={styles.PopUpContainer}>
@@ -160,10 +164,10 @@ export default function Game() {
                 attackCode: enemyAttackCode,
               })
             }
-            title="Attack"
+            title={stratego.self.teamId}
             color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
           />
-          <view>
+          <View>
             {stratego.lobby.gameState === GameState.playing && (
               <Text>Game is running...</Text>
             )}
@@ -180,7 +184,7 @@ export default function Game() {
                   {stratego.self.teamId}.
                 </Text>
               )}
-          </view>
+          </View>
         </>
         {/* Einde test gedeelte gameloop */}
         <Pressable
