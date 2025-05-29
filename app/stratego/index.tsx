@@ -34,6 +34,7 @@ export default function Game() {
   );
   const namen = ['Bas', 'Jan', 'Oscar', 'Mark'];
   const rangen = ['Generaal', 'Verkenner', 'Sergeant', 'Bom'];
+  const isTeamLeader = true; // This should be determined based on the lobby or player data
 
   const [enemyAttackCode, setEnemyAttackCode] = useState('');
   const [isPowerCardOpen, setPowerCardOpen] = React.useState(false);
@@ -88,7 +89,7 @@ export default function Game() {
           </View>
         </View>
 
-        {(false && (
+        {(isTeamLeader && (
           <View style={styles.SelectScreenContainer}>
             <Picker
               style={styles.SelectFieldContainer}
@@ -143,6 +144,11 @@ export default function Game() {
         </View>
         {/* Gameloop test gedeelte kan later weg */}
         <>
+          <Text>
+            {stratego.self.roleCard !== undefined
+              ? `Jouw rol: ${stratego.self.roleCard} value: ${stratego.self.roleCard}`
+              : 'Je hebt nog geen rolkaart.'}
+          </Text>
           <Text>{stratego.self.attackCode}</Text>
           <TextInput
             onChangeText={text => setEnemyAttackCode(text)}

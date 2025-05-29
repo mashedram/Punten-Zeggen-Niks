@@ -75,7 +75,7 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
     createPlayerData: (lobby, player) => ({
       gameId: StrategoGameId,
       teamId: getNewPlayerTeam(lobby),
-      roleCard: undefined,
+      roleCard: getRandomRoleCard(),
       attackCode: generateAttackCode(),
     }),
     registerEvents: lobby => {},
@@ -96,6 +96,11 @@ function getPlayerData(player: Player): PlayerDataStratego {
 function getRoleCard(cardId?: string): RoleCard | undefined {
   if (!cardId) return undefined;
   return RoleCards[cardId];
+}
+
+function getRandomRoleCard(): string {
+  const keys = Object.keys(RoleCards);
+  return keys[Math.floor(Math.random() * keys.length)];
 }
 
 function getPlayerFromAttackCode(
