@@ -146,7 +146,7 @@ export default function Game() {
         <>
           <Text>
             {stratego.self.roleCard !== undefined
-              ? `Jouw rol: ${stratego.self.roleCard} value: ${stratego.self.roleCard}`
+              ? `Jouw rol: ${stratego.self.roleCard}`
               : 'Je hebt nog geen rolkaart.'}
           </Text>
           <Text>{stratego.self.attackCode}</Text>

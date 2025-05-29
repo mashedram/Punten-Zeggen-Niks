@@ -272,5 +272,6 @@ export const StrategoGame = {
     if (!defender) throw new Error('Invalid attack code');
     performAttack(lobby, attacker, defender);
     checkWinConditions(lobby);
+    lobby.sync();
   },
 };
