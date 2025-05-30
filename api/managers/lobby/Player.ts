@@ -67,6 +67,10 @@ export class Player {
     return this._id;
   }
 
+  public getLobby(): Lobby {
+    return this._lobby;
+  }
+
   public checkAuthToken(token: string): boolean {
     return this._authToken === token;
   }

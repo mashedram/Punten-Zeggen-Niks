@@ -23,49 +23,30 @@ import {
   StatusBar,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
+import { PowerUpList } from '@/constants/PowerUpList';
+import { GameState } from '@/constants/GameState';
 
 export default function Game() {
   const lobby = useLobby();
   const trpc = useTRPC();
   const stratego = useStratego(lobby);
+  const sendAttackMutation = useMutation(
+    trpc.stratego.attack.mutationOptions({}),
+  );
+  const namen = ['Bas', 'Jan', 'Oscar', 'Mark'];
+  const rangen = ['Generaal', 'Verkenner', 'Sergeant', 'Bom'];
+  const isTeamLeader = false; // This should be determined based on the lobby or player data
 
-  const [attackCode, setAttackCode] = useState('');
-
-  const attackMutation = useMutation(trpc.stratego.attack.mutationOptions({}));
-
+  const [enemyAttackCode, setEnemyAttackCode] = useState('');
   const [isPowerCardOpen, setPowerCardOpen] = React.useState(false);
   const [selectedName, setSelectedName] = React.useState('Kies een speler');
-  const namen = ['Bas', 'Jan', 'Oscar', 'Mark'];
   const [selectedRang, setSelectedRang] = React.useState('Kies een rang');
-  const rangen = ['Generaal', 'Verkenner', 'Sergeant', 'Bom'];
-  const [PowerupsIndex, setPowerupsIndex] = React.useState<
+  const [PowerUpsIndex, setPowerupsIndex] = React.useState<
     number | undefined
   >();
   const [ingezettePowerupIndex, setIngezettePowerupIndex] = React.useState<
     number | null
   >(null);
-
-  const powerups = [
-    {
-      id: 'vergrootglas',
-      image: require('@/assets/images/Vergrootglas.jpg'),
-      name: 'Vergrootglas',
-      description: 'Onthul alle power-ups van de spelers in de omgeving.',
-    },
-    {
-      id: 'bomvest',
-      image: require('@/assets/images/Bomvest.jpg'),
-      name: 'Bomvest',
-      description: 'Bescherm jezelf tegen bommen voor 1 beurt.',
-    },
-    {
-      id: 'spion',
-      image: require('@/assets/images/SpionP.jpg'),
-      name: 'Spion',
-      description:
-        'Versla elke rang en niet alleen rang 10, uitzondering van de bom.',
-    },
-  ];
 
   if (lobby.loading) {
     return;
@@ -85,7 +66,7 @@ export default function Game() {
   }
 
   return (
-    <SafeAreaView style={styles.backgroundView}>
+    <SafeAreaView style={styles.BackgroundView}>
       <>
         <View style={styles.CardStackTrackerContainer}>
           <CartStackTracker />
@@ -100,7 +81,7 @@ export default function Game() {
             <Circle cx={10} cy={10} r={10} fill="#FF2424" />
           </Svg>
           <Text style={styles.CaptainIcon}>🎖</Text>
-          <Text style={styles.CaptainUitroepteken}>!</Text>
+          <Text style={styles.CaptainExclamationMark}>!</Text>
         </View>
 
         <View style={styles.BattleLogButtonContainer}>
@@ -109,7 +90,7 @@ export default function Game() {
           </View>
         </View>
 
-        {(false && (
+        {(isTeamLeader && (
           <View style={styles.SelectScreenContainer}>
             <Picker
               style={styles.SelectFieldContainer}
@@ -148,55 +129,86 @@ export default function Game() {
             source={require('@/assets/images/Spion.png')}
             style={styles.SpelerCard}></Image>
         )}
+
         <View style={styles.PopUpContainer}>
-          {PowerupsIndex !== undefined && (
+          {PowerUpsIndex !== undefined && (
             <PowerUpPopUp
-              name={powerups[PowerupsIndex].name}
-              description={powerups[PowerupsIndex].description}
-              image={powerups[PowerupsIndex].image}
+              name={PowerUpList[PowerUpsIndex].name}
+              description={PowerUpList[PowerUpsIndex].description}
+              image={PowerUpList[PowerUpsIndex].image}
               onDelete={() => setPowerupsIndex(undefined)}
               onInzet={() => {
-                setIngezettePowerupIndex(PowerupsIndex);
+                setIngezettePowerupIndex(PowerUpsIndex);
                 setPowerupsIndex(undefined);
               }}
             />
           )}
         </View>
+        {/* Gameloop test gedeelte kan later weg */}
         <>
+          <Text>
+            {stratego.self.roleCard !== undefined
+              ? `Jouw rol: ${stratego.self.roleCard}`
+              : 'Je hebt nog geen rolkaart.'}
+          </Text>
+          <Text>{stratego.self.attackCode}</Text>
           <TextInput
-            onChangeText={text => setAttackCode(text)}
-            value={attackCode}
+            onChangeText={text => setEnemyAttackCode(text)}
+            value={enemyAttackCode}
             style={{ backgroundColor: 'white' }}
           />
           <Button
             onPress={() =>
-              attackMutation.mutate({ token: lobby.getToken(), attackCode })
+              sendAttackMutation.mutate({
+                token: lobby.getToken(),
+                attackCode: enemyAttackCode,
+              })
             }
-            title="Attack"
+            title={stratego.self.teamId}
+            color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
           />
+          <View>
+            {stratego.lobby.gameState === GameState.playing && (
+              <Text>Game is running...</Text>
+            )}
+            {stratego.lobby.gameState === stratego.self.teamId &&
+              stratego.lobby.gameState !== GameState.playing && (
+                <Text>
+                  Je hebt gewonnen! Gefeliciteerd, {stratego.self.teamId} team!
+                </Text>
+              )}
+            {stratego.lobby.gameState !== stratego.self.teamId &&
+              stratego.lobby.gameState !== GameState.playing && (
+                <Text>
+                  Je hebt verloren. Volgende keer beter team{' '}
+                  {stratego.self.teamId}.
+                </Text>
+              )}
+          </View>
         </>
+        {/* Einde test gedeelte gameloop */}
         <Pressable
           style={{
             transform: [{ translateY: isPowerCardOpen ? '5%' : '80%' }],
-            ...styles.PowerupBarContainer,
+            ...styles.PowerUpBarContainer,
           }}
           onPress={() => setPowerCardOpen(!isPowerCardOpen)}>
           <View style={styles.PowerCardTitleContainer}>
             <Text
               style={{
                 transform: [{ rotate: isPowerCardOpen ? '90deg' : '-90deg' }],
-                ...styles.PowerupArrow,
+                ...styles.PowerUpArrow,
               }}>
               ➔
             </Text>
-            <Text style={styles.PowerupsTekst}>Power-ups</Text>
+            <Text style={styles.PowerUpTekst}>Power-ups</Text>
           </View>
-          <View style={styles.PowerupCardContainer}>
-            {powerups.map((powerup, index) => (
+          <View style={styles.PowerUpCardContainer}>
+            {PowerUpList.map((powerUp, index) => (
               <Pressable
-                key={powerup.id}
+                key={powerUp.id}
                 style={[
-                  styles.PowerupPressable,
+                  styles.PowerUpPressable,
                   index === ingezettePowerupIndex && {
                     borderWidth: 6,
                     borderColor: '#70C25C',
@@ -211,7 +223,7 @@ export default function Game() {
                   event.stopPropagation();
                   if (isPowerCardOpen) setPowerupsIndex(index);
                 }}>
-                <Image source={powerup.image} style={styles.PowerupCard} />
+                <Image source={powerUp.image} style={styles.PowerupCard} />
               </Pressable>
             ))}
           </View>
@@ -222,7 +234,7 @@ export default function Game() {
 }
 
 const styles = StyleSheet.create({
-  backgroundView: {
+  BackgroundView: {
     position: 'relative',
     backgroundColor: 'rgba(92, 163, 194, 1)',
     display: 'flex',
@@ -330,7 +342,7 @@ const styles = StyleSheet.create({
     fontSize: 60,
     fontWeight: '700',
   },
-  CaptainUitroepteken: {
+  CaptainExclamationMark: {
     position: 'absolute',
     width: 20,
     height: 20,
@@ -342,7 +354,7 @@ const styles = StyleSheet.create({
     marginTop: -40,
     marginLeft: -39,
   },
-  PowerupBarContainer: {
+  PowerUpBarContainer: {
     position: 'absolute',
     width: '100%',
     bottom: 0,
@@ -364,20 +376,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  PowerupArrow: {
+  PowerUpArrow: {
     color: 'rgba(255, 255, 255, 1)',
     fontFamily: 'Inter',
     fontSize: 24,
     fontWeight: 400,
     transitionDuration: '0.3s',
   },
-  PowerupsTekst: {
+  PowerUpTekst: {
     color: 'rgba(255, 255, 255, 1)',
     fontFamily: 'Inter',
     fontSize: 24,
     fontWeight: 400,
   },
-  PowerupCardContainer: {
+  PowerUpCardContainer: {
     height: '80%',
     width: '100%',
     display: 'flex',
@@ -385,11 +397,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
   },
-  PowerupPressable: {
+  PowerUpPressable: {
     height: '90%',
     width: '30%',
   },
-
   PowerupCard: {
     width: '100%',
     height: '100%',
@@ -397,7 +408,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'black',
   },
-
   SelectScreenContainer: {
     position: 'relative',
     flexShrink: 0,
