@@ -16,6 +16,7 @@ export const strategoRouter = router({
       const [lobby, attacker] = entity;
       StrategoGame.attack(lobby, attacker, input.attackCode);
     }),
+
   revive: publicProcedure
     .input(
       z.object({
@@ -38,6 +39,7 @@ export const strategoRouter = router({
       if (!targetPlayer) throw new Error('Target player not found');
       StrategoGame.revive(lobby, teamLeader, targetPlayer, roleCard);
     }),
+
   getAvailableRoleCards: publicProcedure
     .output(z.record(z.string(), z.number()))
     .input(z.object({ token: z.string() }))

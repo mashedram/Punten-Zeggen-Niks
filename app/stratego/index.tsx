@@ -25,6 +25,7 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 import { PowerUpList } from '@/constants/PowerUpList';
 import { GameState } from '@/constants/GameState';
+import { RoleCard } from '@/constants/RoleCards';
 
 export default function Game() {
   const lobby = useLobby();
@@ -33,9 +34,14 @@ export default function Game() {
   const sendAttackMutation = useMutation(
     trpc.stratego.attack.mutationOptions({}),
   );
+
   const namen = ['Bas', 'Jan', 'Oscar', 'Mark'];
   const rangen = ['Generaal', 'Verkenner', 'Sergeant', 'Bom'];
   const isTeamLeader = false; // This should be determined based on the lobby or player data
+
+  const [selectedRoleCard, setSelectedRoleCard] = useState<RoleCard | string>(
+    'select role card',
+  );
 
   const [enemyAttackCode, setEnemyAttackCode] = useState('');
   const [isPowerCardOpen, setPowerCardOpen] = React.useState(false);
@@ -152,6 +158,12 @@ export default function Game() {
               : 'Je hebt nog geen rolkaart.'}
           </Text>
           <Text>{stratego.self.attackCode}</Text>
+          <Picker
+            style={styles.SelectFieldContainer}
+            selectedValue={selectedRoleCard}
+            onValueChange={(itemValue, itemIndex) => {
+              setSelectedRoleCard(itemValue);
+            }}></Picker>
           <TextInput
             onChangeText={text => setEnemyAttackCode(text)}
             value={enemyAttackCode}
