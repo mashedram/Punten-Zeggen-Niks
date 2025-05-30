@@ -1,11 +1,7 @@
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
+import { getPlayerData, getRoleCardFromDeck, endGame } from './StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
-import {
-  getPlayerData,
-  endGame,
-  getRoleCardFromSelection,
-} from './StrategoGame';
 
 export function performAttack(
   lobby: Lobby,
@@ -106,7 +102,7 @@ function win(player: Player) {
 
 function defeat(player: Player) {
   const playerData = getPlayerData(player);
-  playerData.roleCard = getRoleCardFromSelection(
+  playerData.roleCard = getRoleCardFromDeck(
     player.getLobby(),
     playerData.teamId,
   );
@@ -121,7 +117,7 @@ function defeat(player: Player) {
 
 function explode(player: Player) {
   const playerData = getPlayerData(player);
-  playerData.roleCard = getRoleCardFromSelection(
+  playerData.roleCard = getRoleCardFromDeck(
     player.getLobby(),
     playerData.teamId,
   );

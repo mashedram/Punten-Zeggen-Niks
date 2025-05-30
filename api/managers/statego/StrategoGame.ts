@@ -181,49 +181,6 @@ function checkActiveRoleCards(lobby: Lobby, teamId: string): boolean {
 /// External utils ///
 //////////////////////
 
-export function getRoleCardFromSelection(
-  lobby: Lobby,
-  teamId: string,
-): string | undefined {
-  const lobbyData = getLobbyData(lobby);
-  const team = lobbyData.teams.find(team => team.id === teamId);
-  if (!team || !team.deck) {
-    throw new Error(`Team ${teamId} or its deck not found in lobby data.`);
-  }
-  const availableCards = Object.keys(team.deck);
-  console.log(`Available cards for team ${teamId}:`, team.deck);
-  if (team.deck[RoleCards.vlag.id] > 0) {
-    removeRoleCardFromDeck(lobby, teamId, RoleCards.vlag.id);
-    return RoleCards.vlag.id;
-  }
-  if (availableCards.length === 0) {
-    return undefined;
-  }
-  const cardName =
-    availableCards[Math.floor(Math.random() * availableCards.length)];
-  removeRoleCardFromDeck(lobby, teamId, cardName);
-  return cardName;
-}
-
-export function endGame(lobby: Lobby, winningTeamId: string) {
-  const lobbyData = getLobbyData(lobby);
-  if (winningTeamId === 'red') {
-    lobbyData.gameState = String(GameState.red_wins);
-  } else if (winningTeamId === 'blue') {
-    lobbyData.gameState = String(GameState.blue_wins);
-  } else {
-    // there is no state where a game can draw, but we handle it just in case
-    console.warn('Game ended in a draw, no winning team found.');
-    lobbyData.gameState = String(GameState.draw);
-  }
-  lobby.sync();
-  console.log(`Game ended. Team ${winningTeamId} has won.`);
-}
-
-//////////////////////////
-/// EXTERNAL FUNCTIONS ///
-//////////////////////////
-
 export function getLobbyData(lobby: Lobby): LobbyDataStratego {
   return lobby.getGameData<LobbyDataStratego>();
 }
@@ -231,7 +188,6 @@ export function getLobbyData(lobby: Lobby): LobbyDataStratego {
 export function getPlayerData(player: Player): PlayerDataStratego {
   return player.getGameData<PlayerDataStratego>();
 }
-
 
 export function getRoleCardFromDeck(
   lobby: Lobby,
@@ -255,6 +211,21 @@ export function getRoleCardFromDeck(
     availableCards[Math.floor(Math.random() * availableCards.length)];
   removeRoleCardFromDeck(lobby, teamId, cardName);
   return cardName;
+}
+
+export function endGame(lobby: Lobby, winningTeamId: string) {
+  const lobbyData = getLobbyData(lobby);
+  if (winningTeamId === 'red') {
+    lobbyData.gameState = String(GameState.red_wins);
+  } else if (winningTeamId === 'blue') {
+    lobbyData.gameState = String(GameState.blue_wins);
+  } else {
+    // there is no state where a game can draw, but we handle it just in case
+    console.warn('Game ended in a draw, no winning team found.');
+    lobbyData.gameState = String(GameState.draw);
+  }
+  lobby.sync();
+  console.log(`Game ended. Team ${winningTeamId} has won.`);
 }
 
 //////////////////////////
