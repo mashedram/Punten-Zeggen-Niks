@@ -190,9 +190,9 @@ export function getRoleCardFromSelection(
   }
   const availableCards = Object.keys(team.deck);
   console.log(`Available cards for team ${teamId}:`, team.deck);
-  if (team.deck[RoleCards.vlag.name] > 0) {
-    removeRoleCardFromDeck(lobby, teamId, RoleCards.vlag.name);
-    return RoleCards.vlag.name;
+  if (team.deck[RoleCards.vlag.id] > 0) {
+    removeRoleCardFromDeck(lobby, teamId, RoleCards.vlag.id);
+    return RoleCards.vlag.id;
   }
   if (availableCards.length === 0) {
     return undefined;

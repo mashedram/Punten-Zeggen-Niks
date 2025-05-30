@@ -1,4 +1,5 @@
 export type RoleCard = {
+  id: string;
   name: string;
   value: number;
   canAttack: boolean;
@@ -8,7 +9,8 @@ export type RoleCard = {
 };
 
 const vlag: RoleCard = {
-  name: 'vlag',
+  id: 'vlag',
+  name: 'Vlag',
   value: 0,
   image: require('@/assets/images/Vlag.png'),
   canAttack: false,
@@ -16,7 +18,8 @@ const vlag: RoleCard = {
 };
 
 const maarschalk: RoleCard = {
-  name: 'maarschalk',
+  id: 'maarschalk',
+  name: 'Maarschalk',
   value: 10,
   image: require('@/assets/images/Maarschalk.png'),
   canAttack: true,
@@ -24,7 +27,8 @@ const maarschalk: RoleCard = {
 };
 
 const generaal: RoleCard = {
-  name: 'generaal',
+  id: 'generaal',
+  name: 'Generaal',
   value: 9,
   image: require('@/assets/images/Generaal.png'),
   canAttack: true,
@@ -32,7 +36,8 @@ const generaal: RoleCard = {
 };
 
 const kolonel: RoleCard = {
-  name: 'kolonel',
+  id: 'kolonel',
+  name: 'Kolonel',
   value: 8,
   image: require('@/assets/images/Kolonel.png'),
   canAttack: true,
@@ -40,7 +45,8 @@ const kolonel: RoleCard = {
 };
 
 const majoor: RoleCard = {
-  name: 'majoor',
+  id: 'majoor',
+  name: 'Majoor',
   value: 7,
   image: require('@/assets/images/Majoor.png'),
   canAttack: true,
@@ -48,7 +54,8 @@ const majoor: RoleCard = {
 };
 
 const kapitein: RoleCard = {
-  name: 'kapitein',
+  id: 'kapitein',
+  name: 'Kapitein',
   value: 6,
   image: require('@/assets/images/Kapitein.png'),
   canAttack: true,
@@ -56,7 +63,8 @@ const kapitein: RoleCard = {
 };
 
 const luitenant: RoleCard = {
-  name: 'luitenant',
+  id: 'luitenant',
+  name: 'Luitenant',
   value: 5,
   image: require('@/assets/images/Luitenant.png'),
   canAttack: true,
@@ -64,7 +72,8 @@ const luitenant: RoleCard = {
 };
 
 const sergeant: RoleCard = {
-  name: 'sergeant',
+  id: 'sergeant',
+  name: 'Sergeant',
   value: 4,
   image: require('@/assets/images/Sergeant.png'),
   canAttack: true,
@@ -72,7 +81,8 @@ const sergeant: RoleCard = {
 };
 
 const mineur: RoleCard = {
-  name: 'mineur',
+  id: 'mineur',
+  name: 'Mineur',
   value: 3,
   image: require('@/assets/images/Mineur.png'),
   canAttack: true,
@@ -80,7 +90,8 @@ const mineur: RoleCard = {
 };
 
 const spion: RoleCard = {
-  name: 'spion',
+  id: 'spion',
+  name: 'Spion',
   value: 2,
   image: require('@/assets/images/Spion.png'),
   canAttack: true,
@@ -88,7 +99,8 @@ const spion: RoleCard = {
 };
 
 const bom: RoleCard = {
-  name: 'bom',
+  id: 'bom',
+  name: 'Bom',
   value: 1,
   image: require('@/assets/images/Bom.png'),
   canAttack: false,
