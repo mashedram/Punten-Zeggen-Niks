@@ -164,7 +164,7 @@ export default function Game() {
                 attackCode: enemyAttackCode,
               })
             }
-            title={stratego.self.teamId}
+            title="Attack"
             color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
           />
           <View>

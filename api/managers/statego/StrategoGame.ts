@@ -2,7 +2,7 @@ import { GameType } from '@/api/game/GameType';
 import { z } from 'zod';
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { RoleCards } from '@/constants/RoleCards';
+import { RoleCard, RoleCards } from '@/constants/RoleCards';
 import { GameState } from '@/constants/GameState';
 import { createRoleCardDeck } from '@/constants/RoleCardDeck';
 import { console } from 'inspector';
@@ -41,6 +41,7 @@ export const PlayerDataSchemaStratego = z.object({
   teamId: z.string(),
   roleCard: z.string().optional(),
   attackCode: z.string(),
+  isTeamLeader: z.boolean(),
   lastFightResult: z
     .object({
       index: z.number(),
@@ -79,6 +80,7 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
       return {
         gameId: StrategoGameId,
         teamId,
+        isTeamLeader: true,
         roleCard: getRoleCardFromDeck(lobby, teamId),
         attackCode: generateAttackCode(),
       };
@@ -175,9 +177,9 @@ function checkActiveRoleCards(lobby: Lobby, teamId: string): boolean {
   );
 }
 
-//////////////////////////
-/// EXTERNAL FUNCTIONS ///
-//////////////////////////
+//////////////////////
+/// EXTERNAL UTILS ///
+//////////////////////
 
 export function getLobbyData(lobby: Lobby): LobbyDataStratego {
   return lobby.getGameData<LobbyDataStratego>();
@@ -186,23 +188,6 @@ export function getLobbyData(lobby: Lobby): LobbyDataStratego {
 export function getPlayerData(player: Player): PlayerDataStratego {
   return player.getGameData<PlayerDataStratego>();
 }
-
-export const StrategoGame = {
-  attack(lobby: Lobby, attacker: Player, attackCode: string) {
-    console.log('Received attack request from player:', attacker.getId());
-    const defender = getPlayerFromAttackCode(lobby, attackCode);
-    if (!defender) throw new Error('Invalid attack code');
-    console.log(
-      'attacker:',
-      getPlayerData(attacker).teamId,
-      'defender:',
-      getPlayerData(defender).teamId,
-    );
-    performAttack(lobby, attacker, defender);
-    checkWinConditions(lobby);
-    lobby.sync();
-  },
-};
 
 export function endGame(lobby: Lobby, winningTeamId: string) {
   const lobbyData = getLobbyData(lobby);
@@ -242,3 +227,61 @@ export function getRoleCardFromDeck(
   removeRoleCardFromDeck(lobby, teamId, cardName);
   return cardName;
 }
+
+//////////////////////////
+/// EXTERNAL FUNCTIONS ///
+//////////////////////////
+
+export const StrategoGame = {
+  attack(lobby: Lobby, attacker: Player, attackCode: string) {
+    const defender = getPlayerFromAttackCode(lobby, attackCode);
+    if (!defender) throw new Error('Invalid attack code');
+    console.log(
+      'attacker:',
+      getPlayerData(attacker).teamId,
+      'defender:',
+      getPlayerData(defender).teamId,
+    );
+    performAttack(lobby, attacker, defender);
+    checkWinConditions(lobby);
+    lobby.sync();
+  },
+
+  revive(lobby: Lobby, player: Player, target: Player, roleCard: RoleCard) {
+    const playerData = getPlayerData(player);
+    const targetData = getPlayerData(target);
+    const lobbyData = getLobbyData(lobby);
+    if (!playerData.isTeamLeader) {
+      throw new Error('Only team leaders can revive players.');
+    }
+    if (targetData.roleCard) {
+      throw new Error('Target player is already active.');
+    }
+    if (targetData.teamId !== playerData.teamId) {
+      throw new Error('Target player is not on the same team.');
+    }
+    if (
+      Object.keys(
+        lobbyData.teams.find(team => team.id === playerData.teamId)!.deck,
+      ).length <= 0
+    ) {
+      throw new Error('Team has no role cards left to revive players.');
+    }
+    targetData.roleCard = roleCard.name;
+    target.sync();
+    console.log(
+      `Player ${target.getId()} has been revived with role card: ${targetData.roleCard}`,
+    );
+  },
+
+  getAvailableRoleCards(lobby: Lobby, player: Player): Record<string, number> {
+    const lobbyData = getLobbyData(lobby);
+    const playerData = getPlayerData(player);
+    const teamId = playerData.teamId;
+    const team = lobbyData.teams.find(t => t.id === teamId);
+    if (!team) {
+      throw new Error(`Team ${teamId} not found in lobby data.`);
+    }
+    return team.deck;
+  },
+};
