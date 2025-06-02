@@ -1,5 +1,5 @@
 import { useTRPC } from '@/api/query';
-import { CartStackTracker } from '@/components/ui/CartStackTracker';
+
 import { PowerUpPopUp } from '@/components/ui/PowerUpPopUp';
 import {
   InitalizationFailureReason,
@@ -23,6 +23,7 @@ import {
   StatusBar,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
+import { CardCountBar } from '@/components/ui/CardCountBar';
 
 export default function Game() {
   const lobby = useLobby();
@@ -88,7 +89,7 @@ export default function Game() {
     <SafeAreaView style={styles.backgroundView}>
       <>
         <View style={styles.CardStackTrackerContainer}>
-          <CartStackTracker />
+          <CardCountBar />
         </View>
         <View style={styles.CaptainIconContainer}>
           <Svg
