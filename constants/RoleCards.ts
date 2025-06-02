@@ -155,16 +155,16 @@ export const RoleCards: Record<string, RoleCard> = {
   bom,
 };
 
-export const roleCardImages = {
-  vlag: require('@/assets/images/Vlag.png'),
-  maarschalk: require('@/assets/images/Maarschalk.png'),
-  generaal: require('@/assets/images/Generaal.png'),
-  kolonel: require('@/assets/images/Kolonel.png'),
-  majoor: require('@/assets/images/Majoor.png'),
-  kapitein: require('@/assets/images/Kapitein.png'),
-  luitenant: require('@/assets/images/Luitenant.png'),
-  sergeant: require('@/assets/images/Sergeant.png'),
-  mineur: require('@/assets/images/Mineur.png'),
-  spion: require('@/assets/images/Spion.png'),
-  bom: require('@/assets/images/Bom.png'),
-};
+// export const roleCardImages = {
+//   vlag: require('@/assets/images/Vlag.png'),
+//   maarschalk: require('@/assets/images/Maarschalk.png'),
+//   generaal: require('@/assets/images/Generaal.png'),
+//   kolonel: require('@/assets/images/Kolonel.png'),
+//   majoor: require('@/assets/images/Majoor.png'),
+//   kapitein: require('@/assets/images/Kapitein.png'),
+//   luitenant: require('@/assets/images/Luitenant.png'),
+//   sergeant: require('@/assets/images/Sergeant.png'),
+//   mineur: require('@/assets/images/Mineur.png'),
+//   spion: require('@/assets/images/Spion.png'),
+//   bom: require('@/assets/images/Bom.png'),
+// };
