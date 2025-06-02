@@ -15,7 +15,7 @@ interface Rolecardprops {
   code: string;
 }
 
-export const Spion = ({ actie, image, code }: Rolecardprops) => {
+export const PlayerRole = ({ actie, image, code }: Rolecardprops) => {
   const [toggled, setToggled] = useState(false);
 
   const styles = StyleSheet.create({
@@ -39,14 +39,10 @@ export const Spion = ({ actie, image, code }: Rolecardprops) => {
       activeOpacity={0.8}>
       {toggled ? (
         <View style={styles.image}>
-          <QRCode value={`${actie}?${Math.random()}`} size={100} />
+          <QRCode value={`${actie}?${code}`} />
         </View>
       ) : (
-        <Image
-          style={styles.image}
-          resizeMode="contain"
-          // source={}
-        />
+        <Image style={styles.image} resizeMode="contain" source={image} />
       )}
     </TouchableOpacity>
   );
