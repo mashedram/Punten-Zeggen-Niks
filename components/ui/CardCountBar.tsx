@@ -1,14 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { defaultDeckSize } from '@/constants/RoleCardDeck';
 
 type CardCountBarProps = {
-  blueCount?: number;
-  redCount?: number;
+  blueCardCount?: number;
+  redCardCount?: number;
 };
 
 export const CardCountBar: React.FC<CardCountBarProps> = ({
-  blueCount,
-  redCount,
+  blueCardCount: blueCount,
+  redCardCount: redCount,
 }) => {
   if (blueCount == null || redCount == null) {
     return (
@@ -18,19 +19,17 @@ export const CardCountBar: React.FC<CardCountBarProps> = ({
     );
   }
 
-  // TODO: Haal total af van de cons defaultDeckSize in RoleCardDeck zodra het gemerged is
-  const total =  60;
-  const blueRatio = blueCount / total;
-  const redRatio = redCount / total;
+  const teamBlueRatio = blueCount / defaultDeckSize;
+  const teamRedRatio = redCount / defaultDeckSize;
 
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{blueCount}</Text>
       <View style={styles.barContainer}>
         <View style={styles.edge} />
-        <View style={[styles.blueBar, { flex: blueRatio }]} />
+        <View style={[styles.blueBar, { flex: teamBlueRatio }]} />
         <View style={styles.centerSeparator} />
-        <View style={[styles.redBar, { flex: redRatio }]} />
+        <View style={[styles.redBar, { flex: teamRedRatio }]} />
         <View style={styles.edge} />
       </View>
       <Text style={styles.text}>{redCount}</Text>

@@ -1,6 +1,6 @@
 import { RoleCards } from '../constants/RoleCards';
 
-const defaultDeckSize = 60; // Total number of role cards in the deck
+export const defaultDeckSize = 60; // Total number of role cards in the deck
 
 export function createRoleCardDeck(
   setDeckSize?: number,

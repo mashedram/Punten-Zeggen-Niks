@@ -70,7 +70,7 @@ export default function Game() {
     <SafeAreaView style={styles.BackgroundView}>
       <>
         <View style={styles.CardStackTrackerContainer}>
-          <CardCountBar blueCount={60} redCount={60} />
+          <CardCountBar blueCardCount={60} redCardCount={60} />
         </View>
         <View style={styles.CaptainIconContainer}>
           <Svg
