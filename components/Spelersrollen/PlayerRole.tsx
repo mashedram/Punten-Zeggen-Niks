@@ -25,10 +25,10 @@ export const PlayerRole = ({ actie, image, code }: Rolecardprops) => {
       overflow: 'hidden',
     },
     image: {
-      width: 100,
-      height: 100,
-      borderRadius: 40,
-      padding: 100,
+      width: 240,
+      height: 240,
+      borderRadius: 20,
+      marginBottom: 20,
     },
   });
 

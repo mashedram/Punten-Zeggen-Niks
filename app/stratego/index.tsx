@@ -1,6 +1,8 @@
 import { useTRPC } from '@/api/query';
+import { PlayerRole } from '@/components/Spelersrollen/PlayerRole';
 import { CartStackTracker } from '@/components/ui/CartStackTracker';
 import { PowerUpPopUp } from '@/components/ui/PowerUpPopUp';
+import { CardImages } from '@/constants/CardImages';
 import {
   InitalizationFailureReason,
   useStratego,
@@ -144,9 +146,11 @@ export default function Game() {
             </View>
           </View>
         )) || (
-          <Image
-            source={require('@/assets/images/Spion.png')}
-            style={styles.SpelerCard}></Image>
+          <PlayerRole
+            actie={selectedRang}
+            image={require('@/assets/images/Generaal.png')}
+            code={selectedRang.toUpperCase()}
+          />
         )}
         <View style={styles.PopUpContainer}>
           {PowerupsIndex !== undefined && (
