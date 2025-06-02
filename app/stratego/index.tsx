@@ -148,7 +148,7 @@ export default function Game() {
         )) || (
           <PlayerRole
             actie={selectedRang}
-            image={require('@/assets/images/Generaal.png')}
+            image={CardImages[selectedRang]}
             code={selectedRang.toUpperCase()}
           />
         )}

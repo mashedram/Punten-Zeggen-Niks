@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { View } from 'react-native';
-
+import { Text } from 'react-native';
 interface Rolecardprops {
   actie: string;
   image: ImageSourcePropType;
@@ -29,6 +29,8 @@ export const PlayerRole = ({ actie, image, code }: Rolecardprops) => {
       height: 240,
       borderRadius: 20,
       marginBottom: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
   });
 
@@ -41,8 +43,27 @@ export const PlayerRole = ({ actie, image, code }: Rolecardprops) => {
         <View style={styles.image}>
           <QRCode value={`${actie}?${code}`} />
         </View>
-      ) : (
+      ) : image ? (
         <Image style={styles.image} resizeMode="contain" source={image} />
+      ) : (
+        <View style={styles.image}>
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 18,
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+              Je hebt (nog) geen rol gekregen!
+            </Text>
+          </View>
+        </View>
       )}
     </TouchableOpacity>
   );
