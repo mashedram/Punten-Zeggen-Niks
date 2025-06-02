@@ -3,11 +3,11 @@ import { fn } from '@storybook/test';
 
 import { View } from 'react-native';
 
-import { Spion } from '@/components/Spelersrollen/Spion';
+import { PlayerRole } from '@/components/Spelersrollen/PlayerRole';
 
 const meta = {
-  title: 'Player Page/Spion',
-  component: Spion,
+  title: 'Player Page/PlayerRole',
+  component: PlayerRole,
   decorators: [
     Story => (
       <View style={{ flex: 1, alignItems: 'flex-start' }}>
@@ -17,12 +17,16 @@ const meta = {
   ],
   tags: ['autodocs'],
   // args: { onPress: fn() },
-} satisfies Meta<typeof Spion>;
+} satisfies Meta<typeof PlayerRole>;
 
 export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// export const Primary: Story = {
-//   args: {},
-// };
+export const Primary: Story = {
+  args: {
+    actie: 'Spion',
+    image: require('@/assets/images/spion.png'),
+    code: 'SPION',
+  },
+};
