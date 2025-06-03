@@ -2,7 +2,7 @@ import { GameType } from '@/api/game/GameType';
 import { z } from 'zod';
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { RoleCard, RoleCards } from '@/constants/RoleCards';
+import { RoleCard } from '@/constants/RoleCards';
 import { GameState } from '@/constants/GameState';
 import { createRoleCardDeck } from '@/constants/RoleCardDeck';
 import { console } from 'inspector';
@@ -81,7 +81,7 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         gameId: StrategoGameId,
         teamId,
         isTeamLeader: true,
-        roleCard: getRoleCardFromDeck(lobby, teamId),
+        roleCard: undefined,
         attackCode: generateAttackCode(),
       };
     },
@@ -91,18 +91,6 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
 /////////////////
 /// FUNCTIONS ///
 /////////////////
-
-function removeRoleCardFromDeck(lobby: Lobby, teamId: string, cardId: string) {
-  const lobbyData = getLobbyData(lobby);
-  const team = lobbyData.teams.find(team => team.id === teamId);
-  if (!team || !team.deck || !team.deck[cardId]) {
-    throw new Error(`Card ${cardId} not found in team ${teamId} deck.`);
-  }
-  team.deck[cardId] -= 1;
-  if (team.deck[cardId] <= 0) {
-    delete team.deck[cardId];
-  }
-}
 
 function getPlayerFromAttackCode(
   lobby: Lobby,
@@ -189,30 +177,6 @@ export function getPlayerData(player: Player): PlayerDataStratego {
   return player.getGameData<PlayerDataStratego>();
 }
 
-export function getRoleCardFromDeck(
-  lobby: Lobby,
-  teamId: string,
-): string | undefined {
-  const lobbyData = getLobbyData(lobby);
-  const team = lobbyData.teams.find(team => team.id === teamId);
-  if (!team || !team.deck) {
-    throw new Error(`Team ${teamId} or its deck not found in lobby data.`);
-  }
-  const availableCards = Object.keys(team.deck);
-  console.log(`Available cards for team ${teamId}:`, team.deck);
-  if (team.deck[RoleCards.vlag.name] > 0) {
-    removeRoleCardFromDeck(lobby, teamId, RoleCards.vlag.name);
-    return RoleCards.vlag.name;
-  }
-  if (availableCards.length === 0) {
-    return undefined;
-  }
-  const cardName =
-    availableCards[Math.floor(Math.random() * availableCards.length)];
-  removeRoleCardFromDeck(lobby, teamId, cardName);
-  return cardName;
-}
-
 export function endGame(lobby: Lobby, winningTeamId: string) {
   const lobbyData = getLobbyData(lobby);
   if (winningTeamId === 'red') {
@@ -226,6 +190,22 @@ export function endGame(lobby: Lobby, winningTeamId: string) {
   }
   lobby.sync();
   console.log(`Game ended. Team ${winningTeamId} has won.`);
+}
+
+export function removeRoleCardFromDeck(
+  lobby: Lobby,
+  teamId: string,
+  cardId: string,
+) {
+  const lobbyData = getLobbyData(lobby);
+  const team = lobbyData.teams.find(team => team.id === teamId);
+  if (!team || !team.deck || !team.deck[cardId]) {
+    throw new Error(`Card ${cardId} not found in team ${teamId} deck.`);
+  }
+  team.deck[cardId] -= 1;
+  if (team.deck[cardId] <= 0) {
+    delete team.deck[cardId];
+  }
 }
 
 //////////////////////////
@@ -282,6 +262,31 @@ export const StrategoGame = {
     if (!team) {
       throw new Error(`Team ${teamId} not found in lobby data.`);
     }
+    console.log(team.deck);
+    if (team.deck.vlag > 0) {
+      console.log('vlag found in deck', { vlag: 1 });
+      return { vlag: 1 };
+    }
     return team.deck;
+  },
+
+  getPlayersWithoutRoleCards(lobby: Lobby, player: Player): string[] {
+    const playerData = getPlayerData(player);
+    if (!playerData.isTeamLeader) {
+      throw new Error(
+        'Only team leaders can check for players without role cards.',
+      );
+    }
+    const teamId = playerData.teamId;
+    const playersWithoutRoleCards: string[] = [];
+
+    for (const p of lobby.getActivePlayers()) {
+      const pData = getPlayerData(p);
+      if (pData.teamId === teamId && !pData.roleCard) {
+        playersWithoutRoleCards.push(p.getId());
+      }
+    }
+
+    return playersWithoutRoleCards;
   },
 };

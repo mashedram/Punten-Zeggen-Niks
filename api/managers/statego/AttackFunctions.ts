@@ -1,6 +1,6 @@
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { getPlayerData, getRoleCardFromDeck, endGame } from './StrategoGame';
+import { getPlayerData, endGame, removeRoleCardFromDeck } from './StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
 
 export function performAttack(
@@ -102,10 +102,8 @@ function win(player: Player) {
 
 function defeat(player: Player) {
   const playerData = getPlayerData(player);
-  playerData.roleCard = getRoleCardFromDeck(
-    player.getLobby(),
-    playerData.teamId,
-  );
+  deleteRoleCard(player);
+  playerData.roleCard = undefined;
   playerData.lastFightResult = {
     index: playerData.lastFightResult
       ? playerData.lastFightResult.index + 1
@@ -117,10 +115,8 @@ function defeat(player: Player) {
 
 function explode(player: Player) {
   const playerData = getPlayerData(player);
-  playerData.roleCard = getRoleCardFromDeck(
-    player.getLobby(),
-    playerData.teamId,
-  );
+  deleteRoleCard(player);
+  playerData.roleCard = undefined;
   playerData.lastFightResult = {
     index: playerData.lastFightResult
       ? playerData.lastFightResult.index + 1
@@ -143,4 +139,14 @@ function getRoleCard(cardId?: string): RoleCard | undefined {
     return undefined;
   }
   return RoleCards[cardId];
+}
+
+function deleteRoleCard(player: Player) {
+  const playerData = getPlayerData(player);
+  const lobby = player.getLobby();
+  if (!playerData.roleCard) {
+    console.warn(`Player ${player.getId()} has no role card to remove.`);
+    return;
+  }
+  removeRoleCardFromDeck(lobby, playerData.teamId, playerData.roleCard);
 }

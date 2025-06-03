@@ -51,4 +51,16 @@ export const strategoRouter = router({
       const [lobby, player] = entity;
       return StrategoGame.getAvailableRoleCards(lobby, player);
     }),
+
+  getPlayersWithoutRoleCards: publicProcedure
+    .output(z.array(z.string()))
+    .input(z.object({ token: z.string() }))
+    .query(({ input }) => {
+      const entity = lobbyManager.getPlayer(
+        PlayerToken.fromString(input.token),
+      );
+      if (!entity) throw new Error('Lobby not found');
+      const [lobby, player] = entity;
+      return StrategoGame.getPlayersWithoutRoleCards(lobby, player);
+    }),
 });
