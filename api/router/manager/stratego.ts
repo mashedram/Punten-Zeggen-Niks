@@ -33,10 +33,11 @@ export const strategoRouter = router({
       );
       if (!entity) throw new Error('Lobby not found');
       const [lobby, teamLeader] = entity;
-      const targetPlayer = lobby.getPlayer(
-        PlayerToken.fromString(input.targetId),
-      );
-      if (!targetPlayer) throw new Error('Target player not found');
+      const targetPlayer = lobby
+        .getPlayers()
+        .find(p => p.getId() === input.targetId);
+      if (!targetPlayer)
+        throw new Error('Target player not found: stratego.revive');
       StrategoGame.revive(lobby, teamLeader, targetPlayer, roleCard);
     }),
 

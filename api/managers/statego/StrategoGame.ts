@@ -42,6 +42,7 @@ export const PlayerDataSchemaStratego = z.object({
   roleCard: z.string().optional(),
   attackCode: z.string(),
   isTeamLeader: z.boolean(),
+  hasRoleCard: z.boolean(),
   lastFightResult: z
     .object({
       index: z.number(),
@@ -81,6 +82,7 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         gameId: StrategoGameId,
         teamId,
         isTeamLeader: true,
+        hasRoleCard: false,
         roleCard: undefined,
         attackCode: generateAttackCode(),
       };
@@ -202,7 +204,10 @@ export function removeRoleCardFromDeck(
   if (!team || !team.deck || !team.deck[cardId]) {
     throw new Error(`Card ${cardId} not found in team ${teamId} deck.`);
   }
-  team.deck[cardId] -= 1;
+  console.log('removing role from deck');
+  console.log(team.deck[cardId]);
+  team.deck[cardId] = team.deck[cardId] - 1;
+  console.log(team.deck[cardId]);
   if (team.deck[cardId] <= 0) {
     delete team.deck[cardId];
   }
@@ -247,11 +252,22 @@ export const StrategoGame = {
     ) {
       throw new Error('Team has no role cards left to revive players.');
     }
-    targetData.roleCard = roleCard.name;
-    target.sync();
+    const availableRoleCards = StrategoGame.getAvailableRoleCards(
+      lobby,
+      player,
+    );
+    if (!Object.keys(availableRoleCards).some(key => key === roleCard.id)) {
+      throw new Error(
+        `Role card ${roleCard.id} is not available in the team deck.`,
+      );
+    }
+    targetData.roleCard = roleCard.id;
+    targetData.hasRoleCard = true;
+    removeRoleCardFromDeck(lobby, playerData.teamId, roleCard.id);
     console.log(
       `Player ${target.getId()} has been revived with role card: ${targetData.roleCard}`,
     );
+    lobby.sync();
   },
 
   getAvailableRoleCards(lobby: Lobby, player: Player): Record<string, number> {
@@ -262,9 +278,7 @@ export const StrategoGame = {
     if (!team) {
       throw new Error(`Team ${teamId} not found in lobby data.`);
     }
-    console.log(team.deck);
     if (team.deck.vlag > 0) {
-      console.log('vlag found in deck', { vlag: 1 });
       return { vlag: 1 };
     }
     return team.deck;

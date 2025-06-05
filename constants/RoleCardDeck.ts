@@ -24,7 +24,7 @@ export function createRoleCardDeck(
 
   // fill the deck with mineurs till we reach numnerOfCards
   const totalCards = Object.values(deck).reduce((sum, count) => sum + count, 0);
-  deck[RoleCards.mineur.name] = deckSize - totalCards;
+  deck[RoleCards.mineur.id] = deckSize - totalCards;
 
   return deck;
 }

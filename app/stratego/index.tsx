@@ -25,7 +25,7 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 import { PowerUpList } from '@/constants/PowerUpList';
 import { GameState } from '@/constants/GameState';
-import { RoleCard, RoleCards } from '@/constants/RoleCards';
+import { AllRoleCards } from '@/constants/RoleCards';
 
 export default function Game() {
   const lobby = useLobby();
@@ -33,9 +33,6 @@ export default function Game() {
   const stratego = useStratego(lobby);
   const sendAttackMutation = useMutation(
     trpc.stratego.attack.mutationOptions({}),
-  );
-  const sendReviveMutation = useMutation(
-    trpc.stratego.revive.mutationOptions({}),
   );
   const namen = ['Bas', 'Jan', 'Oscar', 'Mark'];
   const rangen = ['Generaal', 'Verkenner', 'Sergeant', 'Bom'];
@@ -46,18 +43,25 @@ export default function Game() {
       !lobby.loading && lobby.inLobby ? { token: lobby.getToken() } : skipToken,
     ),
   );
-  const playersWithoutRoleCards = useQuery(
-    trpc.stratego.getPlayersWithoutRoleCards.queryOptions(
-      !lobby.loading && lobby.inLobby ? { token: lobby.getToken() } : skipToken,
-    ),
+
+  const sendReviveMutation = useMutation(
+    trpc.stratego.revive.mutationOptions({
+      onError: error => {
+        console.error('Error reviving player:', error);
+      },
+      onSuccess: () => {
+        availableRoleCards.refetch();
+        setSelectedPlayerToRevive(undefined);
+      },
+    }),
   );
 
   const [selectedRoleCardToRevive, setSelectedRoleCardToRevive] = useState<
-    RoleCard | string
-  >('select role card (const)');
-  const [selectedPlayerToRevive, setSelectedPlayerToRevive] = useState<string>(
-    'Select a player to revive (const)',
-  );
+    string | undefined
+  >(undefined);
+  const [selectedPlayerToRevive, setSelectedPlayerToRevive] = useState<
+    string | undefined
+  >(undefined);
 
   const [enemyAttackCode, setEnemyAttackCode] = useState('');
   const [isPowerCardOpen, setPowerCardOpen] = React.useState(false);
@@ -192,14 +196,15 @@ export default function Game() {
             />
             {availableRoleCards.data &&
               Object.entries(availableRoleCards.data).map(
-                ([roleCard, count]) => (
-                  <Picker.Item
-                    key={roleCard}
-                    label={`${roleCard} (${count})`}
-                    value={roleCard}
-                    enabled={count > 0}
-                  />
-                ),
+                ([roleCard, count]) => {
+                  return (
+                    <Picker.Item
+                      key={roleCard}
+                      label={`${roleCard}, ${count} available`}
+                      value={roleCard}
+                    />
+                  );
+                },
               )}
           </Picker>
 
@@ -214,27 +219,49 @@ export default function Game() {
               label="Select player to revive"
               value="select player to revive"
             />
-            {playersWithoutRoleCards.data &&
-              playersWithoutRoleCards.data.map(playerId => (
-                <Picker.Item
-                  key={playerId}
-                  label={'player label' + playerId}
-                  value={playerId}
-                />
-              ))}
+            {stratego.otherPlayers
+              .filter(
+                p =>
+                  p.hasRoleCard === false && p.teamId === stratego.self.teamId,
+              )
+              .map(player => {
+                return (
+                  <Picker.Item
+                    key={player.id}
+                    label={player.id}
+                    value={player.id}
+                  />
+                );
+              })}
           </Picker>
 
           {/* Knop om een rolkaart toe te wijzen aan een speler */}
           <Button
-            onPress={() =>
-              sendReviveMutation.mutate({
-                token: lobby.getToken(),
-                targetId: selectedPlayerToRevive,
-                roleCard: selectedRoleCardToRevive as string,
-              })
-            }
+            onPress={() => {
+              if (selectedRoleCardToRevive && selectedPlayerToRevive) {
+                const players = lobby.get()?.players ?? [];
+                const selectedPlayer = players.find(
+                  player => player.id === selectedPlayerToRevive,
+                );
+                const selectedRoleCard = AllRoleCards.find(
+                  card => card.id === selectedRoleCardToRevive,
+                );
+                if (!selectedPlayer || !selectedRoleCard) {
+                  console.error(
+                    `invalid selection, no player or rol selected: ${selectedPlayerToRevive}, ${selectedRoleCardToRevive}`,
+                  );
+                  return;
+                }
+                sendReviveMutation.mutate({
+                  token: lobby.getToken(),
+                  targetId: selectedPlayer.id,
+                  roleCard: selectedRoleCard.id,
+                });
+              }
+            }}
             title="Revive"
           />
+
           {/* invoer veld voor de aanvalscode van de vijand */}
           <TextInput
             onChangeText={text => setEnemyAttackCode(text)}
