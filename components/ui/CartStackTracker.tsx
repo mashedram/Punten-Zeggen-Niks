@@ -3,13 +3,13 @@ import { View, Text, StyleSheet } from 'react-native';
 export const CartStackTracker = () => {
   return (
     <View style={styles.BackgroundView}>
-      <Text style={styles.NumberText}>60</Text>
+      <Text style={styles.NumberText}>{60}</Text>
       <View style={styles.WhiteBar}>
         <View style={styles.BlueBar}></View>
         <View style={styles.BlackBar}></View>
         <View style={styles.RedBar}></View>
       </View>
-      <Text style={styles.NumberText}>60</Text>
+      <Text style={styles.NumberText}>{60}</Text>
     </View>
   );
 };

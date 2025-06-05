@@ -17,7 +17,6 @@ import {
   Pressable,
   StyleSheet,
   Alert,
-  Dimensions,
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
@@ -87,7 +86,6 @@ export default function EnterPinScreen() {
           <TouchableOpacity
             style={styles.ReturnButtonContainer}
             onPress={() => {
-              lobby.leave();
               router.navigate('/');
             }}>
             <Text style={styles.PlayText}>Return</Text>

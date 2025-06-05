@@ -2,8 +2,11 @@ import { GameType } from '@/api/game/GameType';
 import { z } from 'zod';
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { RoleCard, RoleCards } from './constants/RoleCards';
-import { AttackResult } from './constants/AttackResult';
+import { RoleCards } from '../../../constants/RoleCards';
+import { GameState } from '../../../constants/GameState';
+import { createRoleCardDeck } from '@/constants/RoleCardDeck';
+import { console } from 'inspector';
+import { performAttack } from './AttackFunctions';
 
 export const StrategoGameId = 'stratego';
 
@@ -17,8 +20,10 @@ export const LobbyDataSchemaStratego = z.object({
     z.object({
       id: z.string(),
       name: z.string(),
+      deck: z.record(z.string(), z.number()),
     }),
   ),
+  gameState: z.enum(Object.values(GameState) as [string, ...string[]]),
   battleLog: z.array(
     z.object({
       playerName: z.string(),
@@ -39,7 +44,7 @@ export const PlayerDataSchemaStratego = z.object({
   lastFightResult: z
     .object({
       index: z.number(),
-      state: z.enum(['win', 'lose', 'draw']),
+      state: z.enum(['win', 'lose', 'draw', 'explode']),
     })
     .optional(),
 });
@@ -58,20 +63,26 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         {
           id: 'red',
           name: 'Rood',
+          deck: createRoleCardDeck(),
         },
         {
           id: 'blue',
           name: 'Blauw',
+          deck: createRoleCardDeck(),
         },
       ],
+      gameState: String(GameState.playing),
       battleLog: [],
     }),
-    createPlayerData: (lobby, player) => ({
-      gameId: StrategoGameId,
-      teamId: getNewPlayerTeam(lobby),
-      roleCard: undefined,
-      attackCode: generateAttackCode(),
-    }),
+    createPlayerData: (lobby, player) => {
+      const teamId = getNewPlayerTeam(lobby);
+      return {
+        gameId: StrategoGameId,
+        teamId,
+        roleCard: getRoleCardFromSelection(lobby, teamId),
+        attackCode: generateAttackCode(),
+      };
+    },
     registerEvents: lobby => {},
   };
 
@@ -79,17 +90,16 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
 /// FUNCTIONS ///
 /////////////////
 
-function getLobbyData(lobby: Lobby): LobbyDataStratego {
-  return lobby.getGameData<LobbyDataStratego>();
-}
-
-function getPlayerData(player: Player): PlayerDataStratego {
-  return player.getGameData<PlayerDataStratego>();
-}
-
-function getRoleCard(cardId?: string): RoleCard | undefined {
-  if (!cardId) return undefined;
-  return RoleCards[cardId];
+function removeRoleCardFromDeck(lobby: Lobby, teamId: string, cardId: string) {
+  const lobbyData = getLobbyData(lobby);
+  const team = lobbyData.teams.find(team => team.id === teamId);
+  if (!team || !team.deck || !team.deck[cardId]) {
+    throw new Error(`Card ${cardId} not found in team ${teamId} deck.`);
+  }
+  team.deck[cardId] -= 1;
+  if (team.deck[cardId] <= 0) {
+    delete team.deck[cardId];
+  }
 }
 
 function getPlayerFromAttackCode(
@@ -139,89 +149,100 @@ function getNewPlayerTeam(lobby: Lobby): string {
   return smallestTeam;
 }
 
-function performAttack(
+function checkWinConditions(lobby: Lobby) {
+  const lobbyData = getLobbyData(lobby);
+  const teams = lobbyData.teams;
+  if (teams.some(team => Object.keys(team.deck).length <= 0)) {
+    const emptyDeckTeam = teams.find(
+      team => Object.keys(team.deck).length <= 0,
+    )?.id;
+    if (!checkActiveRoleCards(lobby, emptyDeckTeam!)) {
+      const winningTeamId = teams.find(team => team.deck.length > 0)?.id;
+      endGame(lobby, winningTeamId!);
+    }
+  }
+}
+
+// Returns true if there are active platers with a role card in the given team
+function checkActiveRoleCards(lobby: Lobby, teamId: string): boolean {
+  const players = lobby
+    .getActivePlayers()
+    .filter(
+      player => player.getGameData<PlayerDataStratego>().teamId === teamId,
+    );
+  return players.some(
+    player => player.getGameData<PlayerDataStratego>().roleCard === undefined,
+  );
+}
+
+//////////////////////
+/// External utils ///
+//////////////////////
+
+export function getRoleCardFromSelection(
   lobby: Lobby,
-  attacker: Player,
-  defender: Player,
-): AttackResult {
-  const attackerData = getPlayerData(attacker);
-  const defenderData = getPlayerData(defender);
-  const attackerCard = getRoleCard(attackerData.roleCard);
-  const defenderCard = getRoleCard(defenderData.roleCard);
-
-  if (!attackerCard || !defenderCard) {
-    return AttackResult.Ignore;
+  teamId: string,
+): string | undefined {
+  const lobbyData = getLobbyData(lobby);
+  const team = lobbyData.teams.find(team => team.id === teamId);
+  if (!team || !team.deck) {
+    throw new Error(`Team ${teamId} or its deck not found in lobby data.`);
   }
-
-  if (attackerCard.value > defenderCard.value) {
-    return AttackResult.AttackerWon;
+  const availableCards = Object.keys(team.deck);
+  console.log(`Available cards for team ${teamId}:`, team.deck);
+  if (team.deck[RoleCards.vlag.id] > 0) {
+    removeRoleCardFromDeck(lobby, teamId, RoleCards.vlag.id);
+    return RoleCards.vlag.id;
   }
-
-  if (attackerCard.value < defenderCard.value) {
-    return AttackResult.DefenderWon;
+  if (availableCards.length === 0) {
+    return undefined;
   }
-
-  return AttackResult.Draw;
+  const cardName =
+    availableCards[Math.floor(Math.random() * availableCards.length)];
+  removeRoleCardFromDeck(lobby, teamId, cardName);
+  return cardName;
 }
 
-function handleAttackResult(
-  attacker: Player,
-  defender: Player,
-  result: AttackResult,
-) {
-  if (result === AttackResult.Ignore) {
-    draw(attacker);
-    draw(defender);
-    return;
+export function endGame(lobby: Lobby, winningTeamId: string) {
+  const lobbyData = getLobbyData(lobby);
+  if (winningTeamId === 'red') {
+    lobbyData.gameState = String(GameState.red_wins);
+  } else if (winningTeamId === 'blue') {
+    lobbyData.gameState = String(GameState.blue_wins);
+  } else {
+    // there is no state where a game can draw, but we handle it just in case
+    console.warn('Game ended in a draw, no winning team found.');
+    lobbyData.gameState = String(GameState.draw);
   }
-
-  if (result === AttackResult.AttackerWon) {
-    win(attacker);
-    defeat(defender);
-  } else if (result === AttackResult.DefenderWon) {
-    win(defender);
-    defeat(attacker);
-  }
-}
-
-function draw(player: Player) {
-  const data = getPlayerData(player);
-  data.lastFightResult = {
-    index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
-    state: 'draw',
-  };
-  player.sync();
-}
-
-function win(player: Player) {
-  const data = getPlayerData(player);
-  data.lastFightResult = {
-    index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
-    state: 'win',
-  };
-  player.sync();
-}
-
-function defeat(player: Player) {
-  const data = getPlayerData(player);
-  data.roleCard = undefined;
-  data.lastFightResult = {
-    index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
-    state: 'lose',
-  };
-  player.sync();
+  lobby.sync();
+  console.log(`Game ended. Team ${winningTeamId} has won.`);
 }
 
 //////////////////////////
 /// EXTERNAL FUNCTIONS ///
 //////////////////////////
 
+export function getLobbyData(lobby: Lobby): LobbyDataStratego {
+  return lobby.getGameData<LobbyDataStratego>();
+}
+
+export function getPlayerData(player: Player): PlayerDataStratego {
+  return player.getGameData<PlayerDataStratego>();
+}
+
 export const StrategoGame = {
   attack(lobby: Lobby, attacker: Player, attackCode: string) {
+    console.log('Received attack request from player:', attacker.getId());
     const defender = getPlayerFromAttackCode(lobby, attackCode);
     if (!defender) throw new Error('Invalid attack code');
-
-    const result = performAttack(lobby, attacker, defender);
-    handleAttackResult(attacker, defender, result);
+    console.log(
+      'attacker:',
+      getPlayerData(attacker).teamId,
+      'defender:',
+      getPlayerData(defender).teamId,
+    );
+    performAttack(lobby, attacker, defender);
+    checkWinConditions(lobby);
+    lobby.sync();
   },
 };
