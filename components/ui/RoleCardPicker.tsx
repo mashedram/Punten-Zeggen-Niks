@@ -1,7 +1,7 @@
 import { useTRPC } from '@/api/query';
 import { Picker } from '@react-native-picker/picker';
 import React, { useState } from 'react';
-import { Button, StyleSheet } from 'react-native';
+import { Button, StyleSheet, View } from 'react-native';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
 import { useLobbyUnsafe } from '@/hooks/useLobbyUnsafe';
@@ -10,15 +10,15 @@ import { AllRoleCards } from '@/constants/RoleCards';
 /**
  * Ensure the stratego state is initialized and the user is in a lobby.
  */
-export const RolePicker = () => {
+export const RoleCardPicker = () => {
   const trpc = useTRPC();
   const lobby = useLobbyUnsafe();
   const stratego = useStrategoUnsafe();
 
   const [selectedRoleCardToRevive, setSelectedRoleCardToRevive] =
-    useState<string>('Select role card');
+    useState<string>('');
   const [selectedPlayerToRevive, setSelectedPlayerToRevive] =
-    useState<string>('Select player');
+    useState<string>('');
 
   const availableRoleCards = useQuery(
     trpc.stratego.getAvailableRoleCards.queryOptions({
@@ -43,9 +43,11 @@ export const RolePicker = () => {
       <Picker
         style={styles.SelectFieldContainer}
         selectedValue={selectedRoleCardToRevive}
+        prompt="Select role card to revive"
         onValueChange={(itemValue, itemIndex) => {
           setSelectedRoleCardToRevive(itemValue);
         }}>
+        <Picker.Item label="Select role card" value="" />
         {availableRoleCards.data &&
           Object.entries(availableRoleCards.data).map(([roleCard, count]) => {
             return (
@@ -63,6 +65,7 @@ export const RolePicker = () => {
         onValueChange={(itemValue, itemIndex) => {
           setSelectedPlayerToRevive(itemValue);
         }}>
+        <Picker.Item label="Select player" value="" />
         {stratego.otherPlayers
           .filter(
             p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
@@ -77,50 +80,50 @@ export const RolePicker = () => {
             );
           })}
       </Picker>
-      <Button
-        onPress={() => {
-          if (selectedRoleCardToRevive && selectedPlayerToRevive) {
-            const players = lobby.get()?.players ?? [];
-            const selectedPlayer = players.find(
-              player => player.id === selectedPlayerToRevive,
-            );
-            const selectedRoleCard = AllRoleCards.find(
-              card => card.id === selectedRoleCardToRevive,
-            );
-            if (!selectedPlayer || !selectedRoleCard) {
-              console.error(
-                `invalid selection, no player or rol selected: ${selectedPlayerToRevive}, ${selectedRoleCardToRevive}`,
+      <View style={styles.ReviveButton}>
+        <Button
+          onPress={() => {
+            if (selectedRoleCardToRevive && selectedPlayerToRevive) {
+              const players = lobby.get()?.players ?? [];
+              const selectedPlayer = players.find(
+                player => player.id === selectedPlayerToRevive,
               );
-              return;
+              const selectedRoleCard = AllRoleCards.find(
+                card => card.id === selectedRoleCardToRevive,
+              );
+              if (!selectedPlayer || !selectedRoleCard) {
+                console.error(
+                  `invalid selection, no player or rol selected: ${selectedPlayerToRevive}, ${selectedRoleCardToRevive}`,
+                );
+                return;
+              }
+              sendReviveMutation.mutate({
+                token: lobby.getToken(),
+                targetId: selectedPlayer.id,
+                roleCard: selectedRoleCard.id,
+              });
             }
-            sendReviveMutation.mutate({
-              token: lobby.getToken(),
-              targetId: selectedPlayer.id,
-              roleCard: selectedRoleCard.id,
-            });
-          }
-        }}
-        title="Revive"
-      />
+          }}
+          title="Revive"
+        />
+      </View>
     </>
   );
 };
 
 const styles = StyleSheet.create({
   SelectFieldContainer: {
-    width: '70%',
-    height: '10%',
-    marginTop: 10,
-    marginLeft: 50,
-    color: 'black',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    marginBottom: 10,
-    display: 'flex',
+    width: '75%',
+    height: '20%',
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: 'black',
-    padding: 10,
+    alignSelf: 'center',
+  },
+  ReviveButton: {
+    alignSelf: 'center',
   },
 });

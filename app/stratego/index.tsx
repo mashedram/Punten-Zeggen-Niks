@@ -24,7 +24,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { PowerUpList } from '@/constants/PowerUpList';
 import { GameState } from '@/constants/GameState';
 import { CardCountBar } from '@/components/ui/CardCountBar';
-import { RolePicker } from '@/components/ui/RolePicker';
+import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
 
 export default function Game() {
   const lobby = useLobby();
@@ -86,20 +86,18 @@ export default function Game() {
         </View>
 
         {(stratego.self.isTeamLeader && (
-          <>
-            <View style={styles.SelectScreenContainer}>
-              <Image
-                source={require('@/assets/images/Generaal.png')}
-                style={styles.SpelerCardSelect}></Image>
-            </View>
-            <View>
-              <RolePicker />
-            </View>
-          </>
+          <View style={styles.SelectScreenContainer}>
+            <Image
+              source={require('@/assets/images/Generaal.png')}
+              style={styles.SpelerCardSelect}></Image>
+            <RoleCardPicker />
+          </View>
         )) || (
-          <Image
-            source={require('@/assets/images/Spion.png')}
-            style={styles.SpelerCard}></Image>
+          <View style={styles.SelectScreenContainer}>
+            <Image
+              source={require('@/assets/images/Spion.png')}
+              style={styles.SpelerCard}></Image>
+          </View>
         )}
 
         <View style={styles.PopUpContainer}>
@@ -118,7 +116,7 @@ export default function Game() {
         </View>
 
         {/* Gameloop test gedeelte kan later weg */}
-        <>
+        <View>
           {/* Welke rol heeft de speler */}
           <Text>
             {stratego.self.roleCard !== undefined
@@ -165,7 +163,7 @@ export default function Game() {
                 </Text>
               )}
           </View>
-        </>
+        </View>
         {/* Einde test gedeelte gameloop */}
 
         <Pressable
@@ -228,12 +226,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   SpelerCard: {
-    position: 'relative',
-    flexShrink: 0,
     width: '70%',
-    height: '41%',
+    height: '40%',
     borderRadius: 12,
-    marginBottom: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   SpelerCardSelect: {
     position: 'relative',
@@ -390,15 +387,15 @@ const styles = StyleSheet.create({
     borderColor: 'black',
   },
   SelectScreenContainer: {
-    position: 'relative',
-    flexShrink: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
+    // position: 'relative',
+    // flexShrink: 0,
+    // display: 'flex',
+    // flexDirection: 'column',
+    // alignItems: 'flex-start',
     rowGap: 8,
     width: '80%',
     height: '40%',
-    marginBottom: 240,
+    marginBottom: 150,
   },
   SelectFieldContainer: {
     width: '70%',
