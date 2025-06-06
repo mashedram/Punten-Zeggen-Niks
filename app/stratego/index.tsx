@@ -27,6 +27,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { PowerUpList } from '@/constants/PowerUpList';
 import { GameState } from '@/constants/GameState';
 import { CardCountBar } from '@/components/ui/CardCountBar';
+import { AllRoleCards } from '@/constants/RoleCards';
 
 export default function Game() {
   const lobby = useLobby();
@@ -128,9 +129,8 @@ export default function Game() {
           </View>
         )) || (
           <PlayerRole
-            actie={selectedRang}
-            image={CardImages[selectedRang]}
-            code={selectedRang.toUpperCase()}
+            attackCode={stratego.self.attackCode}
+            roleCard={AllRoleCards.find(card => card.name === 'kolonel')}
           />
         )}
 
