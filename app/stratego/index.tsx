@@ -157,8 +157,8 @@ export default function Game() {
             style={styles.SpelerCard}></Image>
         )}
 
-        <View style={styles.PopUpContainer}>
-          {PowerUpsIndex !== undefined && (
+        {PowerUpsIndex !== undefined && (
+          <View style={styles.PopUpContainer}>
             <PowerUpPopUp
               name={PowerUpList[PowerUpsIndex].name}
               description={PowerUpList[PowerUpsIndex].description}
@@ -169,8 +169,8 @@ export default function Game() {
                 setPowerupsIndex(undefined);
               }}
             />
-          )}
-        </View>
+          </View>
+        )}
 
         {/* Gameloop test gedeelte kan later weg */}
         <>
