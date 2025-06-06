@@ -154,46 +154,50 @@ export default function Game() {
         </View>
         {/* Gameloop test gedeelte kan later weg */}
         <>
-          <Text>
-            {stratego.self.roleCard !== undefined
-              ? `Jouw rol: ${stratego.self.roleCard}`
-              : 'Je hebt nog geen rolkaart.'}
-          </Text>
-          <Text>{stratego.self.attackCode}</Text>
-          <TextInput
-            onChangeText={text => setEnemyAttackCode(text)}
-            value={enemyAttackCode}
-            style={{ backgroundColor: 'white' }}
-          />
-          <Button
-            onPress={() =>
-              sendAttackMutation.mutate({
-                token: lobby.getToken(),
-                attackCode: enemyAttackCode,
-              })
-            }
-            title={stratego.self.teamId}
-            color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
-          />
-          <View>
-            {stratego.lobby.gameState === GameState.playing && (
-              <Text>Game is running...</Text>
-            )}
-            {stratego.lobby.gameState === stratego.self.teamId &&
-              stratego.lobby.gameState !== GameState.playing && (
-                <Text>
-                  Je hebt gewonnen! Gefeliciteerd, {stratego.self.teamId} team!
-                </Text>
+          <View style={styles.opmaakContainer}>
+            <Text style={{ color: 'white', fontSize: 18 }}>
+              {stratego.self.roleCard !== undefined
+                ? `Jouw rol: ${stratego.self.roleCard}`
+                : 'Je hebt nog geen rolkaart.'}
+            </Text>
+            <TextInput
+              onChangeText={text => setEnemyAttackCode(text)}
+              value={enemyAttackCode}
+              style={{ backgroundColor: 'white', fontSize: 15 }}
+            />
+            <Text style={{ color: 'white' }}>{stratego.self.attackCode}</Text>
+            <Button
+              onPress={() =>
+                sendAttackMutation.mutate({
+                  token: lobby.getToken(),
+                  attackCode: enemyAttackCode,
+                })
+              }
+              title={stratego.self.teamId}
+              color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
+            />
+            <View>
+              {stratego.lobby.gameState === GameState.playing && (
+                <Text style={{ color: 'white' }}>Game is running...</Text>
               )}
-            {stratego.lobby.gameState !== stratego.self.teamId &&
-              stratego.lobby.gameState !== GameState.playing && (
-                <Text>
-                  Je hebt verloren. Volgende keer beter team{' '}
-                  {stratego.self.teamId}.
-                </Text>
-              )}
+              {stratego.lobby.gameState === stratego.self.teamId &&
+                stratego.lobby.gameState !== GameState.playing && (
+                  <Text>
+                    Je hebt gewonnen! Gefeliciteerd, {stratego.self.teamId}{' '}
+                    team!
+                  </Text>
+                )}
+              {stratego.lobby.gameState !== stratego.self.teamId &&
+                stratego.lobby.gameState !== GameState.playing && (
+                  <Text>
+                    Je hebt verloren. Volgende keer beter team{' '}
+                    {stratego.self.teamId}.
+                  </Text>
+                )}
+            </View>
           </View>
         </>
+
         {/* Einde test gedeelte gameloop */}
         <Pressable
           style={{
@@ -458,5 +462,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  opmaakContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    rowGap: 2,
   },
 });
