@@ -6,12 +6,21 @@ import {
 } from '@/api/managers/statego/StrategoGame';
 
 export enum InitalizationFailureReason {
+  // eslint-disable-next-line no-unused-vars
   Loading,
+  // eslint-disable-next-line no-unused-vars
   NotInLobby,
+  // eslint-disable-next-line no-unused-vars
   GameNotRunning,
 }
 type PlayerDataStrategoExtended = PlayerDataStratego & {
   id: string;
+};
+
+export type StategoStateUnsafe = {
+  lobby: LobbyDataStratego;
+  self: PlayerDataStratego;
+  otherPlayers: PlayerDataStrategoExtended[];
 };
 
 export type StategoState =
@@ -19,12 +28,9 @@ export type StategoState =
       initialized: false;
       reason: InitalizationFailureReason;
     }
-  | {
+  | ({
       initialized: true;
-      lobby: LobbyDataStratego;
-      self: PlayerDataStratego;
-      otherPlayers: PlayerDataStrategoExtended[];
-    };
+    } & StategoStateUnsafe);
 
 export function useStratego(lobby: LobbyState): StategoState {
   if (lobby.loading) {
