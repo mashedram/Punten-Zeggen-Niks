@@ -1,15 +1,10 @@
 import React from 'react';
 import { useState } from 'react';
-import {
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ImageSourcePropType,
-} from 'react-native';
+import { StyleSheet, Image, TouchableOpacity } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { View } from 'react-native';
 import { Text } from 'react-native';
-import { RoleCard, AllRoleCards } from '@/constants/RoleCards';
+import { RoleCard } from '@/constants/RoleCards';
 import { CardImages } from '@/constants/CardImages';
 
 interface Rolecardprops {
@@ -18,47 +13,23 @@ interface Rolecardprops {
 }
 
 export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
-  const [toggled, setToggled] = useState(false);
+  const [imageToggled, setToggled] = useState(false);
 
-  const image = roleCard ? CardImages[roleCard.name?.toLowerCase()] : undefined;
+  const image = roleCard ? CardImages[roleCard.id?.toLowerCase()] : undefined;
 
-  const styles = StyleSheet.create({
-    container: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      overflow: 'hidden',
-    },
-    image: {
-      width: 240,
-      height: 240,
-      borderRadius: 20,
-      marginBottom: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  });
-
-  if (!roleCard) {
+  if (roleCard == undefined) {
     return (
-      <View style={[styles.image, { backgroundColor: '#444' }]}>
-        <Text
-          style={{
-            color: 'white',
-            fontSize: 18,
-            fontWeight: 'bold',
-            textAlign: 'center',
-          }}>
-          Je hebt (nog) geen rol gekregen!
-        </Text>
+      <View style={[styles.image]}>
+        <Text style={styles.text}>Je hebt (nog) geen rol gekregen!</Text>
       </View>
     );
   }
   return (
     <TouchableOpacity
       style={styles.container}
-      onPress={() => setToggled(!toggled)}
+      onPress={() => setToggled(!imageToggled)}
       activeOpacity={0.8}>
-      {toggled ? (
+      {imageToggled ? (
         <View style={styles.image}>
           <QRCode value={`${roleCard.name}?${attackCode}`} />
         </View>
@@ -87,3 +58,26 @@ export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  image: {
+    width: 240,
+    height: 240,
+    borderRadius: 20,
+    marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#444',
+  },
+  text: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+});

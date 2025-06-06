@@ -1,7 +1,6 @@
 import { useTRPC } from '@/api/query';
 import { PlayerRole } from '@/components/Spelersrollen/PlayerRole';
 import { PowerUpPopUp } from '@/components/ui/PowerUpPopUp';
-import { CardImages } from '@/constants/CardImages';
 import {
   InitalizationFailureReason,
   useStratego,
@@ -117,9 +116,12 @@ export default function Game() {
               ))}
             </Picker>
 
-            <Image
-              source={require('@/assets/images/Generaal.png')}
-              style={styles.SpelerCardSelect}></Image>
+            <PlayerRole
+              attackCode={stratego.self.attackCode}
+              roleCard={AllRoleCards.find(
+                card => card.id === stratego.self.roleCard,
+              )}
+            />
             <View style={styles.ConfirmButtom}>
               <Text
                 style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
@@ -130,7 +132,9 @@ export default function Game() {
         )) || (
           <PlayerRole
             attackCode={stratego.self.attackCode}
-            roleCard={AllRoleCards.find(card => card.name === 'kolonel')}
+            roleCard={AllRoleCards.find(
+              card => card.id === stratego.self.roleCard,
+            )}
           />
         )}
 
