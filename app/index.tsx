@@ -27,7 +27,6 @@ export default function HomePage() {
           style={styles.profileImage}
         />
       </View>
-
       <View style={styles.bottomCard}>
         <JoinButton />
         <CreateButton />
@@ -43,101 +42,11 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     margin: -1.2,
   },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: 'white',
-  },
-  time: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: 'black',
-  },
-  statusIcons: {
-    flexDirection: 'row',
-    gap: 6,
-    alignItems: 'center',
-  },
-  statusDot: {
-    width: 10,
-    height: 10,
-    backgroundColor: 'black',
-    borderRadius: 10,
-  },
-
-  batteryContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  batteryBody: {
-    width: 24,
-    height: 12,
-    borderWidth: 1,
-    borderColor: 'black',
-    borderRadius: 3,
-    justifyContent: 'center',
-    padding: 1,
-  },
-
-  batteryLevel: {
-    width: '50%',
-    height: '100%',
-    backgroundColor: 'black',
-    borderRadius: 2,
-  },
-
-  batteryCap: {
-    width: 2,
-    height: 6,
-    backgroundColor: 'black',
-    marginLeft: 1,
-    borderRadius: 1,
-  },
-
   mainContent: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-  },
-  levelInfo: {
-    alignItems: 'flex-start',
-    width: '90%',
-  },
-  levelNumber: {
-    color: 'white',
-    fontSize: 40,
-    fontWeight: '700',
-  },
-  levelLabel: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  progressBar: {
-    width: '90%',
-    height: 6,
-    backgroundColor: '#EEEEEE',
-    borderRadius: 5,
-    marginTop: 8,
-  },
-  progressFill: {
-    width: '65%',
-    height: '100%',
-    backgroundColor: '#C27B5C',
-    borderRadius: 5,
-  },
-  progressText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '700',
-    alignSelf: 'flex-end',
-    marginRight: '5%',
-    marginTop: 4,
   },
   bottomCard: {
     backgroundColor: 'white',
@@ -159,28 +68,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '700',
     fontSize: 16,
-  },
-  Text: {
-    color: '#665858',
-    marginTop: 16,
-    fontWeight: '700',
-    fontSize: 16,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: 'black',
-    paddingVertical: 12,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  footerIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: 'white',
   },
   profileImage: {
     width: '80%',
