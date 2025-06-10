@@ -27,7 +27,6 @@ import { PowerUpList } from '@/constants/PowerUpList';
 import { GameState } from '@/constants/GameState';
 import { AllRoleCards } from '@/constants/RoleCards';
 import { CardCountBar } from '@/components/ui/CardCountBar';
-import { AllRoleCards } from '@/constants/RoleCards';
 
 export default function Game() {
   const lobby = useLobby();
@@ -305,21 +304,6 @@ export default function Game() {
                   {stratego.self.teamId}.
                 </Text>
               )}
-              {stratego.lobby.gameState === stratego.self.teamId &&
-                stratego.lobby.gameState !== GameState.playing && (
-                  <Text>
-                    Je hebt gewonnen! Gefeliciteerd, {stratego.self.teamId}{' '}
-                    team!
-                  </Text>
-                )}
-              {stratego.lobby.gameState !== stratego.self.teamId &&
-                stratego.lobby.gameState !== GameState.playing && (
-                  <Text>
-                    Je hebt verloren. Volgende keer beter team{' '}
-                    {stratego.self.teamId}.
-                  </Text>
-                )}
-            </View>
           </View>
         </>
 
