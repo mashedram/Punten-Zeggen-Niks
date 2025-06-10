@@ -6,8 +6,7 @@ import {
   useStratego,
 } from '@/hooks/game/useStratego';
 import { useLobby } from '@/hooks/useLobby';
-import { Picker } from '@react-native-picker/picker';
-import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Redirect } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -25,8 +24,9 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 import { PowerUpList } from '@/constants/PowerUpList';
 import { GameState } from '@/constants/GameState';
-import { AllRoleCards } from '@/constants/RoleCards';
 import { CardCountBar } from '@/components/ui/CardCountBar';
+import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
+import { AllRoleCards } from '@/constants/RoleCards';
 
 export default function Game() {
   const lobby = useLobby();
@@ -35,39 +35,9 @@ export default function Game() {
   const sendAttackMutation = useMutation(
     trpc.stratego.attack.mutationOptions({}),
   );
-  const namen = ['Bas', 'Jan', 'Oscar', 'Mark'];
-  const rangen = ['Generaal', 'Verkenner', 'Sergeant', 'Bom'];
-  const isTeamLeader = false; // This should be determined based on the lobby or player data
-
-  const availableRoleCards = useQuery(
-    trpc.stratego.getAvailableRoleCards.queryOptions(
-      !lobby.loading && lobby.inLobby ? { token: lobby.getToken() } : skipToken,
-    ),
-  );
-
-  const sendReviveMutation = useMutation(
-    trpc.stratego.revive.mutationOptions({
-      onError: error => {
-        console.error('Error reviving player:', error);
-      },
-      onSuccess: () => {
-        availableRoleCards.refetch();
-        setSelectedPlayerToRevive(undefined);
-      },
-    }),
-  );
-
-  const [selectedRoleCardToRevive, setSelectedRoleCardToRevive] = useState<
-    string | undefined
-  >(undefined);
-  const [selectedPlayerToRevive, setSelectedPlayerToRevive] = useState<
-    string | undefined
-  >(undefined);
 
   const [enemyAttackCode, setEnemyAttackCode] = useState('');
   const [isPowerCardOpen, setPowerCardOpen] = React.useState(false);
-  const [selectedName, setSelectedName] = React.useState('Kies een speler');
-  const [selectedRang, setSelectedRang] = React.useState('Kies een rang');
   const [PowerUpsIndex, setPowerupsIndex] = React.useState<
     number | undefined
   >();
@@ -92,265 +62,171 @@ export default function Game() {
     return;
   }
 
+  const availablePlayers = stratego.otherPlayers.filter(
+    p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
+  ).length;
+
   return (
     <SafeAreaView style={styles.BackgroundView}>
-      <>
-        <View style={styles.CardStackTrackerContainer}>
-          <CardCountBar blueCardCount={60} redCardCount={60} />
-        </View>
+      <View style={styles.CardStackTrackerContainer}>
+        <CardCountBar blueCardCount={60} redCardCount={30} />
+      </View>
+
+      {(stratego.self.isTeamLeader && (
         <View style={styles.CaptainIconContainer}>
-          <Svg
-            style={styles.CaptainEllipse}
-            width={20}
-            height={20}
-            viewBox="0 0 20 20"
-            fill="none">
-            <Circle cx={10} cy={10} r={10} fill="#FF2424" />
-          </Svg>
-          <Text style={styles.CaptainIcon}>🎖</Text>
-          <Text style={styles.CaptainExclamationMark}>!</Text>
-        </View>
-
-        <View style={styles.BattleLogButtonContainer}>
-          <View style={styles.BattlelogButton}>
-            <Text style={styles.BattleLogButtonArrow}>{'➔'} </Text>
-          </View>
-        </View>
-
-        {(isTeamLeader && (
-          <View style={styles.SelectScreenContainer}>
-            <Picker
-              style={styles.SelectFieldContainer}
-              selectedValue={selectedName}
-              onValueChange={(itemValue, itemIndex) =>
-                setSelectedName(itemValue)
-              }>
-              {namen.map(naam => (
-                <Picker.Item key={naam} label={naam} value={naam} />
-              ))}
-            </Picker>
-
-            <Picker
-              style={styles.SelectFieldContainer}
-              selectedValue={selectedRang}
-              onValueChange={(itemValue, itemIndex) =>
-                setSelectedRang(itemValue)
-              }>
-              {rangen.map(rang => (
-                <Picker.Item key={rang} label={rang} value={rang} />
-              ))}
-            </Picker>
-
-            <PlayerRole
-              attackCode={stratego.self.attackCode}
-              roleCard={AllRoleCards.find(
-                card => card.id === stratego.self.roleCard,
-              )}
-            />
-            <View style={styles.ConfirmButtom}>
-              <Text
-                style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
-                Confirm
+          {availablePlayers > 0 && (
+            <>
+              <Svg
+                style={styles.CaptainEllipse}
+                width={20}
+                height={20}
+                viewBox="0 0 20 20"
+                fill="none">
+                <Circle cx={10} cy={10} r={10} fill="#FF2424" />
+              </Svg>
+              <Text style={styles.CaptainExclamationMark}>
+                {availablePlayers}
               </Text>
-            </View>
-          </View>
-        )) || (
+            </>
+          )}
+          <Text style={styles.CaptainIcon}>🎖</Text>
+        </View>
+      )) || <View style={styles.CaptainIconContainer}></View>}
+
+      <View style={styles.BattleLogButtonContainer}>
+        <View style={styles.BattlelogButton}>
+          <Text style={styles.BattleLogButtonArrow}>{'➔'} </Text>
+        </View>
+      </View>
+
+      {(stratego.self.isTeamLeader && (
+        <View style={styles.SelectScreenContainer}>
           <PlayerRole
             attackCode={stratego.self.attackCode}
             roleCard={AllRoleCards.find(
               card => card.id === stratego.self.roleCard,
             )}
           />
-        )}
-
-        {PowerUpsIndex !== undefined && (
-          <View style={styles.PopUpContainer}>
-            <PowerUpPopUp
-              name={PowerUpList[PowerUpsIndex].name}
-              description={PowerUpList[PowerUpsIndex].description}
-              image={PowerUpList[PowerUpsIndex].image}
-              onDelete={() => setPowerupsIndex(undefined)}
-              onInzet={() => {
-                setIngezettePowerupIndex(PowerUpsIndex);
-                setPowerupsIndex(undefined);
-              }}
-            />
-          </View>
-        )}
-
-        {/* Gameloop test gedeelte kan later weg */}
-        <>
-          {/* Welke rol heeft de speler */}
-          <Text>
-            {stratego.self.roleCard !== undefined
-              ? `Jouw rol: ${stratego.self.roleCard}`
-              : 'Je hebt nog geen rolkaart.'}
-          </Text>
-
-          {/* Wat is de aanvalscode van de speler */}
-          <Text>{stratego.self.attackCode}</Text>
-
-          {/* Selectie die de teamleider ziet om een rolkaart te kiezen */}
-          <Picker
-            style={styles.SelectFieldContainer}
-            selectedValue={selectedRoleCardToRevive}
-            onValueChange={(itemValue, itemIndex) => {
-              setSelectedRoleCardToRevive(itemValue);
-            }}>
-            <Picker.Item
-              label="Select role card (picker)"
-              value="select role card (picker)"
-            />
-            {availableRoleCards.data &&
-              Object.entries(availableRoleCards.data).map(
-                ([roleCard, count]) => {
-                  return (
-                    <Picker.Item
-                      key={roleCard}
-                      label={`${roleCard}, ${count} available`}
-                      value={roleCard}
-                    />
-                  );
-                },
-              )}
-          </Picker>
-
-          {/* Lijst aan spelers die geen rolkaart hebben binnen de speler zijn team*/}
-          <Picker
-            style={styles.SelectFieldContainer}
-            selectedValue={selectedPlayerToRevive}
-            onValueChange={(itemValue, itemIndex) => {
-              setSelectedPlayerToRevive(itemValue);
-            }}>
-            <Picker.Item
-              label="Select player to revive"
-              value="select player to revive"
-            />
-            {stratego.otherPlayers
-              .filter(
-                p =>
-                  p.hasRoleCard === false && p.teamId === stratego.self.teamId,
-              )
-              .map(player => {
-                return (
-                  <Picker.Item
-                    key={player.id}
-                    label={player.id}
-                    value={player.id}
-                  />
-                );
-              })}
-          </Picker>
-
-          {/* Knop om een rolkaart toe te wijzen aan een speler */}
-          <Button
-            onPress={() => {
-              if (selectedRoleCardToRevive && selectedPlayerToRevive) {
-                const players = lobby.get()?.players ?? [];
-                const selectedPlayer = players.find(
-                  player => player.id === selectedPlayerToRevive,
-                );
-                const selectedRoleCard = AllRoleCards.find(
-                  card => card.id === selectedRoleCardToRevive,
-                );
-                if (!selectedPlayer || !selectedRoleCard) {
-                  console.error(
-                    `invalid selection, no player or rol selected: ${selectedPlayerToRevive}, ${selectedRoleCardToRevive}`,
-                  );
-                  return;
-                }
-                sendReviveMutation.mutate({
-                  token: lobby.getToken(),
-                  targetId: selectedPlayer.id,
-                  roleCard: selectedRoleCard.id,
-                });
-              }
-            }}
-            title="Revive"
-          />
-
-          {/* invoer veld voor de aanvalscode van de vijand */}
-          <TextInput
-            onChangeText={text => setEnemyAttackCode(text)}
-            value={enemyAttackCode}
-            style={{ backgroundColor: 'white' }}
-          />
-          <Button
-            onPress={() =>
-              sendAttackMutation.mutate({
-                token: lobby.getToken(),
-                attackCode: enemyAttackCode,
-              })
-            }
-            title="Attack"
-            color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
-          />
-
-          {/* status van de game */}
-          <View>
-            {stratego.lobby.gameState === GameState.playing && (
-              <Text>Game is running...</Text>
+          <RoleCardPicker />
+        </View>
+      )) || (
+        <View style={styles.SelectScreenContainer}>
+          <PlayerRole
+            attackCode={stratego.self.attackCode}
+            roleCard={AllRoleCards.find(
+              card => card.id === stratego.self.roleCard,
             )}
-            {stratego.lobby.gameState === stratego.self.teamId &&
-              stratego.lobby.gameState !== GameState.playing && (
-                <Text>
-                  Je hebt gewonnen! Gefeliciteerd, {stratego.self.teamId} team!
-                </Text>
-              )}
-            {stratego.lobby.gameState !== stratego.self.teamId &&
-              stratego.lobby.gameState !== GameState.playing && (
-                <Text>
-                  Je hebt verloren. Volgende keer beter team{' '}
-                  {stratego.self.teamId}.
-                </Text>
-              )}
-          </View>
-        </>
+          />
+        </View>
+      )}
 
-        {/* Einde test gedeelte gameloop */}
+      <View style={styles.PopUpContainer}>
+        {PowerUpsIndex !== undefined && (
+          <PowerUpPopUp
+            name={PowerUpList[PowerUpsIndex].name}
+            description={PowerUpList[PowerUpsIndex].description}
+            image={PowerUpList[PowerUpsIndex].image}
+            onDelete={() => setPowerupsIndex(undefined)}
+            onInzet={() => {
+              setIngezettePowerupIndex(PowerUpsIndex);
+              setPowerupsIndex(undefined);
+            }}
+          />
+        )}
+      </View>
 
-        <Pressable
-          style={{
-            transform: [{ translateY: isPowerCardOpen ? '5%' : '80%' }],
-            ...styles.PowerUpBarContainer,
-          }}
-          onPress={() => setPowerCardOpen(!isPowerCardOpen)}>
-          <View style={styles.PowerCardTitleContainer}>
-            <Text
-              style={{
-                transform: [{ rotate: isPowerCardOpen ? '90deg' : '-90deg' }],
-                ...styles.PowerUpArrow,
+      {/* Gameloop test gedeelte kan later weg */}
+      <View>
+        {/* Welke rol heeft de speler */}
+        <Text>
+          {stratego.self.roleCard !== undefined
+            ? `Jouw rol: ${stratego.self.roleCard}`
+            : 'Je hebt nog geen rolkaart.'}
+        </Text>
+
+        {/* Wat is de aanvalscode van de speler */}
+        <Text>{stratego.self.attackCode}</Text>
+
+        {/* invoer veld voor de aanvalscode van de vijand */}
+        <TextInput
+          onChangeText={text => setEnemyAttackCode(text)}
+          value={enemyAttackCode}
+          style={{ backgroundColor: 'white' }}
+        />
+        <Button
+          onPress={() =>
+            sendAttackMutation.mutate({
+              token: lobby.getToken(),
+              attackCode: enemyAttackCode,
+            })
+          }
+          title="Attack"
+          color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
+        />
+
+        {/* status van de game */}
+        <View>
+          {stratego.lobby.gameState === GameState.playing && (
+            <Text>Game is running...</Text>
+          )}
+          {stratego.lobby.gameState === stratego.self.teamId &&
+            stratego.lobby.gameState !== GameState.playing && (
+              <Text>
+                Je hebt gewonnen! Gefeliciteerd, {stratego.self.teamId} team!
+              </Text>
+            )}
+          {stratego.lobby.gameState !== stratego.self.teamId &&
+            stratego.lobby.gameState !== GameState.playing && (
+              <Text>
+                Je hebt verloren. Volgende keer beter team{' '}
+                {stratego.self.teamId}.
+              </Text>
+            )}
+        </View>
+      </View>
+      {/* Einde test gedeelte gameloop */}
+
+      <Pressable
+        style={{
+          transform: [{ translateY: isPowerCardOpen ? '5%' : '80%' }],
+          ...styles.PowerUpBarContainer,
+        }}
+        onPress={() => setPowerCardOpen(!isPowerCardOpen)}>
+        <View style={styles.PowerCardTitleContainer}>
+          <Text
+            style={{
+              transform: [{ rotate: isPowerCardOpen ? '90deg' : '-90deg' }],
+              ...styles.PowerUpArrow,
+            }}>
+            ➔
+          </Text>
+          <Text style={styles.PowerUpTekst}>Power-ups</Text>
+        </View>
+        <View style={styles.PowerUpCardContainer}>
+          {PowerUpList.map((powerUp, index) => (
+            <Pressable
+              key={powerUp.id}
+              style={[
+                styles.PowerUpPressable,
+                index === ingezettePowerupIndex && {
+                  borderWidth: 6,
+                  borderColor: '#70C25C',
+                  borderRadius: 16,
+                  shadowColor: 'rgba(0, 0, 0, 0.25)',
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowRadius: 8,
+                  shadowOpacity: 8,
+                },
+              ]}
+              onPress={event => {
+                event.stopPropagation();
+                if (isPowerCardOpen) setPowerupsIndex(index);
               }}>
-              ➔
-            </Text>
-            <Text style={styles.PowerUpTekst}>Power-ups</Text>
-          </View>
-          <View style={styles.PowerUpCardContainer}>
-            {PowerUpList.map((powerUp, index) => (
-              <Pressable
-                key={powerUp.id}
-                style={[
-                  styles.PowerUpPressable,
-                  index === ingezettePowerupIndex && {
-                    borderWidth: 6,
-                    borderColor: '#70C25C',
-                    borderRadius: 16,
-                    shadowColor: 'rgba(0, 0, 0, 0.25)',
-                    shadowOffset: { width: 0, height: 8 },
-                    shadowRadius: 8,
-                    shadowOpacity: 8,
-                  },
-                ]}
-                onPress={event => {
-                  event.stopPropagation();
-                  if (isPowerCardOpen) setPowerupsIndex(index);
-                }}>
-                <Image source={powerUp.image} style={styles.PowerupCard} />
-              </Pressable>
-            ))}
-          </View>
-        </Pressable>
-      </>
+              <Image source={powerUp.image} style={styles.PowerupCard} />
+            </Pressable>
+          ))}
+        </View>
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -369,12 +245,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   SpelerCard: {
-    position: 'relative',
-    flexShrink: 0,
     width: '70%',
-    height: '41%',
+    height: '40%',
     borderRadius: 12,
-    marginBottom: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   SpelerCardSelect: {
     position: 'relative',
@@ -418,11 +293,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     top: 0,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 12,
+    marginTop: 10,
   },
   PopUpContainer: {
     width: '90%',
@@ -531,15 +402,10 @@ const styles = StyleSheet.create({
     borderColor: 'black',
   },
   SelectScreenContainer: {
-    position: 'relative',
-    flexShrink: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
     rowGap: 8,
     width: '80%',
     height: '40%',
-    marginBottom: 240,
+    marginBottom: 150,
   },
   SelectFieldContainer: {
     width: '70%',

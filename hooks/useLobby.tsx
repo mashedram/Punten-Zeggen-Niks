@@ -1,7 +1,7 @@
 import type { LobbyData } from '@/api/managers/lobby/Lobby';
 import type { PlayerEvent } from '@/api/managers/lobby/Player';
 import { useTRPC } from '@/api/query';
-import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
+import { skipToken, useMutation } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
 import React, {
   createContext,
@@ -14,16 +14,19 @@ import { useMMKVString } from 'react-native-mmkv';
 
 type LobbyEventCallback = (event: PlayerEvent<unknown>) => void;
 
+export type LobbyStateUnsafe = {
+  getToken: () => string;
+  get: () => LobbyData | null;
+  setEventHandler: (callback: LobbyEventCallback) => void;
+  leave: () => void;
+  setGame: (gameId: string) => void;
+};
+
 export type LobbyState =
-  | {
+  | ({
       loading: false;
       inLobby: true;
-      getToken: () => string;
-      get: () => LobbyData | null;
-      setEventHandler: (callback: LobbyEventCallback) => void;
-      leave: () => void;
-      setGame: (gameId: string) => void;
-    }
+    } & LobbyStateUnsafe)
   | {
       loading: false;
       inLobby: false;

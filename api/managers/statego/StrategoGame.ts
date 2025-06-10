@@ -78,10 +78,11 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
     }),
     createPlayerData: (lobby, player) => {
       const teamId = getNewPlayerTeam(lobby);
+      const isTeamLeader = setTeamLeader(lobby, teamId);
       return {
         gameId: StrategoGameId,
         teamId,
-        isTeamLeader: true,
+        isTeamLeader: isTeamLeader,
         hasRoleCard: false,
         roleCard: undefined,
         attackCode: generateAttackCode(),
@@ -93,6 +94,19 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
 /////////////////
 /// FUNCTIONS ///
 /////////////////
+
+// for now the first player to join a team is the team leader.
+// This needs to be changed later to allow players to choose their team leader.
+function setTeamLeader(lobby: Lobby, teamId: string): boolean {
+  const players = lobby
+    .getActivePlayers()
+    .filter(
+      player => player.getGameData<PlayerDataStratego>().teamId === teamId,
+    );
+  return !players.some(
+    player => player.getGameData<PlayerDataStratego>().isTeamLeader,
+  );
+}
 
 function getPlayerFromAttackCode(
   lobby: Lobby,
