@@ -128,3 +128,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+// {PowerUpsIndex !== undefined && (
+//             <PowerUpPopUp
+//               name={PowerUpList[PowerUpsIndex].name}
+//               description={PowerUpList[PowerUpsIndex].description}
+//               image={PowerUpList[PowerUpsIndex].image}
+//               onDelete={() => setPowerupsIndex(undefined)}
+//               onInzet={() => {
+//                 setIngezettePowerupIndex(PowerUpsIndex);
+//                 setPowerupsIndex(undefined);
+//               }}
+//             />
+//           )}

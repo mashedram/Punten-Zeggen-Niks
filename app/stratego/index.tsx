@@ -1,5 +1,5 @@
 import { useTRPC } from '@/api/query';
-
+import { PlayerRole } from '@/components/Spelersrollen/PlayerRole';
 import { PowerUpPopUp } from '@/components/ui/PowerUpPopUp';
 import {
   InitalizationFailureReason,
@@ -141,9 +141,12 @@ export default function Game() {
               ))}
             </Picker>
 
-            <Image
-              source={require('@/assets/images/Generaal.png')}
-              style={styles.SpelerCardSelect}></Image>
+            <PlayerRole
+              attackCode={stratego.self.attackCode}
+              roleCard={AllRoleCards.find(
+                card => card.id === stratego.self.roleCard,
+              )}
+            />
             <View style={styles.ConfirmButtom}>
               <Text
                 style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
@@ -152,9 +155,12 @@ export default function Game() {
             </View>
           </View>
         )) || (
-          <Image
-            source={require('@/assets/images/Spion.png')}
-            style={styles.SpelerCard}></Image>
+          <PlayerRole
+            attackCode={stratego.self.attackCode}
+            roleCard={AllRoleCards.find(
+              card => card.id === stratego.self.roleCard,
+            )}
+          />
         )}
 
         {PowerUpsIndex !== undefined && (
@@ -300,6 +306,7 @@ export default function Game() {
               )}
           </View>
         </>
+
         {/* Einde test gedeelte gameloop */}
 
         <Pressable
@@ -565,5 +572,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  opmaakContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    rowGap: 2,
   },
 });
