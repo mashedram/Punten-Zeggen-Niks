@@ -1,13 +1,9 @@
 import React from 'react';
-import { useState } from 'react';
-import { StyleSheet, Image, TouchableOpacity } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
+import { StyleSheet, Image } from 'react-native';
 import { View } from 'react-native';
 import { Text } from 'react-native';
 import { RoleCard } from '@/constants/RoleCards';
 import { CardImages } from '@/constants/CardImages';
-import { Animated } from 'react-native';
-import { useRef } from 'react';
 
 interface Rolecardprops {
   attackCode: string;
@@ -15,70 +11,47 @@ interface Rolecardprops {
 }
 
 export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
-  const flipAnim = useRef(new Animated.Value(0)).current;
-  const [imageToggled, setToggled] = useState(false);
+  const image = roleCard ? CardImages[roleCard.id?.toLowerCase()] : undefined;
+
   if (roleCard === undefined) {
     return (
-      <View style={[styles.image]}>
-        <Text style={styles.text}>Je hebt (nog) geen rol gekregen!</Text>
+      <View style={styles.container}>
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>No role card assigned</Text>
+        </View>
       </View>
     );
   }
-  const image = roleCard ? CardImages[roleCard.id?.toLowerCase()] : undefined;
-
-  // const handleToggle = () => {
-  //   const toValue = imageToggled ? 0 : 1;
-  //   Animated.timing(flipAnim, {
-  //     toValue: 0.5,
-  //     duration: 250,
-  //     useNativeDriver: true,
-  //   }).start(() => {
-  //     setToggled(prev => !prev);
-  //     Animated.timing(flipAnim, {
-  //       toValue,
-  //       duration: 250,
-  //       useNativeDriver: true,
-  //     }).start();
-  //   });
-  // };
-  const rotateY = flipAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '180deg'],
-  });
 
   return (
-    <Animated.View style={[styles.image, { transform: [{ rotateY }] }]}>
-      <TouchableOpacity
-        style={styles.container}
-        // onPress={handleToggle}
-        activeOpacity={0.8}>
-        {imageToggled ? (
-          <View style={styles.image}>
-            <View style={{ transform: [{ rotateY: '180deg' }] }}>
-              <QRCode value={`${roleCard.id}?${attackCode}`} size={220} />
-            </View>
-          </View>
-        ) : image ? (
-          <Image style={styles.image} source={image} resizeMode="cover" />
-        ) : null}
-      </TouchableOpacity>
-    </Animated.View>
+    <View style={styles.container}>
+      <Image source={image} style={styles.image} resizeMode="center" />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {},
-  image: {
-    // height: 320,
-    // width: 240,
+  container: {
+    backgroundColor: 'white',
+    width: '100%',
+    height: 200,
     borderRadius: 20,
-    // alignItems: 'center',
-    // justifyContent: 'center',
+  },
+  image: {
+    borderRadius: 20,
+    width: '100%',
+    height: '100%',
   },
   text: {
-    color: 'white',
-    fontSize: 18,
+    color: 'black',
+    fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+    margin: 10,
+  },
+  textContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
