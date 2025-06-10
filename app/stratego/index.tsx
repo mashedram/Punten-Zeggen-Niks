@@ -402,11 +402,6 @@ const styles = StyleSheet.create({
     borderColor: 'black',
   },
   SelectScreenContainer: {
-    // position: 'relative',
-    // flexShrink: 0,
-    // display: 'flex',
-    // flexDirection: 'column',
-    // alignItems: 'flex-start',
     rowGap: 8,
     width: '80%',
     height: '40%',
