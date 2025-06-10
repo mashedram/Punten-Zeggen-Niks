@@ -1,24 +1,31 @@
-import { z } from 'zod';
 import { LOBBY_CONSTANTS, LobbyManager } from './LobbyManager';
-import {
-  ConnectionState,
-  Player,
-  playerDataSchema,
-  PlayerEvent,
-  priviligedPlayerDataSchema,
-} from './Player';
-import { PlayerToken } from './PlayerToken';
-import {
-  LobbyGameData,
-  LobbyGameDataSchema,
-} from '@/api/game/lobby/LobbyGameData';
+import { Player } from './Player';
+import { TrackedInstance } from '@/common/networking/tracking/tracker/TrackedInstance';
+import { Client } from '@/common/networking/client/Client';
+import { SERVER_DATA_STORE } from '@/common/networking/Globals';
+import { ClientPool } from '@/common/networking/client/ClientPool';
+import { LobbyGameData } from '@/api/game/lobby/LobbyGameData';
 import { GameType, GameTypes } from '@/api/game/GameType';
-import EventEmitter from 'events';
+import {
+  LobbyData,
+  LobbyDataDescriptor,
+} from '@/common/networking/tracking/descriptors/LobbyInstanceDescriptor';
+import { DataTracker } from '@/common/networking/tracking/tracker/DataTracker';
+import { PlayerGameData } from '@/api/game/player/PlayerGameData';
+import {
+  LobbyDataGameInstanceDescriptor,
+  PlayerDataGameInstanceDescriptor,
+} from '@/common/networking/tracking/descriptors/StrategoInstanceDescriptors';
 
-type LobbyEventMap = {
-  playerCreated: [lobby: Lobby, player: Player];
-  playerRemoving: [lobby: Lobby, player: Player];
-};
+type GameState<P extends PlayerGameData, L extends LobbyGameData> =
+  | {
+      id: string;
+      type: GameType<P, L>;
+      data: TrackedInstance<L>;
+    }
+  | {
+      id: null;
+    };
 
 function generateRandomCode(length: number): string {
   let value = '';
@@ -30,42 +37,38 @@ function generateRandomCode(length: number): string {
   return value;
 }
 
-/**
- * A type that defines publicly shared data between server and client for a lobby
- */
-export const lobbyDataSchema = z.object({
-  code: z.string(),
-  game: LobbyGameDataSchema,
-  self: priviligedPlayerDataSchema,
-  players: z.array(playerDataSchema),
-});
-
-export type LobbyData = z.infer<typeof lobbyDataSchema>;
-
-export class Lobby extends EventEmitter<LobbyEventMap> {
+export class Lobby {
   private manager: LobbyManager;
 
   code: string;
-  private _gameType?: GameType<never, never>;
-  private _gameData: LobbyGameData = {
-    gameId: undefined,
-  };
   private _players: { [id: string]: Player } = {};
-  private _playerIdCounter = 0;
+
+  private _clients: ClientPool;
+  private _tracker: DataTracker;
+  private _data: TrackedInstance<LobbyData>;
+
+  private _gameState: GameState<PlayerGameData, LobbyGameData> = {
+    id: null,
+  };
 
   constructor(manager: LobbyManager) {
-    super();
     this.manager = manager;
     this.code = generateRandomCode(LOBBY_CONSTANTS.LOBBY_CODE_LENGTH);
-  }
 
-  /**
-   * Called when the lobby is about to be removed
-   */
-  public onRemoval(): void {
-    for (const player of Object.values(this._players)) {
-      player.onRemoval();
-    }
+    this._clients = new ClientPool();
+    this._tracker = SERVER_DATA_STORE.createDataTracker(
+      LobbyDataDescriptor.tracker.name,
+      this._clients,
+    );
+    this._data = SERVER_DATA_STORE.startTracking(
+      LobbyDataDescriptor,
+      {
+        code: this.code,
+        players: [],
+        game: undefined,
+      },
+      this._tracker,
+    );
   }
 
   // Player control methods
@@ -74,70 +77,62 @@ export class Lobby extends EventEmitter<LobbyEventMap> {
     return this.code;
   }
 
-  public getGameType(): LobbyGameData {
-    return this._gameData;
+  public getGameType(): GameType<PlayerGameData, LobbyGameData> | undefined {
+    return this._gameState.id ? this._gameState.type : undefined;
   }
 
-  public getGameData<T extends LobbyGameData>(): T {
-    return this._gameData as T;
+  public getGameData<T extends LobbyGameData>(): T | undefined {
+    if (this._gameState.id === null) return undefined;
+    return this._gameState.data.data as T;
+  }
+
+  public clearGame() {
+    if (this._gameState.id === null) return;
+    for (const player of Object.values(this._players)) {
+      player.clearGameData(this._tracker);
+    }
+    this._tracker.stopTracking(this._gameState.data.getId());
+    this._gameState = {
+      id: null,
+    };
   }
 
   public setGame(gameId: string) {
     const type = GameTypes.find(g => g.id === gameId);
-    if (!type) throw new Error('Game not found');
-    this._gameType = type as unknown as GameType<never, never>;
-    this._gameData = type.createLobbyData();
-    for (const player of Object.values(this._players)) {
-      player.setGameData(type.createPlayerData(this, player));
+    if (!type) {
+      throw new Error('Game not found');
     }
-    this.sync();
-  }
-
-  public getDataForPlayer(player: Player): LobbyData {
-    return {
-      code: this.code,
-      game: this._gameData,
-      self: player.getPrivilegedData(),
-      players: this.getActivePlayers().map(p => p.getPublicData()),
-    };
-  }
-
-  public createSyncEventFor(player: Player): PlayerEvent<LobbyData> {
-    const data = this.getDataForPlayer(player);
-    return {
-      type: LOBBY_CONSTANTS.LOBBY_STATE_EVENT,
-      content: data,
-    };
-  }
-
-  public sync() {
-    for (const player of this.getActivePlayers()) {
-      const event = this.createSyncEventFor(player);
-      player.emit(event);
+    if (this._gameState.id) {
+      this.clearGame();
     }
-  }
-
-  public syncWith(player: Player) {
-    const event = this.createSyncEventFor(player);
-    player.emit(event);
-  }
-
-  public syncOthers(player: Player) {
-    for (const other of this.getActivePlayers()) {
-      if (other === player) continue;
-      const event = this.createSyncEventFor(other);
-      other.emit(event);
-    }
-  }
-
-  public getPlayer(playerToken: PlayerToken): Player | undefined {
-    return Object.values(this._players).find(p =>
-      p.checkAuthToken(playerToken.getPlayerAuthToken()),
+    const lobbyGameData = SERVER_DATA_STORE.startTracking(
+      LobbyDataGameInstanceDescriptor,
+      type.createLobbyData(),
+      this._tracker,
     );
+    this._gameState = {
+      id: gameId,
+      type: type as GameType<PlayerGameData, LobbyGameData>,
+      data: lobbyGameData,
+    };
+    // @ts-expect-error Type resolving doesn't go well with generic hell
+    this._data.data.game = lobbyGameData.getRef();
+
+    for (const player of Object.values(this._players)) {
+      player.setGameData(
+        PlayerDataGameInstanceDescriptor,
+        type.createPlayerData(this, player),
+        this._tracker,
+      );
+    }
   }
 
   public getPlayers(): Player[] {
     return Object.values(this._players);
+  }
+
+  public getPlayerOfClient(client: Client): Player | undefined {
+    return this._players[client.getId()];
   }
 
   /**
@@ -145,18 +140,26 @@ export class Lobby extends EventEmitter<LobbyEventMap> {
    */
   public getActivePlayers(): Player[] {
     return Object.values(this._players).filter(
-      p => p.getConnectionState() === ConnectionState.Connected,
+      p =>
+        p.getClient().isConnected() &&
+        (this._gameState.id === null || p.getGameData() !== undefined),
     );
   }
 
-  public createPlayer(): Player {
-    const id = this._playerIdCounter++;
-    const player = new Player(id.toString(), false, this);
-    if (this._gameType) {
-      player.setGameData(this._gameType.createPlayerData(this, player));
+  public sync() {
+    this._data.markDirty();
+  }
+
+  public createPlayer(client: Client): Player {
+    this._clients.addClient(client);
+    const player = new Player(client.getId(), client, this._tracker, this);
+    if (Object.keys(this._players).length === 0) {
+      player.setAdmin(true);
     }
     this._players[player.getId()] = player;
-    this.emit('playerCreated', this, player);
+    this._data.data.players.push(player.getInstanceReference());
+    this._data.sync('players');
+    client.getData().lobby = this;
     return player;
   }
 
@@ -164,9 +167,13 @@ export class Lobby extends EventEmitter<LobbyEventMap> {
     const player = this._players[id];
     if (!player) return;
 
-    this.emit('playerRemoving', this, player);
+    player.getClient().getData().lobby = undefined;
     player.onRemoval();
+    this._clients.removeClient(player.getClient());
     delete this._players[id];
+    this._data.data.players = this._data.data.players.filter(
+      p => p.get()?.data.id !== id,
+    );
 
     if (Object.keys(this._players).length === 0) {
       this.manager.deleteLobby(this.getCode());
@@ -180,5 +187,12 @@ export class Lobby extends EventEmitter<LobbyEventMap> {
       const newAdmin = Object.values(this._players).find(p => !p.isAdmin());
       newAdmin?.setAdmin(true);
     }
+  }
+
+  public onRemoval() {
+    for (const player of Object.values(this._players)) {
+      player.onRemoval();
+    }
+    SERVER_DATA_STORE.removeDataTracker(this._data.getTracker());
   }
 }

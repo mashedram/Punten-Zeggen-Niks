@@ -3,10 +3,17 @@ module.exports = {
   env: {
     node: true,
   },
-  extends: ['expo', 'eslint:recommended', 'plugin:import/typescript'],
+  plugins: ['@typescript-eslint'],
+  extends: [
+    'expo',
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
   ignorePatterns: ['/dist/*'],
   rules: {
     'no-undef': 0,
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error'],
   },
   settings: {
     'import/resolver': {

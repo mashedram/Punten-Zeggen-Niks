@@ -31,7 +31,7 @@ import { AllRoleCards } from '@/constants/RoleCards';
 export default function Game() {
   const lobby = useLobby();
   const trpc = useTRPC();
-  const stratego = useStratego(lobby);
+  const stratego = useStratego();
   const sendAttackMutation = useMutation(
     trpc.stratego.attack.mutationOptions({}),
   );
@@ -62,7 +62,7 @@ export default function Game() {
     return;
   }
 
-  const availablePlayers = stratego.otherPlayers.filter(
+  const availablePlayers = stratego.players.filter(
     p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
   ).length;
 
@@ -156,7 +156,6 @@ export default function Game() {
         <Button
           onPress={() =>
             sendAttackMutation.mutate({
-              token: lobby.getToken(),
               attackCode: enemyAttackCode,
             })
           }

@@ -1,5 +1,5 @@
 import { Lobby } from './Lobby';
-import { PlayerToken } from './PlayerToken';
+import { Client } from '@/common/networking/client/Client';
 import { Player } from './Player';
 
 export const LOBBY_CONSTANTS = {
@@ -21,25 +21,24 @@ export class LobbyManager {
     return this.lobbies[code];
   }
 
+  public getClientLobbyAndPlayer(
+    client: Client,
+  ): [Lobby, Player] | [undefined, undefined] {
+    const data = client.getData();
+    if (!data.lobby) return [undefined, undefined];
+    const lobby = data.lobby;
+
+    const player = lobby.getPlayerOfClient(client);
+    if (!player) return [undefined, undefined];
+
+    return [lobby, player];
+  }
+
   public deleteLobby(code: string): void {
     const lobby = this.lobbies[code];
     if (!lobby) return;
     lobby.onRemoval();
     delete this.lobbies[code];
-  }
-
-  public getPlayerLobby(token: PlayerToken): Lobby | undefined {
-    const lobby = this.getLobby(token.getLobbyCode());
-
-    return lobby;
-  }
-
-  public getPlayer(token: PlayerToken): [Lobby, Player] | undefined {
-    const lobby = this.getLobby(token.getLobbyCode());
-    if (!lobby) return undefined;
-    const player = lobby.getPlayer(token);
-    if (!player) return undefined;
-    return [lobby, player];
   }
 }
 
