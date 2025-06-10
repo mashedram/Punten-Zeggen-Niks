@@ -1,4 +1,5 @@
 import { useTRPC } from '@/api/query';
+import { PlayerRole } from '@/components/Spelersrollen/PlayerRole';
 import { PowerUpPopUp } from '@/components/ui/PowerUpPopUp';
 import {
   InitalizationFailureReason,
@@ -25,6 +26,7 @@ import { PowerUpList } from '@/constants/PowerUpList';
 import { GameState } from '@/constants/GameState';
 import { CardCountBar } from '@/components/ui/CardCountBar';
 import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
+import { AllRoleCards } from '@/constants/RoleCards';
 
 export default function Game() {
   const lobby = useLobby();
@@ -99,16 +101,22 @@ export default function Game() {
 
       {(stratego.self.isTeamLeader && (
         <View style={styles.SelectScreenContainer}>
-          <Image
-            source={require('@/assets/images/Generaal.png')}
-            style={styles.SpelerCardSelect}></Image>
+          <PlayerRole
+            attackCode={stratego.self.attackCode}
+            roleCard={AllRoleCards.find(
+              card => card.id === stratego.self.roleCard,
+            )}
+          />
           <RoleCardPicker />
         </View>
       )) || (
         <View style={styles.SelectScreenContainer}>
-          <Image
-            source={require('@/assets/images/Spion.png')}
-            style={styles.SpelerCardSelect}></Image>
+          <PlayerRole
+            attackCode={stratego.self.attackCode}
+            roleCard={AllRoleCards.find(
+              card => card.id === stratego.self.roleCard,
+            )}
+          />
         </View>
       )}
 
@@ -435,5 +443,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  opmaakContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    rowGap: 2,
   },
 });
