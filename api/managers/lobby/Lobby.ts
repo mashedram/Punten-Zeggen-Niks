@@ -98,9 +98,7 @@ export class Lobby extends EventEmitter<LobbyEventMap> {
       code: this.code,
       game: this._gameData,
       self: player.getPrivilegedData(),
-      players: this.getActivePlayers()
-        .filter(p => p !== player)
-        .map(p => p.getPublicData()),
+      players: this.getActivePlayers().map(p => p.getPublicData()),
     };
   }
 

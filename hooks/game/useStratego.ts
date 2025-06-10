@@ -1,17 +1,18 @@
-import { useTRPC } from '@/api/query';
 import { LobbyState } from '../useLobby';
 import {
   type PlayerDataStratego,
   type LobbyDataStratego,
   StrategoGameId,
 } from '@/api/managers/statego/StrategoGame';
-import { useCallback } from 'react';
 
 export enum InitalizationFailureReason {
   Loading,
   NotInLobby,
   GameNotRunning,
 }
+type PlayerDataStrategoExtended = PlayerDataStratego & {
+  id: string;
+};
 
 export type StategoState =
   | {
@@ -22,7 +23,7 @@ export type StategoState =
       initialized: true;
       lobby: LobbyDataStratego;
       self: PlayerDataStratego;
-      otherPlayers: PlayerDataStratego[];
+      otherPlayers: PlayerDataStrategoExtended[];
     };
 
 export function useStratego(lobby: LobbyState): StategoState {
@@ -71,7 +72,10 @@ export function useStratego(lobby: LobbyState): StategoState {
 
   const otherPlayerData = [];
   for (const player of data.players) {
-    const playerData = player.gameData;
+    const playerData = {
+      ...player.gameData,
+      id: player.id,
+    };
     // Other players not using the game ID will be counted as not playing
     if (playerData.gameId !== StrategoGameId) continue;
     otherPlayerData.push(playerData);
