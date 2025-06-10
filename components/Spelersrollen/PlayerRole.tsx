@@ -1,21 +1,33 @@
 import React from 'react';
-import { StyleSheet, Image } from 'react-native';
+import { StyleSheet, Image, Dimensions } from 'react-native';
 import { View } from 'react-native';
 import { Text } from 'react-native';
 import { RoleCard } from '@/constants/RoleCards';
 import { CardImages } from '@/constants/CardImages';
+import { TeamColors } from '@/constants/Colors';
 
 interface Rolecardprops {
-  attackCode: string;
+  teamId: string;
   roleCard: RoleCard | undefined;
 }
 
-export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
+const { height, width } = Dimensions.get('window');
+const CONTAINER_WIDTH = width * 0.5;
+const CONTAINER_HEIGHT = height * 0.32;
+
+export const PlayerRole = ({ teamId, roleCard }: Rolecardprops) => {
   const image = roleCard ? CardImages[roleCard.id?.toLowerCase()] : undefined;
 
   if (roleCard === undefined) {
     return (
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            borderColor:
+              teamId === 'red' ? TeamColors.red.color : TeamColors.blue.color,
+          },
+        ]}>
         <View style={styles.textContainer}>
           <Text style={styles.text}>No role card assigned</Text>
         </View>
@@ -24,7 +36,14 @@ export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          borderColor:
+            teamId === 'red' ? TeamColors.red.color : TeamColors.blue.color,
+        },
+      ]}>
       <Image source={image} style={styles.image} resizeMode="center" />
     </View>
   );
@@ -33,9 +52,10 @@ export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    width: '100%',
-    height: 200,
+    width: CONTAINER_WIDTH,
+    height: CONTAINER_HEIGHT,
     borderRadius: 20,
+    borderWidth: 4,
   },
   image: {
     borderRadius: 20,

@@ -15,8 +15,6 @@ import {
   TextInput,
   StyleSheet,
   View,
-  Platform,
-  StatusBar,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { GameState } from '@/constants/GameState';
@@ -61,10 +59,10 @@ export default function Game() {
         <CardCountBar blueCardCount={60} redCardCount={30} />
       </View>
 
-      {(stratego.self.isTeamLeader && (
+      {stratego.self.isTeamLeader && (
         <View style={styles.CaptainIconContainer}>
           {availablePlayers > 0 && (
-            <>
+            <View>
               <Svg
                 style={styles.CaptainEllipse}
                 width={20}
@@ -73,53 +71,38 @@ export default function Game() {
                 fill="none">
                 <Circle cx={10} cy={10} r={10} fill="#FF2424" />
               </Svg>
-              <Text style={styles.CaptainExclamationMark}>
-                {availablePlayers}
-              </Text>
-            </>
+              <Text style={styles.CaptainText}>{availablePlayers}</Text>
+            </View>
           )}
           <Text style={styles.CaptainIcon}>🎖</Text>
         </View>
-      )) || <View style={styles.CaptainIconContainer}></View>}
+      )}
 
-      <View style={styles.BattleLogButtonContainer}>
-        <View style={styles.BattlelogButton}>
-          <Text style={styles.BattleLogButtonArrow}>{'➔'} </Text>
-        </View>
-      </View>
-
-      <View>
-        {(stratego.self.isTeamLeader && (
-          <View style={styles.SelectScreenContainer}>
-            <PlayerRole
-              attackCode={stratego.self.attackCode}
-              roleCard={AllRoleCards.find(
-                card => card.id === stratego.self.roleCard,
-              )}
-            />
+      {(stratego.self.isTeamLeader && (
+        <View style={styles.roleContainer}>
+          <PlayerRole
+            teamId={stratego.self.teamId}
+            roleCard={AllRoleCards.find(
+              card => card.id === stratego.self.roleCard,
+            )}
+          />
+          <View style={styles.roleCardPickerContainer}>
             <RoleCardPicker />
           </View>
-        )) || (
-          <View style={styles.SelectScreenContainer}>
-            <PlayerRole
-              attackCode={stratego.self.attackCode}
-              roleCard={AllRoleCards.find(
-                card => card.id === stratego.self.roleCard,
-              )}
-            />
-          </View>
-        )}
-      </View>
+        </View>
+      )) || (
+        <View style={styles.roleContainer}>
+          <PlayerRole
+            teamId={stratego.self.teamId}
+            roleCard={AllRoleCards.find(
+              card => card.id === stratego.self.roleCard,
+            )}
+          />
+        </View>
+      )}
 
       {/* Gameloop test gedeelte kan later weg */}
       <View>
-        {/* Welke rol heeft de speler */}
-        <Text>
-          {stratego.self.roleCard !== undefined
-            ? `Jouw rol: ${stratego.self.roleCard}`
-            : 'Je hebt nog geen rolkaart.'}
-        </Text>
-
         {/* Wat is de aanvalscode van de speler */}
         <Text>{stratego.self.attackCode}</Text>
 
@@ -137,7 +120,7 @@ export default function Game() {
             })
           }
           title="Attack"
-          color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
+          color={stratego.self.teamId === 'red' ? 'red' : 'blue'}
         />
 
         {/* status van de game */}
@@ -167,108 +150,45 @@ export default function Game() {
 
 const styles = StyleSheet.create({
   BackgroundView: {
-    position: 'relative',
     backgroundColor: 'rgba(92, 163, 194, 1)',
-    display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
     flex: 1,
-    justifyContent: 'center',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    margin: -1.2,
-    overflow: 'hidden',
-  },
-  BattleLogButtonContainer: {
-    position: 'absolute',
-    right: 0,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  BattlelogButton: {
-    position: 'relative',
-    width: 28,
-    height: 143,
-    backgroundColor: 'rgba(194, 123, 92, 1)',
-    shadowColor: 'rgba(0, 0, 0, 0.25)',
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 4,
-    borderRadius: 15,
-    marginRight: 12,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  BattleLogButtonArrow: {
-    color: 'rgba(255, 255, 255, 1)',
-    fontFamily: 'Inter',
-    fontSize: 24,
-    fontWeight: 400,
-    transform: [{ rotate: '180deg' }],
   },
   CardStackTrackerContainer: {
-    position: 'absolute',
     width: '100%',
     top: 0,
-    marginTop: 10,
-  },
-  PopUpContainer: {
-    width: '90%',
-    height: '35%',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
+    marginTop: '1%',
   },
   CaptainIconContainer: {
     position: 'absolute',
-    width: '100%',
     top: 0,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 72,
+    marginTop: '10%',
   },
   CaptainEllipse: {
     position: 'absolute',
-    width: 20,
-    height: 20,
     borderRadius: 10,
-    backgroundColor: 'rgba(255, 36, 36, 1)',
-    shadowColor: 'rgba(0, 0, 0, 0.25)',
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 4,
-    marginRight: 55,
-    marginTop: -45,
   },
   CaptainIcon: {
-    width: 67,
-    height: 66,
     textAlign: 'left',
     color: 'rgba(0, 0, 0, 1)',
     fontFamily: 'Inter',
     fontSize: 60,
     fontWeight: '700',
   },
-  CaptainExclamationMark: {
+  CaptainText: {
     position: 'absolute',
-    width: 20,
-    height: 20,
-    textAlign: 'left',
     color: 'rgba(255, 255, 255, 1)',
     fontFamily: 'Inter',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
-    marginTop: -40,
-    marginLeft: -39,
+    left: 8,
+    top: 4,
   },
-  SelectScreenContainer: {
-    rowGap: 8,
-    width: '80%',
-    height: '40%',
-    marginBottom: 150,
+  roleContainer: {
+    marginTop: '25%',
+  },
+  roleCardPickerContainer: {
+    rowGap: 10,
+    marginTop: 20,
   },
 });
