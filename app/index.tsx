@@ -6,15 +6,11 @@ import { Image } from 'react-native';
 
 import {
   View,
-  Text,
   StyleSheet,
   SafeAreaView,
-  Dimensions,
   Platform,
   StatusBar,
 } from 'react-native';
-
-const { width } = Dimensions.get('window');
 
 export default function HomePage() {
   const lobby = useLobby();
@@ -35,8 +31,6 @@ export default function HomePage() {
       <View style={styles.bottomCard}>
         <JoinButton />
         <CreateButton />
-
-        <Text style={styles.Text}>Support</Text>
       </View>
     </SafeAreaView>
   );
@@ -47,6 +41,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#5CA3C2',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    margin: -1.2,
   },
   topBar: {
     flexDirection: 'row',
@@ -188,7 +183,10 @@ const styles = StyleSheet.create({
     borderColor: 'white',
   },
   profileImage: {
-    width: Math.min(width * 0.9, 400),
+    width: '80%',
+    height: '80%',
+    marginRight: 0,
+    marginBottom: 50,
     resizeMode: 'contain',
     marginVertical: 20,
     elevation: 4,

@@ -1,7 +1,7 @@
 import type { LobbyData } from '@/api/managers/lobby/Lobby';
 import type { PlayerEvent } from '@/api/managers/lobby/Player';
 import { useTRPC } from '@/api/query';
-import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
+import { skipToken, useMutation } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
 import React, {
   createContext,
@@ -27,8 +27,8 @@ export type LobbyState =
   | {
       loading: false;
       inLobby: false;
-      join: (code: string) => void;
-      create: () => void;
+      join: (code: string, name: string) => void;
+      create: (name: string) => void;
     }
   | {
       loading: true;
@@ -105,15 +105,18 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
   }, [lobbyState]);
 
   const joinLobbyCallback = useCallback(
-    (code: string) => {
-      joinMutation.mutate({ code });
+    (code: string, name: string) => {
+      joinMutation.mutate({ code, name });
     },
     [joinMutation],
   );
 
-  const createLobbyCallback = useCallback(() => {
-    createMutation.mutate();
-  }, [createMutation]);
+  const createLobbyCallback = useCallback(
+    (name: string) => {
+      createMutation.mutate({ name });
+    },
+    [createMutation],
+  );
 
   const leaveLobbyCallback = useCallback(() => {
     setToken(undefined);

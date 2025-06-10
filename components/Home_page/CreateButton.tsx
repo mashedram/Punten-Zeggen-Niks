@@ -15,10 +15,10 @@ export const CreateButton = () => {
         if (lobby.loading) return;
         if (lobby.inLobby) return;
         // @ts-ignore
-        lobby.create();
-        router.navigate('/lobby');
+
+        router.navigate('/lobby/create');
       }}>
-      <Text style={styles.createText}>Create a game</Text>
+      <Text style={styles.createText}>Maak een spel aan</Text>
     </TouchableOpacity>
   );
 };

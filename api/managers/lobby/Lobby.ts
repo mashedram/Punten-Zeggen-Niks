@@ -98,9 +98,7 @@ export class Lobby extends EventEmitter<LobbyEventMap> {
       code: this.code,
       game: this._gameData,
       self: player.getPrivilegedData(),
-      players: this.getActivePlayers()
-        .filter(p => p !== player)
-        .map(p => p.getPublicData()),
+      players: this.getPlayers().map(p => p.getPublicData()),
     };
   }
 
@@ -151,9 +149,9 @@ export class Lobby extends EventEmitter<LobbyEventMap> {
     );
   }
 
-  public createPlayer(): Player {
+  public createPlayer(name: string, isAdmin = false): Player {
     const id = this._playerIdCounter++;
-    const player = new Player(id.toString(), false, this);
+    const player = new Player(id.toString(), name, isAdmin, this);
     if (this._gameType) {
       player.setGameData(this._gameType.createPlayerData(this, player));
     }

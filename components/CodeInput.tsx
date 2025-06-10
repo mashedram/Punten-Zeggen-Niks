@@ -1,12 +1,6 @@
 import { useThemeColor } from '@/hooks/useThemeColor';
 import React from 'react';
-import {
-  ButtonProps,
-  StyleSheet,
-  TextInput,
-  TextInputProps,
-} from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { StyleSheet, TextInput, TextInputProps } from 'react-native';
 
 export type CodeInputProps = TextInputProps & {
   lightColor?: string;
@@ -34,26 +28,21 @@ const CodeInput = ({
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView>
-        <TextInput
-          style={[{ color }, styles.input]}
-          keyboardType="numeric"
-          value={code}
-          onChangeText={onChangeCode}
-          {...rest}
-        />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <TextInput
+      style={[{ color }, styles.input]}
+      keyboardType="numeric"
+      value={code}
+      onChangeText={onChangeCode}
+      {...rest}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   input: {
-    height: 40,
-    margin: 12,
+    height: '80%',
+    margin: 0,
     borderWidth: 1,
-    padding: 10,
   },
 });
 

@@ -6,21 +6,24 @@ import z from 'zod';
 
 export const lobbyRouter = router({
   joinLobby: publicProcedure
-    .input(z.object({ code: z.string() }))
+    .input(z.object({ code: z.string(), name: z.string() }))
     .output(z.string())
     .mutation(({ input }) => {
       const lobby = lobbyManager.getLobby(input.code);
       if (!lobby) throw new Error('Lobby not found');
 
-      const player = lobby.createPlayer();
+      const player = lobby.createPlayer(input.name);
       return player.getToken().toString();
     }),
-  createLobby: publicProcedure.output(z.string()).mutation(() => {
-    const lobby = lobbyManager.createLobby();
-    const player = lobby.createPlayer();
-    player.setAdmin(true);
-    return player.getToken().toString();
-  }),
+  createLobby: publicProcedure
+    .input(z.object({ name: z.string() }))
+    .output(z.string())
+    .mutation(({ input }) => {
+      const lobby = lobbyManager.createLobby();
+      const player = lobby.createPlayer(input.name);
+      player.setAdmin(true);
+      return player.getToken().toString();
+    }),
   setGame: publicProcedure
     .input(z.object({ token: z.string(), gameId: z.string() }))
     .mutation(({ input }) => {

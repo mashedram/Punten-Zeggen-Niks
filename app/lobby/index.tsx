@@ -2,7 +2,7 @@ import { SettingsButton } from '@/components/lobby_host/SettingsButton';
 import { ThemedText } from '@/components/ThemedText';
 import { useLobby } from '@/hooks/useLobby';
 import { ExternalPathString, Link, Redirect, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
+  ScrollView,
 } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { QrButton } from '@/components/lobby_host/QrButton';
@@ -35,16 +36,6 @@ export default function LobbyPage() {
   const handlePress = () => {
     Alert.alert('Je hebt op de afbeelding gedrukt!');
   };
-
-  type Item = {
-    id: number;
-    name: string;
-    host: boolean;
-  };
-
-  const [items, setItems] = useState<Item[]>([
-    { id: 1, name: 'naam', host: true },
-  ]);
 
   if (!activeLobby) {
     return (
@@ -86,41 +77,39 @@ export default function LobbyPage() {
       </View>
 
       <View style={stylesheet.SpelerlijstContainer}>
-        <View style={stylesheet.list}>
+        <ScrollView
+          style={stylesheet.list}
+          contentContainerStyle={stylesheet.listContentContainer}>
           <View style={stylesheet.NaamBox}>
-            {items.map(item => (
-              <>
-                <Text
-                  key={item.id}
-                  style={[stylesheet.NaamTekst, { marginBottom: 10 }]}>
-                  {item.name}
-                </Text>
-                {item.host && (
-                  <ImageBackground
-                    style={stylesheet.CrownImage}
-                    source={require('@/assets/images/CrownImage.png')}
-                  />
-                )}
-              </>
-            ))}
+            {activeLobby.players.map(player => {
+              console.log(player.name);
+              return (
+                <>
+                  <Text
+                    key={player.id}
+                    style={[stylesheet.NaamTekst, { marginBottom: 10 }]}>
+                    {player.name}
+                  </Text>
+                  {player.isAdmin && (
+                    <ImageBackground
+                      style={stylesheet.CrownImage}
+                      source={require('@/assets/images/CrownImage.png')}
+                    />
+                  )}
+                </>
+              );
+            })}
           </View>
-        </View>
+        </ScrollView>
+
         <View style={stylesheet.check} />
         <View style={stylesheet.settingsAndPlayers}>
           <SettingsButton />
           <Text style={stylesheet.title}>
-            Players: {activeLobby.players.length}/8
+            Players: {activeLobby.players.length}
           </Text>
         </View>
       </View>
-
-      <SafeAreaView>
-        {activeLobby.players.map(player => (
-          <View key={player.id}>
-            <ThemedText>Player: {player.id}</ThemedText>
-          </View>
-        ))}
-      </SafeAreaView>
 
       <View style={stylesheet.bottomCard}>
         <TouchableOpacity
@@ -159,17 +148,18 @@ const stylesheet = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    margin: -1.2,
   },
 
   bottomCard: {
-    width: '28%',
-    top: 30,
+    width: '100%',
     backgroundColor: 'white',
     paddingVertical: 24,
     paddingHorizontal: 20,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     alignItems: 'center',
+    marginTop: 200,
   },
 
   CodeContainer: {
@@ -185,6 +175,7 @@ const stylesheet = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 10,
     borderRadius: 8,
+    marginTop: 30,
   },
 
   Cijfercode: {
@@ -277,15 +268,20 @@ const stylesheet = StyleSheet.create({
     justifyContent: 'center',
     columnGap: 8,
     borderRadius: 20,
+    fontSize: 18,
   },
 
   SpelerlijstContainer: {
     position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
     flexShrink: 0,
-    height: 314,
-    width: 359,
-    paddingTop: 17,
+    height: '38%',
+    width: '90%',
+    paddingTop: 18,
     paddingBottom: 0,
+    marginTop: 2,
     backgroundColor: 'rgba(255, 255, 255, 1)',
     shadowColor: 'rgba(0, 0, 0, 0.25)',
     shadowOffset: {
@@ -293,34 +289,30 @@ const stylesheet = StyleSheet.create({
       height: 4,
     },
     shadowRadius: 4,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
     justifyContent: 'center',
     rowGap: 0,
     paddingHorizontal: 0,
     borderRadius: 8,
   },
-
   list: {
     position: 'absolute',
     flexShrink: 0,
-    height: 274,
+    height: 290,
     width: 344,
-    display: 'flex',
-    flexDirection: 'column',
+  },
+  listContentContainer: {
     alignItems: 'center',
+    flexDirection: 'column',
     rowGap: 2,
     paddingHorizontal: 4,
     paddingVertical: 0,
   },
-
   NaamBox: {
     position: 'absolute',
     flexShrink: 0,
     top: 12,
-    left: -4,
-    width: 340,
+    marginLeft: -1,
+    width: '95%',
     shadowColor: 'rgba(255, 255, 255, 0.25)',
     shadowRadius: 4,
     display: 'flex',
@@ -329,12 +321,10 @@ const stylesheet = StyleSheet.create({
     columnGap: 8,
     borderRadius: 20,
   },
-
   logo: {
     position: 'relative',
     flexShrink: 0,
   },
-
   CrownImage: {
     flexShrink: 0,
     marginTop: -25,
@@ -344,7 +334,6 @@ const stylesheet = StyleSheet.create({
     height: 20,
     color: 'rgb(255, 255, 255)',
   },
-
   check: {
     position: 'absolute',
     flexShrink: 0,
@@ -360,12 +349,11 @@ const stylesheet = StyleSheet.create({
   settingsAndPlayers: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     width: '100%',
     paddingHorizontal: 20,
-    marginBottom: 10,
-    marginLeft: 10,
-    marginRight: 190,
+    marginBottom: 35,
+    marginRight: 50,
     marginTop: -275,
   },
   title: {
@@ -376,7 +364,6 @@ const stylesheet = StyleSheet.create({
     fontWeight: '400',
     marginLeft: 10,
   },
-
   StrategoContainer: {
     display: 'flex',
     position: 'relative',
@@ -398,7 +385,6 @@ const stylesheet = StyleSheet.create({
     borderRadius: 36,
     marginVertical: 10,
   },
-
   StrategoImage: {
     position: 'relative',
     flexGrow: 1,

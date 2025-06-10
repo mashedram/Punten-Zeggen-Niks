@@ -22,6 +22,7 @@ export type PlayerEvent<T> = {
  */
 export const playerDataSchema = z.object({
   id: z.string(),
+  name: z.string(),
   isAdmin: z.boolean(),
   gameData: PlayerGameDataSchema,
 });
@@ -44,6 +45,7 @@ export enum ConnectionState {
 export class Player {
   private _id: string;
   private _authToken: string;
+  private _name: string;
   private _isAdmin: boolean;
   private _lobby: Lobby;
 
@@ -56,8 +58,9 @@ export class Player {
 
   private emitter: EventEmitter = new EventEmitter();
 
-  constructor(id: string, isAdmin: boolean, lobby: Lobby) {
+  constructor(id: string, name: string, isAdmin: boolean, lobby: Lobby) {
     this._id = id;
+    this._name = name;
     this._isAdmin = isAdmin;
     this._authToken = crypto.randomUUID();
     this._lobby = lobby;
@@ -65,6 +68,10 @@ export class Player {
 
   public getId(): string {
     return this._id;
+  }
+
+  public getName(): string {
+    return this._name;
   }
 
   public getLobby(): Lobby {
@@ -135,6 +142,7 @@ export class Player {
   public getPublicData(): PlayerData {
     return {
       id: this._id,
+      name: this._name,
       isAdmin: this._isAdmin,
       gameData: this._gameData,
     };
