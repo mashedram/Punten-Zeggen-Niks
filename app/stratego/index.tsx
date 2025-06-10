@@ -60,154 +60,165 @@ export default function Game() {
     return;
   }
 
+  const availablePlayers = stratego.otherPlayers.filter(
+    p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
+  ).length;
+
   return (
     <SafeAreaView style={styles.BackgroundView}>
-      <>
-        <View style={styles.CardStackTrackerContainer}>
-          <CardCountBar blueCardCount={60} redCardCount={60} />
-        </View>
+      <View style={styles.CardStackTrackerContainer}>
+        <CardCountBar blueCardCount={60} redCardCount={30} />
+      </View>
+
+      {(stratego.self.isTeamLeader && (
         <View style={styles.CaptainIconContainer}>
-          <Svg
-            style={styles.CaptainEllipse}
-            width={20}
-            height={20}
-            viewBox="0 0 20 20"
-            fill="none">
-            <Circle cx={10} cy={10} r={10} fill="#FF2424" />
-          </Svg>
-          <Text style={styles.CaptainIcon}>🎖</Text>
-          <Text style={styles.CaptainExclamationMark}>!</Text>
-        </View>
-
-        <View style={styles.BattleLogButtonContainer}>
-          <View style={styles.BattlelogButton}>
-            <Text style={styles.BattleLogButtonArrow}>{'➔'} </Text>
-          </View>
-        </View>
-
-        {(stratego.self.isTeamLeader && (
-          <View style={styles.SelectScreenContainer}>
-            <Image
-              source={require('@/assets/images/Generaal.png')}
-              style={styles.SpelerCardSelect}></Image>
-            <RoleCardPicker />
-          </View>
-        )) || (
-          <View style={styles.SelectScreenContainer}>
-            <Image
-              source={require('@/assets/images/Spion.png')}
-              style={styles.SpelerCard}></Image>
-          </View>
-        )}
-
-        <View style={styles.PopUpContainer}>
-          {PowerUpsIndex !== undefined && (
-            <PowerUpPopUp
-              name={PowerUpList[PowerUpsIndex].name}
-              description={PowerUpList[PowerUpsIndex].description}
-              image={PowerUpList[PowerUpsIndex].image}
-              onDelete={() => setPowerupsIndex(undefined)}
-              onInzet={() => {
-                setIngezettePowerupIndex(PowerUpsIndex);
-                setPowerupsIndex(undefined);
-              }}
-            />
+          {availablePlayers > 0 && (
+            <>
+              <Svg
+                style={styles.CaptainEllipse}
+                width={20}
+                height={20}
+                viewBox="0 0 20 20"
+                fill="none">
+                <Circle cx={10} cy={10} r={10} fill="#FF2424" />
+              </Svg>
+              <Text style={styles.CaptainExclamationMark}>
+                {availablePlayers}
+              </Text>
+            </>
           )}
+          <Text style={styles.CaptainIcon}>🎖</Text>
         </View>
+      )) || <View style={styles.CaptainIconContainer}></View>}
 
-        {/* Gameloop test gedeelte kan later weg */}
+      <View style={styles.BattleLogButtonContainer}>
+        <View style={styles.BattlelogButton}>
+          <Text style={styles.BattleLogButtonArrow}>{'➔'} </Text>
+        </View>
+      </View>
+
+      {(stratego.self.isTeamLeader && (
+        <View style={styles.SelectScreenContainer}>
+          <Image
+            source={require('@/assets/images/Generaal.png')}
+            style={styles.SpelerCardSelect}></Image>
+          <RoleCardPicker />
+        </View>
+      )) || (
+        <View style={styles.SelectScreenContainer}>
+          <Image
+            source={require('@/assets/images/Spion.png')}
+            style={styles.SpelerCardSelect}></Image>
+        </View>
+      )}
+
+      <View style={styles.PopUpContainer}>
+        {PowerUpsIndex !== undefined && (
+          <PowerUpPopUp
+            name={PowerUpList[PowerUpsIndex].name}
+            description={PowerUpList[PowerUpsIndex].description}
+            image={PowerUpList[PowerUpsIndex].image}
+            onDelete={() => setPowerupsIndex(undefined)}
+            onInzet={() => {
+              setIngezettePowerupIndex(PowerUpsIndex);
+              setPowerupsIndex(undefined);
+            }}
+          />
+        )}
+      </View>
+
+      {/* Gameloop test gedeelte kan later weg */}
+      <View>
+        {/* Welke rol heeft de speler */}
+        <Text>
+          {stratego.self.roleCard !== undefined
+            ? `Jouw rol: ${stratego.self.roleCard}`
+            : 'Je hebt nog geen rolkaart.'}
+        </Text>
+
+        {/* Wat is de aanvalscode van de speler */}
+        <Text>{stratego.self.attackCode}</Text>
+
+        {/* invoer veld voor de aanvalscode van de vijand */}
+        <TextInput
+          onChangeText={text => setEnemyAttackCode(text)}
+          value={enemyAttackCode}
+          style={{ backgroundColor: 'white' }}
+        />
+        <Button
+          onPress={() =>
+            sendAttackMutation.mutate({
+              token: lobby.getToken(),
+              attackCode: enemyAttackCode,
+            })
+          }
+          title="Attack"
+          color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
+        />
+
+        {/* status van de game */}
         <View>
-          {/* Welke rol heeft de speler */}
-          <Text>
-            {stratego.self.roleCard !== undefined
-              ? `Jouw rol: ${stratego.self.roleCard}`
-              : 'Je hebt nog geen rolkaart.'}
-          </Text>
-
-          {/* Wat is de aanvalscode van de speler */}
-          <Text>{stratego.self.attackCode}</Text>
-
-          {/* invoer veld voor de aanvalscode van de vijand */}
-          <TextInput
-            onChangeText={text => setEnemyAttackCode(text)}
-            value={enemyAttackCode}
-            style={{ backgroundColor: 'white' }}
-          />
-          <Button
-            onPress={() =>
-              sendAttackMutation.mutate({
-                token: lobby.getToken(),
-                attackCode: enemyAttackCode,
-              })
-            }
-            title="Attack"
-            color={stratego.self.teamId === 'red' ? '#FF2424' : '#1E90FF'}
-          />
-
-          {/* status van de game */}
-          <View>
-            {stratego.lobby.gameState === GameState.playing && (
-              <Text>Game is running...</Text>
+          {stratego.lobby.gameState === GameState.playing && (
+            <Text>Game is running...</Text>
+          )}
+          {stratego.lobby.gameState === stratego.self.teamId &&
+            stratego.lobby.gameState !== GameState.playing && (
+              <Text>
+                Je hebt gewonnen! Gefeliciteerd, {stratego.self.teamId} team!
+              </Text>
             )}
-            {stratego.lobby.gameState === stratego.self.teamId &&
-              stratego.lobby.gameState !== GameState.playing && (
-                <Text>
-                  Je hebt gewonnen! Gefeliciteerd, {stratego.self.teamId} team!
-                </Text>
-              )}
-            {stratego.lobby.gameState !== stratego.self.teamId &&
-              stratego.lobby.gameState !== GameState.playing && (
-                <Text>
-                  Je hebt verloren. Volgende keer beter team{' '}
-                  {stratego.self.teamId}.
-                </Text>
-              )}
-          </View>
+          {stratego.lobby.gameState !== stratego.self.teamId &&
+            stratego.lobby.gameState !== GameState.playing && (
+              <Text>
+                Je hebt verloren. Volgende keer beter team{' '}
+                {stratego.self.teamId}.
+              </Text>
+            )}
         </View>
-        {/* Einde test gedeelte gameloop */}
+      </View>
+      {/* Einde test gedeelte gameloop */}
 
-        <Pressable
-          style={{
-            transform: [{ translateY: isPowerCardOpen ? '5%' : '80%' }],
-            ...styles.PowerUpBarContainer,
-          }}
-          onPress={() => setPowerCardOpen(!isPowerCardOpen)}>
-          <View style={styles.PowerCardTitleContainer}>
-            <Text
-              style={{
-                transform: [{ rotate: isPowerCardOpen ? '90deg' : '-90deg' }],
-                ...styles.PowerUpArrow,
+      <Pressable
+        style={{
+          transform: [{ translateY: isPowerCardOpen ? '5%' : '80%' }],
+          ...styles.PowerUpBarContainer,
+        }}
+        onPress={() => setPowerCardOpen(!isPowerCardOpen)}>
+        <View style={styles.PowerCardTitleContainer}>
+          <Text
+            style={{
+              transform: [{ rotate: isPowerCardOpen ? '90deg' : '-90deg' }],
+              ...styles.PowerUpArrow,
+            }}>
+            ➔
+          </Text>
+          <Text style={styles.PowerUpTekst}>Power-ups</Text>
+        </View>
+        <View style={styles.PowerUpCardContainer}>
+          {PowerUpList.map((powerUp, index) => (
+            <Pressable
+              key={powerUp.id}
+              style={[
+                styles.PowerUpPressable,
+                index === ingezettePowerupIndex && {
+                  borderWidth: 6,
+                  borderColor: '#70C25C',
+                  borderRadius: 16,
+                  shadowColor: 'rgba(0, 0, 0, 0.25)',
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowRadius: 8,
+                  shadowOpacity: 8,
+                },
+              ]}
+              onPress={event => {
+                event.stopPropagation();
+                if (isPowerCardOpen) setPowerupsIndex(index);
               }}>
-              ➔
-            </Text>
-            <Text style={styles.PowerUpTekst}>Power-ups</Text>
-          </View>
-          <View style={styles.PowerUpCardContainer}>
-            {PowerUpList.map((powerUp, index) => (
-              <Pressable
-                key={powerUp.id}
-                style={[
-                  styles.PowerUpPressable,
-                  index === ingezettePowerupIndex && {
-                    borderWidth: 6,
-                    borderColor: '#70C25C',
-                    borderRadius: 16,
-                    shadowColor: 'rgba(0, 0, 0, 0.25)',
-                    shadowOffset: { width: 0, height: 8 },
-                    shadowRadius: 8,
-                    shadowOpacity: 8,
-                  },
-                ]}
-                onPress={event => {
-                  event.stopPropagation();
-                  if (isPowerCardOpen) setPowerupsIndex(index);
-                }}>
-                <Image source={powerUp.image} style={styles.PowerupCard} />
-              </Pressable>
-            ))}
-          </View>
-        </Pressable>
-      </>
+              <Image source={powerUp.image} style={styles.PowerupCard} />
+            </Pressable>
+          ))}
+        </View>
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -274,11 +285,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     top: 0,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 12,
+    marginTop: 10,
   },
   PopUpContainer: {
     width: '90%',
