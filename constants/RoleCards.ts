@@ -155,6 +155,8 @@ export const RoleCards: Record<string, RoleCard> = {
   bom,
 };
 
+export const AllRoleCards: RoleCard[] = Object.values(RoleCards);
+
 // export const roleCardImages = {
 //   vlag: require('@/assets/images/Vlag.png'),
 //   maarschalk: require('@/assets/images/Maarschalk.png'),
