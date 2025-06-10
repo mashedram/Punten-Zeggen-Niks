@@ -20,6 +20,8 @@ import {
 import { AppRouter } from '@/api/router/root';
 import { TRPCProvider } from '@/api/query';
 import { LobbyProvider } from '@/hooks/useLobby';
+import { ClientProvider } from '@/hooks/networking/useClient';
+import SuperJSON from 'superjson';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync().catch(e => console.warn(e));
@@ -35,6 +37,8 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
+    // Require does work in the browser on react.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
@@ -63,6 +67,7 @@ export default function RootLayout() {
       links: [
         wsLink({
           client: wsClient,
+          transformer: SuperJSON,
         }),
         loggerLink({
           enabled: opts =>
@@ -82,9 +87,11 @@ export default function RootLayout() {
       <TRPCProvider queryClient={queryClient} trpcClient={tRPCClient}>
         <ThemeProvider
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <LobbyProvider>
-            <Stack screenOptions={{ headerShown: false }} />
-          </LobbyProvider>
+          <ClientProvider>
+            <LobbyProvider>
+              <Stack screenOptions={{ headerShown: false }} />
+            </LobbyProvider>
+          </ClientProvider>
         </ThemeProvider>
       </TRPCProvider>
     </QueryClientProvider>

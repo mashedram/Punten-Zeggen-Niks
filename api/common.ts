@@ -1,7 +1,12 @@
-import { CreateWSSContextFnOptions } from "@trpc/server/adapters/ws"
+import { CreateWSSContextFnOptions } from '@trpc/server/adapters/ws';
+import { Client } from '../common/networking/client/Client';
 
-export const createContext = (opts: CreateWSSContextFnOptions) => {
-    return {
-        req: opts.req
-    }
-}
+export type TrpcContext = {
+  client: Client | undefined;
+};
+
+export const createContext = (opts: CreateWSSContextFnOptions): TrpcContext => {
+  return {
+    client: undefined,
+  };
+};
