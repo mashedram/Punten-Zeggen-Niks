@@ -28,6 +28,7 @@ const StagedObejctFactory = <T extends Record<string, unknown>>(
 
 export type PlayerData = {
   id: string;
+  name: string;
   isAdmin: boolean;
   gameData: TrackedInstanceReference<PlayerDataStratego> | undefined;
 };
@@ -38,6 +39,7 @@ export const PlayerDataDescriptor: DataInstanceDescriptor<PlayerData> = {
   tracker: LobbyTrackerDescriptor,
   mask: {
     id: 'public',
+    name: 'public',
     isAdmin: 'public',
     gameData: 'public',
   },

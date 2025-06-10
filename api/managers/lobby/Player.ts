@@ -17,7 +17,13 @@ export class Player {
   private _gameData: TrackedInstance<PlayerGameData> | undefined;
   private _lobby: Lobby;
 
-  constructor(id: string, client: Client, tracker: DataTracker, lobby: Lobby) {
+  constructor(
+    id: string,
+    name: string,
+    client: Client,
+    tracker: DataTracker,
+    lobby: Lobby,
+  ) {
     this._client = client;
     this._lobby = lobby;
 
@@ -28,6 +34,7 @@ export class Player {
       },
       {
         id,
+        name,
         gameData: undefined,
         isAdmin: false,
       },
@@ -97,6 +104,10 @@ export class Player {
 
   public sync() {
     this._data.markDirty();
+  }
+
+  public getName(): string {
+    return this._data.data.name;
   }
 
   public getLobby(): Lobby {

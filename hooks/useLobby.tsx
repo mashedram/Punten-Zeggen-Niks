@@ -27,8 +27,8 @@ export type LobbyState =
   | {
       loading: false;
       inLobby: false;
-      join: (code: string) => void;
-      create: () => void;
+      join: (code: string, name: string) => void;
+      create: (name: string) => void;
     }
   | {
       loading: true;
@@ -93,17 +93,20 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
   ]);
 
   const joinLobbyCallback = useCallback(
-    (code: string) => {
+    (code: string, name: string) => {
       if (client.isLoading) return;
-      joinMutation.mutate({ code });
+      joinMutation.mutate({ code, name });
     },
     [client, joinMutation],
   );
 
-  const createLobbyCallback = useCallback(() => {
-    if (client.isLoading) return;
-    createMutation.mutate();
-  }, [client, createMutation]);
+  const createLobbyCallback = useCallback(
+    (name: string) => {
+      if (client.isLoading) return;
+      createMutation.mutate({ name });
+    },
+    [client, createMutation],
+  );
 
   const leaveLobbyCallback = useCallback(() => {
     if (client.isLoading) return;

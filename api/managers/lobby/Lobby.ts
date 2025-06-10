@@ -150,9 +150,15 @@ export class Lobby {
     this._data.markDirty();
   }
 
-  public createPlayer(client: Client): Player {
+  public createPlayer(name: string, client: Client): Player {
     this._clients.addClient(client);
-    const player = new Player(client.getId(), client, this._tracker, this);
+    const player = new Player(
+      client.getId(),
+      name,
+      client,
+      this._tracker,
+      this,
+    );
     if (Object.keys(this._players).length === 0) {
       player.setAdmin(true);
     }

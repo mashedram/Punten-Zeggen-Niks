@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    margin: -2.2,
   },
   background: {
     ...StyleSheet.absoluteFillObject,

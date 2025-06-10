@@ -15,7 +15,7 @@ import { Link } from 'expo-router';
 const { height } = Dimensions.get('window');
 
 const MIN_PLAYER_COUNT = 1;
-const MAX_PLAYER_COUNT = 24;
+const MAX_PLAYER_COUNT = 999;
 
 export default function Settingsv2() {
   const [playerCount, setPlayerCount] = useState(1);
@@ -123,6 +123,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#5CA3C2',
+    margin: -1.2,
   },
   header: {
     height: height * 0.1,

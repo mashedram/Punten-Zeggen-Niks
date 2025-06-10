@@ -7,7 +7,6 @@
  * @returns {JSX.Element} De weergave van het PIN-invoerscherm.
  */
 
-import CodeInput from '@/components/CodeInput'; // Aangepaste inputcomponent voor PIN-code
 import { useLobby } from '@/hooks/useLobby'; // Lobby hook voor game-join functionaliteit
 import { Redirect, useRouter } from 'expo-router'; // Navigatie hook van Expo Router
 import React, { useState } from 'react';
@@ -35,7 +34,6 @@ export default function EnterPinScreen() {
    * State voor de ingevoerde code (PIN)
    * @type {[string, React.Dispatch<React.SetStateAction<string>>]}
    */
-  const [code, setCode] = useState('');
 
   const [name, setName] = useState('');
 
@@ -53,15 +51,6 @@ export default function EnterPinScreen() {
         style={styles.screen}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.card}>
-          {/* Invoerveld voor de PIN-code */}
-          <CodeInput
-            code={code}
-            onChange={code => setCode(code as string)}
-            style={styles.CodeInput}
-            placeholder="Vul game PIN in"
-            placeholderTextColor="#888"
-          />
-
           {/* Invoerveld voor de naam van de speler */}
           <TextInput
             value={name}
@@ -72,27 +61,20 @@ export default function EnterPinScreen() {
             autoCapitalize="words"
           />
 
-          {/* Knop om de ingevoerde code te wissen */}
-          <Pressable style={styles.clearButton} onPress={() => setCode('')}>
-            <Text style={styles.clearButtonText}>Delete</Text>
-          </Pressable>
-
           {/* Knop om spel te joinen - alleen actief als er een code is ingevuld */}
           <Pressable
-            style={[styles.button, (!code || !name) && styles.buttonDisabled]}
-            onPress={() => {
-              if (!code.trim()) {
-                Alert.alert('Fout', 'Voer een PIN in om verder te gaan.');
-              } else if (!name.trim()) {
+            style={[styles.button, !name && styles.buttonDisabled]}
+            onPress={async () => {
+              if (!name.trim()) {
                 Alert.alert('Fout', 'Voer een naam in om verder te gaan.');
               } else {
-                lobby.join(code.trim(), name.trim()); // Join het spel met de ingevoerde code
+                await lobby.create(name.trim()); // Join het spel met de ingevoerde code
                 router.push('/lobby'); // Navigeer naar de lobby-pagina
               }
             }}
-            disabled={!code.trim() || !name.trim()} // Schakel knop uit als code leeg of alleen spaties is
+            disabled={!name.trim()} // Schakel knop uit als code leeg of alleen spaties is
           >
-            <Text style={styles.buttonText}>Enter Lobby</Text>
+            <Text style={styles.buttonText}>Lobby aanmaken</Text>
           </Pressable>
         </View>
 
@@ -145,7 +127,8 @@ const styles = StyleSheet.create({
 
   safeArea: {
     flex: 1,
-    backgroundColor: '#5CA3C2', // Blauwgroene achtergrond
+    backgroundColor: '#5CA3C2',
+    margin: -1.2, // Blauwgroene achtergrond
   },
   screen: {
     flex: 1,
@@ -197,7 +180,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#444',
-    marginBottom: 24,
+    marginBottom: 20,
     textAlign: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 1, height: 2 },
@@ -214,7 +197,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     width: '100%',
-    height: '13%',
+    height: '24%',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
