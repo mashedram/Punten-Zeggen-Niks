@@ -1,11 +1,7 @@
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
+import { getPlayerData, endGame } from './StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
-import {
-  getPlayerData,
-  endGame,
-  getRoleCardFromSelection,
-} from './StrategoGame';
 
 export function performAttack(
   lobby: Lobby,
@@ -37,9 +33,16 @@ export function performAttack(
     return;
   }
 
+  // check if attacker can attack
+  if (!attackerCard.canAttack) {
+    console.warn(
+      `Attacker ${attacker.getId()} cannot attack with card ${attackerCard.id}.`,
+    );
+    return;
+  }
+
   // check if defender has a flag
-  // TODO: vlag kan niet aanvallen, maar kan wel verdedigen
-  if (defenderCard.name === RoleCards.vlag.name) {
+  if (defenderCard.id === RoleCards.vlag.id) {
     endGame(lobby, attackerData.teamId);
     console.log(
       `Team ${attackerData.teamId} has captured the flag of team ${defenderData.teamId}.`,
@@ -49,10 +52,10 @@ export function performAttack(
 
   if (attackerCard.beats.includes(defenderCard)) {
     console.log(
-      `Attacker ${attacker.getId()} wins against defender ${defender.getId()}.`,
+      `Attacker ${attacker.getId()}, ${attackerCard.id} wins against defender ${defender.getId()}, ${defenderCard.id}.`,
     );
-    win(defender);
-    defeat(attacker);
+    win(attacker);
+    defeat(defender);
     return;
   }
 
@@ -60,23 +63,16 @@ export function performAttack(
     console.log(
       `Defender ${defender.getId()} wins against attacker ${attacker.getId()}.`,
     );
-    win(attacker);
-    defeat(defender);
+    if (defenderCard.id === RoleCards.bom.id) {
+      explode(defender);
+    } else {
+      win(defender);
+    }
+    defeat(attacker);
     return;
   }
 
   if (attackerCard === defenderCard) {
-    if (
-      attackerCard.name === RoleCards.bom.name ||
-      defenderCard.name === RoleCards.bom.name
-    ) {
-      console.log(
-        `Both players ${attacker.getId()} and ${defender.getId()} have a bomb. Both players explode.`,
-      );
-      explode(attacker);
-      explode(defender);
-      return;
-    }
     console.log(
       `Both players ${attacker.getId()} and ${defender.getId()} have the same card. It's a draw.`,
     );
@@ -96,6 +92,7 @@ function draw(player: Player) {
 }
 
 function win(player: Player) {
+  console.log(`Player ${player.getId()} wins the fight.`);
   const data = getPlayerData(player);
   data.lastFightResult = {
     index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
@@ -105,11 +102,9 @@ function win(player: Player) {
 }
 
 function defeat(player: Player) {
+  console.log(`Player ${player.getId()} loses the fight.`);
   const playerData = getPlayerData(player);
-  playerData.roleCard = getRoleCardFromSelection(
-    player.getLobby(),
-    playerData.teamId,
-  );
+  deleteRoleCard(player);
   playerData.lastFightResult = {
     index: playerData.lastFightResult
       ? playerData.lastFightResult.index + 1
@@ -120,11 +115,9 @@ function defeat(player: Player) {
 }
 
 function explode(player: Player) {
+  console.log(`Player ${player.getId()} explodes.`);
   const playerData = getPlayerData(player);
-  playerData.roleCard = getRoleCardFromSelection(
-    player.getLobby(),
-    playerData.teamId,
-  );
+  deleteRoleCard(player);
   playerData.lastFightResult = {
     index: playerData.lastFightResult
       ? playerData.lastFightResult.index + 1
@@ -147,4 +140,16 @@ function getRoleCard(cardId?: string): RoleCard | undefined {
     return undefined;
   }
   return RoleCards[cardId];
+}
+
+function deleteRoleCard(player: Player) {
+  const playerData = getPlayerData(player);
+  const lobby = player.getLobby();
+  if (!playerData.roleCard) {
+    console.warn(`Player ${player.getId()} has no role card to remove.`);
+    return;
+  }
+  playerData.roleCard = undefined;
+  playerData.hasRoleCard = false;
+  lobby.sync();
 }
