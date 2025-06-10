@@ -13,6 +13,7 @@ interface Rolecardprops {
   attackCode: string;
   roleCard: RoleCard | undefined;
 }
+const flipAnim = useRef(new Animated.Value(0)).current;
 
 export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
   const [imageToggled, setToggled] = useState(false);
@@ -24,8 +25,6 @@ export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
     );
   }
   const image = roleCard ? CardImages[roleCard.id?.toLowerCase()] : undefined;
-
-  const flipAnim = useRef(new Animated.Value(0)).current;
 
   const handleToggle = () => {
     const toValue = imageToggled ? 0 : 1;
