@@ -1,168 +1,116 @@
-import { EventEmitter, on as on } from 'ws';
-import { z } from 'zod';
-import { PlayerToken } from './PlayerToken';
-import { LOBBY_CONSTANTS } from './LobbyManager';
 import { Lobby } from './Lobby';
+import { DataTracker } from '@/common/networking/tracking/tracker/DataTracker';
+import { TrackedInstance } from '@/common/networking/tracking/tracker/TrackedInstance';
+import { Client } from '@/common/networking/client/Client';
+import { TrackedInstanceReference } from '@/common/networking/tracking/tracker/TrackedInstanceReference';
+import { SERVER_DATA_STORE } from '@/common/networking/Globals';
 import {
-  PlayerGameData as PlayerGameData,
-  PlayerGameDataSchema as PlayerGameDataSchema,
-} from '@/api/game/player/PlayerGameData';
-
-/**
- * A type that defines a player event
- * @template T The content of the event, based on it's type
- */
-export type PlayerEvent<T> = {
-  type: string;
-  content: T;
-};
-
-/**
- * A type that defines publicly shared data between server and client
- */
-export const playerDataSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  isAdmin: z.boolean(),
-  gameData: PlayerGameDataSchema,
-});
-
-/**
- * An interface that defines data that is only available to the player themselves
- * Includes publicly available data
- */
-export const priviligedPlayerDataSchema = playerDataSchema.extend({
-  // Empty for future usage
-});
-
-export type PlayerData = z.infer<typeof playerDataSchema>;
-export type PriviligedPlayerData = z.infer<typeof priviligedPlayerDataSchema>;
-export enum ConnectionState {
-  Connected,
-  Disconnected,
-}
+  PlayerData,
+  PlayerDataDescriptor,
+} from '@/common/networking/tracking/descriptors/LobbyInstanceDescriptor';
+import { DataInstanceDescriptor } from '@/common/networking/tracking/descriptors/DataInstanceDescriptor';
+import { PlayerGameData } from '@/api/game/player/PlayerGameData';
 
 export class Player {
-  private _id: string;
-  private _authToken: string;
-  private _name: string;
-  private _isAdmin: boolean;
+  private _client: Client;
+  private _data: TrackedInstance<PlayerData>;
+  private _gameData: TrackedInstance<PlayerGameData> | undefined;
   private _lobby: Lobby;
 
-  private _gameData: PlayerGameData = {
-    gameId: undefined,
-  };
-
-  private connectionState: ConnectionState = ConnectionState.Disconnected;
-  private disconnectTimeout: NodeJS.Timeout | null = null;
-
-  private emitter: EventEmitter = new EventEmitter();
-
-  constructor(id: string, name: string, isAdmin: boolean, lobby: Lobby) {
-    this._id = id;
-    this._name = name;
-    this._isAdmin = isAdmin;
-    this._authToken = crypto.randomUUID();
+  constructor(
+    id: string,
+    name: string,
+    client: Client,
+    tracker: DataTracker,
+    lobby: Lobby,
+  ) {
+    this._client = client;
     this._lobby = lobby;
+
+    this._data = SERVER_DATA_STORE.startTracking(
+      {
+        ...PlayerDataDescriptor,
+        name: PlayerDataDescriptor.name + '-' + id,
+      },
+      {
+        id,
+        name,
+        gameData: undefined,
+        isAdmin: false,
+      },
+      tracker,
+    );
   }
 
   public getId(): string {
-    return this._id;
+    return this._data.data.id;
+  }
+
+  public isAdmin(): boolean {
+    return this._data.data.isAdmin;
+  }
+
+  public setAdmin(value: boolean) {
+    this._data.modify(data => {
+      data.set('isAdmin', value);
+    });
+  }
+
+  public getClient(): Client {
+    return this._client;
+  }
+
+  public getInstanceReference(): TrackedInstanceReference<PlayerData> {
+    return this._data.getRef();
+  }
+
+  public clearGameData(tracker: DataTracker) {
+    if (!this._gameData) return;
+
+    tracker.stopTracking(this._gameData.getId());
+    this._gameData = undefined;
+  }
+
+  public setGameData<T extends PlayerGameData>(
+    descriptor: DataInstanceDescriptor<T>,
+    data: T,
+    tracker: DataTracker,
+  ) {
+    this.clearGameData(tracker);
+
+    const playerData = SERVER_DATA_STORE.startTracking(
+      {
+        ...descriptor,
+        name: descriptor.name + '-' + this._data.data.id,
+      },
+      data,
+      tracker,
+    ) as TrackedInstance<PlayerGameData>;
+    this._data.modify(data => {
+      // @ts-expect-error The reference is valid, typescript just explodes the type
+      data.set('gameData', playerData.getRef());
+    });
+
+    this._gameData = playerData;
+  }
+
+  public getGameData<T extends PlayerGameData>(): T | undefined {
+    return this._gameData?.data as T | undefined;
+  }
+
+  public onRemoval() {
+    SERVER_DATA_STORE.stopTracking(this._data);
+  }
+
+  public sync() {
+    this._data.markDirty();
   }
 
   public getName(): string {
-    return this._name;
+    return this._data.data.name;
   }
 
   public getLobby(): Lobby {
     return this._lobby;
-  }
-
-  public checkAuthToken(token: string): boolean {
-    return this._authToken === token;
-  }
-
-  public setGameData(gameData: PlayerGameData) {
-    this._gameData = gameData;
-  }
-
-  public getGameData<T extends PlayerGameData>(): T {
-    return this._gameData as T;
-  }
-
-  /**
-   * Called when the player is about to be removed
-   */
-  public onRemoval(): void {
-    if (this.disconnectTimeout) {
-      clearTimeout(this.disconnectTimeout);
-      this.disconnectTimeout = null;
-    }
-  }
-
-  public sync(): void {
-    this._lobby.syncWith(this);
-  }
-
-  public syncToOthers(): void {
-    this._lobby.syncOthers(this);
-  }
-
-  public getToken(): PlayerToken {
-    return new PlayerToken(this._lobby.getCode(), this._authToken);
-  }
-
-  public isAdmin(): boolean {
-    return this._isAdmin;
-  }
-
-  public setAdmin(value: boolean) {
-    this._isAdmin = value;
-  }
-
-  public setConnected(state: ConnectionState) {
-    this.connectionState = state;
-
-    if (this.disconnectTimeout) {
-      clearTimeout(this.disconnectTimeout);
-      this.disconnectTimeout = null;
-    }
-
-    if (state === ConnectionState.Disconnected) {
-      this.disconnectTimeout = setTimeout(() => {
-        this._lobby.removePlayer(this.getId());
-      }, LOBBY_CONSTANTS.DISCONNECT_TIMEOUT_MS);
-    }
-  }
-
-  public getConnectionState(): ConnectionState {
-    return this.connectionState;
-  }
-
-  public getPublicData(): PlayerData {
-    return {
-      id: this._id,
-      name: this._name,
-      isAdmin: this._isAdmin,
-      gameData: this._gameData,
-    };
-  }
-
-  public getPrivilegedData(): PriviligedPlayerData {
-    return {
-      ...this.getPublicData(),
-    };
-  }
-
-  public listen(
-    signal?: AbortSignal,
-  ): NodeJS.AsyncIterator<PlayerEvent<unknown>[]> {
-    return on(this.emitter, 'event', {
-      signal,
-    });
-  }
-
-  public emit<T>(event: PlayerEvent<T>) {
-    this.emitter.emit('event', event);
   }
 }

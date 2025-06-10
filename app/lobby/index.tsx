@@ -1,7 +1,6 @@
 import { SettingsButton } from '@/components/lobby_host/SettingsButton';
-import { ThemedText } from '@/components/ThemedText';
 import { useLobby } from '@/hooks/useLobby';
-import { ExternalPathString, Link, Redirect, useRouter } from 'expo-router';
+import { ExternalPathString, Redirect, useRouter } from 'expo-router';
 import React from 'react';
 import {
   View,
@@ -17,7 +16,7 @@ import {
 } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { QrButton } from '@/components/lobby_host/QrButton';
-import { StrategoGameId } from '@/api/managers/statego/StrategoGame';
+import { StrategoGameId } from '@/api/managers/stratego/StrategoGame';
 
 export default function LobbyPage() {
   const lobby = useLobby();
@@ -32,23 +31,17 @@ export default function LobbyPage() {
   }
 
   const activeLobby = lobby.get();
+  console.debug('activeLobby', activeLobby);
 
   const handlePress = () => {
     Alert.alert('Je hebt op de afbeelding gedrukt!');
   };
 
   if (!activeLobby) {
-    return (
-      <View>
-        <ThemedText>Not in a lobby</ThemedText>
-        <Link href="/">
-          <ThemedText type="link">Go Home</ThemedText>
-        </Link>
-      </View>
-    );
+    return <Redirect href="/" />;
   }
 
-  if (activeLobby.game.gameId) {
+  if (activeLobby.game) {
     return (
       <Redirect href={`/${activeLobby.game.gameId}` as ExternalPathString} />
     );
@@ -119,7 +112,7 @@ export default function LobbyPage() {
               : stylesheet.PlayButtonContainerDisabled
           }
           onPress={() => {
-            if (activeLobby.game.gameId) return;
+            if (activeLobby.game) return;
             lobby.setGame(StrategoGameId);
           }}
           disabled={!canStart}>

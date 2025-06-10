@@ -1,4 +1,4 @@
-import { LobbyDataSchemaStratego } from '@/api/managers/statego/StrategoGame';
+import { LobbyDataSchemaStratego } from '@/api/managers/stratego/StrategoGame';
 import { z } from 'zod';
 
 export const LobbyGameDataSchema = z.discriminatedUnion('gameId', [
