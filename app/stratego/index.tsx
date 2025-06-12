@@ -21,6 +21,7 @@ import { CardCountBar } from '@/components/ui/CardCountBar';
 import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
 import { AllRoleCards } from '@/constants/RoleCards';
 import { AttackButton } from '@/components/ui/AttackButton';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function Game() {
   const lobby = useLobby();
@@ -28,11 +29,11 @@ export default function Game() {
 
   const [isLeaderPopupOpen, setLeaderPopupOpen] = useState(false);
 
-  const slideAnim = useRef(new Animated.Value(500)).current;
+  const slideAnim = useRef(new Animated.Value(-500)).current;
 
   useEffect(() => {
     Animated.timing(slideAnim, {
-      toValue: isLeaderPopupOpen ? 0 : 500,
+      toValue: isLeaderPopupOpen ? 0 : -500,
       duration: 300,
       easing: Easing.out(Easing.ease),
       useNativeDriver: true,
@@ -85,7 +86,9 @@ export default function Game() {
         <TouchableOpacity
           style={styles.CaptainIconContainer}
           onPress={() => {
-            setLeaderPopupOpen(!isLeaderPopupOpen);
+            if (availablePlayers > 0 || isLeaderPopupOpen) {
+              setLeaderPopupOpen(!isLeaderPopupOpen);
+            }
           }}>
           {availablePlayers > 0 && (
             <View>
@@ -103,44 +106,39 @@ export default function Game() {
           <Text style={styles.CaptainIcon}>🎖</Text>
         </TouchableOpacity>
       )}
-
-      {(stratego.self.isTeamLeader && (
-        <View style={styles.roleContainer}>
-          <PlayerRole
-            teamId={stratego.self.teamId}
-            roleCard={AllRoleCards.find(
-              card => card.id === stratego.self.roleCard,
-            )}
-          />
-          {isLeaderPopupOpen && (
-            <Animated.View
-              style={[
-                styles.roleCardSelectionContainer,
-                { transform: [{ translateY: slideAnim }] },
-              ]}
-              pointerEvents={isLeaderPopupOpen ? 'auto' : 'none'}>
-              <View style={styles.roleCardPickerContainer}>
-                <Text style={styles.rolePickerText}>
-                  Select a player and role to rivive the chosen player.
-                </Text>
-                <RoleCardPicker />
-              </View>
-            </Animated.View>
+      <View style={styles.roleContainer}>
+        <PlayerRole
+          teamId={stratego.self.teamId}
+          roleCard={AllRoleCards.find(
+            card => card.id === stratego.self.roleCard,
           )}
-        </View>
-      )) || (
-        <View style={styles.roleContainer}>
-          <PlayerRole
-            teamId={stratego.self.teamId}
-            roleCard={AllRoleCards.find(
-              card => card.id === stratego.self.roleCard,
-            )}
-          />
-        </View>
-      )}
+        />
+      </View>
+
       <View style={styles.playerAttackContainer}>
         <AttackButton />
       </View>
+
+      <Animated.View
+        style={[
+          styles.roleCardSelectionContainer,
+          { transform: [{ translateY: slideAnim }] },
+        ]}
+        pointerEvents={isLeaderPopupOpen ? 'auto' : 'none'}>
+        <TouchableOpacity
+          style={styles.closeCardSelection}
+          onPress={() => {
+            setLeaderPopupOpen(!isLeaderPopupOpen);
+          }}>
+          <FontAwesome name="close" size={24} color="black" />
+        </TouchableOpacity>
+        <View style={styles.roleCardPickerContainer}>
+          <Text style={styles.rolePickerText}>
+            Select a player and role to rivive the chosen player.
+          </Text>
+          <RoleCardPicker />
+        </View>
+      </Animated.View>
 
       {/* Gameloop test gedeelte kan later weg */}
       <View>
@@ -219,7 +217,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    top: 10,
+    top: 200,
+    zIndex: 100,
+  },
+  closeCardSelection: {
+    marginLeft: 210,
   },
   roleCardPickerContainer: {
     marginTop: 20,
@@ -232,6 +234,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   playerAttackContainer: {
-    marginTop: 50,
+    marginTop: 10,
   },
 });
