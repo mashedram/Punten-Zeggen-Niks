@@ -51,8 +51,8 @@ export default function EnterPinScreen() {
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.screen}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.card}>
+        behavior={Platform.OS === 'android' ? 'padding' : undefined}>
+        <View style={styles.joinContainer}>
           {/* Invoerveld voor de PIN-code */}
           <CodeInput
             code={code}
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
   },
-  card: {
+  joinContainer: {
     backgroundColor: 'white',
     padding: 28,
     borderRadius: 16,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 5,
-    marginBottom: 40,
+    marginBottom: 130,
   },
   CodeInput: {
     width: '100%',
