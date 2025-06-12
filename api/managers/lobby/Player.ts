@@ -1,4 +1,4 @@
-import { EventEmitter, on as on } from 'ws';
+import { EventEmitter, on as on } from 'events';
 import { z } from 'zod';
 import { PlayerToken } from './PlayerToken';
 import { LOBBY_CONSTANTS } from './LobbyManager';
