@@ -37,27 +37,13 @@ export const RoleCardPicker = () => {
     }),
   );
 
+  const currentTeamColor =
+    stratego.self.teamId === 'red'
+      ? TeamColors.red.color
+      : TeamColors.blue.color;
+
   return (
     <>
-      <Picker
-        style={styles.SelectFieldContainer}
-        selectedValue={selectedRoleCardToRevive}
-        prompt="Select role card to revive"
-        onValueChange={(itemValue, itemIndex) => {
-          setSelectedRoleCardToRevive(itemValue);
-        }}>
-        <Picker.Item label="Select role card" value="" />
-        {availableRoleCards.data &&
-          Object.entries(availableRoleCards.data).map(([roleCard, count]) => {
-            return (
-              <Picker.Item
-                key={roleCard}
-                label={`${roleCard}, ${count} available`}
-                value={roleCard}
-              />
-            );
-          })}
-      </Picker>
       <Picker
         style={styles.SelectFieldContainer}
         selectedValue={selectedPlayerToRevive}
@@ -79,14 +65,30 @@ export const RoleCardPicker = () => {
             );
           })}
       </Picker>
+      <Picker
+        style={[styles.SelectFieldContainer, { marginTop: 5 }]}
+        selectedValue={selectedRoleCardToRevive}
+        prompt="Select role card to revive"
+        onValueChange={(itemValue, itemIndex) => {
+          setSelectedRoleCardToRevive(itemValue);
+        }}>
+        <Picker.Item label="Select role card" value="" />
+        {availableRoleCards.data &&
+          Object.entries(availableRoleCards.data).map(([roleCard, count]) => {
+            return (
+              <Picker.Item
+                key={roleCard}
+                label={`${roleCard}, ${count} available`}
+                value={roleCard}
+              />
+            );
+          })}
+      </Picker>
       <TouchableOpacity
         style={[
           styles.ReviveButton,
           {
-            backgroundColor:
-              stratego.self.teamId === 'red'
-                ? TeamColors.red.color
-                : TeamColors.blue.color,
+            backgroundColor: currentTeamColor,
           },
         ]}
         onPress={() => {
@@ -118,22 +120,30 @@ export const RoleCardPicker = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {},
   SelectFieldContainer: {
-    width: '95%',
+    width: '100%',
+    height: 35,
     borderRadius: 5,
     borderColor: 'black',
     alignSelf: 'center',
   },
   ReviveButton: {
     alignSelf: 'center',
-    width: '65%',
+    width: '80%',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 25,
+    height: 30,
     borderRadius: 5,
+    shadowColor: 'black',
+    marginTop: 15,
   },
   ButtonText: {
     fontWeight: 700,
     color: 'white',
+  },
+  text: {
+    fontWeight: 700,
+    fontSize: 12,
   },
 });

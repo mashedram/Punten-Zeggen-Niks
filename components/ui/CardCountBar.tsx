@@ -27,11 +27,11 @@ export const CardCountBar: React.FC<CardCountBarProps> = ({
     <View style={styles.container}>
       <Text style={styles.text}>{blueCount}</Text>
       <View style={styles.barContainer}>
-        <View style={styles.edge} />
+        <View style={[styles.blueFiller, { flex: 1 - teamBlueRatio }]} />
         <View style={[styles.blueBar, { flex: teamBlueRatio }]} />
         <View style={styles.centerSeparator} />
         <View style={[styles.redBar, { flex: teamRedRatio }]} />
-        <View style={styles.edge} />
+        <View style={[styles.redBarFiller, { flex: 1 - teamRedRatio }]} />
       </View>
       <Text style={styles.text}>{redCount}</Text>
     </View>
@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     overflow: 'hidden',
+    borderWidth: 2,
   },
   edge: {
     width: 4,
@@ -71,12 +72,18 @@ const styles = StyleSheet.create({
   blueBar: {
     backgroundColor: TeamColors.blue.color,
   },
+  blueFiller: {
+    backgroundColor: 'white',
+  },
   centerSeparator: {
     width: 8,
     backgroundColor: 'black',
   },
   redBar: {
     backgroundColor: TeamColors.red.color,
+  },
+  redBarFiller: {
+    backgroundColor: 'white',
   },
 });
 
