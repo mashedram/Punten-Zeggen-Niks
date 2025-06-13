@@ -248,7 +248,7 @@ export default function Game() {
             Algemene spelregels:
           </Text>
           <Text style={{ textAlign: 'center', marginBottom: 8 }}>
-            • Hier staat extra informatie!
+            • Je wint zodra je de vlag van het andere team (blauw/rood) verovert
             {'\n'}•{'\n'}•{'\n'}•{'\n'}•{'\n'}
           </Text>
           <Pressable onPress={() => setShowInfo(false)}>
