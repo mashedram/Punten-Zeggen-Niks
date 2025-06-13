@@ -41,7 +41,7 @@ export const AttackButton = () => {
         </Text>
       </View>
 
-      {((playerRoleCard?.canAttack ?? true) && (
+      {((playerRoleCard?.canAttack ?? false) && (
         <>
           <View style={styles.codeInputContainer}>
             <TextInput
@@ -64,7 +64,11 @@ export const AttackButton = () => {
             <Text style={styles.buttonText}>Attack</Text>
           </TouchableOpacity>
           <View style={styles.qrContainer}>
-            <AttackQrCode />
+            <AttackQrCode
+              onQrScan={qrAttackCode =>
+                sendAttackMutation.mutate({ attackCode: qrAttackCode })
+              }
+            />
           </View>
         </>
       )) || (
