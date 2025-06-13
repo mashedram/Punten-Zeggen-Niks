@@ -1,4 +1,4 @@
-import { FieldMask } from '@/common/networking/packet/PacketBuilder';
+import { PacketMask } from '@/common/networking/packet/PacketBuilder';
 import { DataStore } from '@/common/networking/tracking/stores/DataStore';
 import { LoadingSymbolType } from '@/common/networking/tracking/trackable/Dereferable';
 import { Trackable } from '@/common/networking/tracking/trackable/Trackable';
@@ -21,7 +21,7 @@ export type DataInstanceDescriptor<T> = {
   id: number;
   name: string;
   tracker: DataTrackerDescriptor;
-  mask: FieldMask<T>;
+  mask: PacketMask<T>;
   factory: TrackableFactory<T>;
   deref: (value: T, store: DataStore) => Deref<T> | LoadingSymbolType;
 };

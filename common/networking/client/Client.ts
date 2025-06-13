@@ -5,10 +5,11 @@ import {
   PacketTransformer,
 } from '@/common/networking/packet/PacketTransformer';
 import { Lobby } from '@/api/managers/lobby/Lobby';
+import { Player } from '@/api/managers/lobby/Player';
 
 // All client data *must* be optional
 type ClientData = {
-  lobby?: Lobby;
+  lobby?: { lobby: Lobby; player: Player };
 };
 
 interface EventMap {

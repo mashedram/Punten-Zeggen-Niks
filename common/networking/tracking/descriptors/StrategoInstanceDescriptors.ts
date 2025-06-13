@@ -20,7 +20,14 @@ export const PlayerDataGameInstanceDescriptor: DataInstanceDescriptor<PlayerGame
       return value;
     },
     mask: {
-      '*': 'public',
+      global: (client, raw) => {
+        if (raw.gameId !== 'stratego') return false;
+        const data = client.getData().lobby;
+        if (!data) return false;
+        const gameData = data.player.getGameData();
+        if (gameData?.gameId !== 'stratego') return false;
+        return gameData.teamId === raw.teamId;
+      },
     },
   };
 
@@ -34,6 +41,6 @@ export const LobbyDataGameInstanceDescriptor: DataInstanceDescriptor<LobbyGameDa
       return value;
     },
     mask: {
-      '*': 'public',
+      global: 'public',
     },
   };

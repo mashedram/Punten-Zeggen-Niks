@@ -59,15 +59,19 @@ export class DataTracker {
     this._trackedInstances[instance.getId()] =
       instance as unknown as TrackedInstance<never>;
 
-    for (const client of this._clients.getClients()) {
-      if (!client.isConnected()) {
-        console.debug(
-          `Client ${client.getId()} is not connected, not starting tracking.`,
-        );
-        continue;
+    // We use setImmediate to ensure that the tracking starts after the current event loop tick
+    // This way, if authentication masks depend on data to exist that is made during the same tick, won't crash.
+    setImmediate(() => {
+      for (const client of this._clients.getClients()) {
+        if (!client.isConnected()) {
+          console.debug(
+            `Client ${client.getId()} is not connected, not starting tracking.`,
+          );
+          continue;
+        }
+        instance.sendDataPacket(client);
       }
-      instance.sendDataPacket(client);
-    }
+    });
 
     return instance;
   }

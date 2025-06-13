@@ -38,10 +38,7 @@ export const PlayerDataDescriptor: DataInstanceDescriptor<PlayerData> = {
   name: 'playerdata',
   tracker: LobbyTrackerDescriptor,
   mask: {
-    id: 'public',
-    name: 'public',
-    isAdmin: 'public',
-    gameData: 'public',
+    global: 'public',
   },
   factory: StagedObejctFactory,
   deref: function (
@@ -70,7 +67,7 @@ export const LobbyDataDescriptor: DataInstanceDescriptor<LobbyData> = {
   name: 'lobby-data',
   tracker: LobbyTrackerDescriptor,
   mask: {
-    '*': 'public',
+    global: 'public',
   },
   factory: StagedObejctFactory,
   deref: function (
