@@ -38,6 +38,7 @@ export type LobbyDataStratego = z.infer<typeof LobbyDataSchemaStratego>;
 
 export const PlayerDataSchemaStratego = z.object({
   gameId: z.literal(StrategoGameId),
+  name: z.string(),
   teamId: z.string(),
   roleCard: z.string().optional(),
   attackCode: z.string(),
@@ -79,8 +80,10 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
     createPlayerData: (lobby, player) => {
       const teamId = getNewPlayerTeam(lobby);
       const isTeamLeader = setTeamLeader(lobby, teamId);
+      const name = player.getName();
       return {
         gameId: StrategoGameId,
+        name,
         teamId,
         isTeamLeader,
         hasRoleCard: false,
