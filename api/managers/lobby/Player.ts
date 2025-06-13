@@ -96,6 +96,12 @@ export class Player {
     });
 
     this._gameData = playerData;
+    console.log(
+      'Set game data for player',
+      this._data.data.id,
+      ':',
+      playerData,
+    );
   }
 
   public getGameData<T extends PlayerGameData>(): T | undefined {

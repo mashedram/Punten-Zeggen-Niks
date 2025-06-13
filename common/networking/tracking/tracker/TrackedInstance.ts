@@ -5,10 +5,7 @@ import {
   trackPacket,
   UntrackPacket,
 } from '@/common/networking/packet/Packet';
-import {
-  BuildData,
-  PacketBuilder,
-} from '@/common/networking/packet/PacketBuilder';
+import { PacketBuilder } from '@/common/networking/packet/PacketBuilder';
 import { DataTracker } from '@/common/networking/tracking/tracker/DataTracker';
 import { DataStore } from '@/common/networking/tracking/stores/DataStore';
 import {
@@ -128,8 +125,13 @@ export class TrackedInstance<T = never> implements Dereferable<T> {
     return this._builder.untrackPacket(this.getId());
   }
 
-  public getTrackPacket(): trackPacket {
-    return this._builder.trackPacket(this._descriptor.id, this.getId());
+  public getTrackPacket(client: Client): trackPacket | null {
+    return this._builder.trackPacket(
+      client,
+      this.data,
+      this._descriptor.id,
+      this.getId(),
+    );
   }
 
   public getOrInitiateClient(client: Client): TrackedClientState {
@@ -154,23 +156,28 @@ export class TrackedInstance<T = never> implements Dereferable<T> {
   }
 
   public sendTrackPacket(client: Client) {
-    const packet = this.getTrackPacket();
+    const packet = this.getTrackPacket(client);
+    if (!packet) {
+      console.debug(
+        `No packet to send for ${this.getName()} on client ${client.getId()}`,
+      );
+      return;
+    }
     client.sendEncoded(packet);
     this.getOrInitiateClient(client).instantiated = true;
   }
 
-  public getDataPacket(
-    clientData: TrackedClientState,
-  ): DataPacket<BuildData<T, never, never>> {
-    const data = this._data.getDataPacket(clientData.step);
+  public getDataPacket(client: Client): DataPacket<Partial<T>> {
+    const clientData = this.getOrInitiateClient(client);
+    const contents = this._data.getDataPacket(clientData.step);
     const packet = this._builder.pack(
+      client,
       clientData.step,
-      data,
+      this.data,
+      contents,
       this.getId(),
       this._descriptor.id,
-      true,
     );
-    clientData.step = packet.step;
     return packet;
   }
 
@@ -179,9 +186,17 @@ export class TrackedInstance<T = never> implements Dereferable<T> {
     if (!clientData.instantiated) {
       this.sendTrackPacket(client);
     }
-    const packet = this.getDataPacket(clientData);
-    client.sendEncoded(packet as Packet<never>);
+    const packet = this.getDataPacket(client);
+
+    if (Object.keys(packet.data).length === 0) {
+      console.debug(
+        `No data to send for ${this.getName()} on client ${client.getId()}`,
+      );
+      return;
+    }
+
     clientData.step = packet.step;
+    client.sendEncoded(packet as Packet<never>);
   }
 
   public setInstantiated(client: Client, instantiated: boolean) {

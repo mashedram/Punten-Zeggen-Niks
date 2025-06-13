@@ -165,7 +165,7 @@ export class Lobby {
     this._players[player.getId()] = player;
     this._data.data.players.push(player.getInstanceReference());
     this._data.sync('players');
-    client.getData().lobby = this;
+    client.getData().lobby = { lobby: this, player };
     return player;
   }
 
