@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { defaultDeckSize } from '@/constants/RoleCardDeck';
+import { TeamColors } from '@/constants/Colors';
 
 type CardCountBarProps = {
   blueCardCount?: number;
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#5DA3B5',
+    backgroundColor: 'rgba(92, 163, 194, 1)',
     padding: 4,
     borderRadius: 4,
   },
@@ -68,14 +69,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   blueBar: {
-    backgroundColor: 'blue',
+    backgroundColor: TeamColors.blue.color,
   },
   centerSeparator: {
     width: 8,
     backgroundColor: 'black',
   },
   redBar: {
-    backgroundColor: 'red',
+    backgroundColor: TeamColors.red.color,
   },
 });
 
