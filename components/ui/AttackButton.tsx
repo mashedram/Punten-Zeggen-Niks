@@ -42,7 +42,7 @@ export const AttackButton = () => {
         </Text>
       </View>
 
-      {((playerRoleCard?.canAttack ?? true) && (
+      {((playerRoleCard?.canAttack ?? false) && (
         <>
           <View style={styles.codeInputContainer}>
             <TextInput
