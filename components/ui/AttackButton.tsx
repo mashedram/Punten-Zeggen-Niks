@@ -2,7 +2,6 @@ import { useTRPC } from '@/api/query';
 import { TeamColors } from '@/constants/Colors';
 import { AllRoleCards } from '@/constants/RoleCards';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
-import { useLobbyUnsafe } from '@/hooks/useLobbyUnsafe';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
@@ -12,10 +11,10 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { AttackQrCode } from './AttackQrCode';
 
 export const AttackButton = () => {
   const trpc = useTRPC();
-  const lobby = useLobbyUnsafe();
   const stratego = useStrategoUnsafe();
 
   const sendAttackMutation = useMutation(
@@ -37,9 +36,12 @@ export const AttackButton = () => {
       <View style={styles.attackCodeContainer}>
         <Text>Your attack code:</Text>
         <Text style={styles.attackCodeText}>{stratego.self.attackCode}</Text>
+        <Text style={[{ fontSize: 12 }]}>
+          Tap the role card to show QR code
+        </Text>
       </View>
 
-      {((playerRoleCard?.canAttack ?? false) && (
+      {((playerRoleCard?.canAttack ?? true) && (
         <>
           <View style={styles.codeInputContainer}>
             <TextInput
@@ -56,12 +58,14 @@ export const AttackButton = () => {
             ]}
             onPress={() =>
               sendAttackMutation.mutate({
-                token: lobby.getToken(),
                 attackCode: enemyAttackCode,
               })
             }>
             <Text style={styles.buttonText}>Attack</Text>
           </TouchableOpacity>
+          <View style={styles.qrContainer}>
+            <AttackQrCode />
+          </View>
         </>
       )) || (
         <View style={styles.cantAttackContainer}>
@@ -90,7 +94,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 60,
+    height: 80,
     borderRadius: 5,
     borderWidth: 1,
   },
@@ -129,4 +133,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 25,
   },
+  qrContainer: {},
 });

@@ -25,7 +25,7 @@ import { FontAwesome } from '@expo/vector-icons';
 
 export default function Game() {
   const lobby = useLobby();
-  const stratego = useStratego(lobby);
+  const stratego = useStratego();
 
   const [isLeaderPopupOpen, setLeaderPopupOpen] = useState(false);
 
@@ -109,6 +109,7 @@ export default function Game() {
       <View style={styles.roleContainer}>
         <PlayerRole
           teamId={stratego.self.teamId}
+          attackCode={stratego.self.attackCode}
           roleCard={AllRoleCards.find(
             card => card.id === stratego.self.roleCard,
           )}

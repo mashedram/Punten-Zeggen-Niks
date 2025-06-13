@@ -59,7 +59,7 @@ export const RoleCardPicker = () => {
             return (
               <Picker.Item
                 key={player.id}
-                label={player.id}
+                label={player.name}
                 value={player.id}
               />
             );
@@ -107,7 +107,6 @@ export const RoleCardPicker = () => {
               return;
             }
             sendReviveMutation.mutate({
-              token: lobby.getToken(),
               targetId: selectedPlayer.id,
               roleCard: selectedRoleCard.id,
             });
