@@ -1,8 +1,16 @@
+import { TeamColors } from '@/constants/Colors';
+import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useState } from 'react';
-import { Button, Modal, View, Text } from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-export const AttackQrCode = () => {
+interface AttackQrCodeProps {
+  onQrScan: (qrAttackCode: string) => void;
+}
+
+export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
+  const stratego = useStrategoUnsafe();
+
   const [scannerVisible, setScannerVisible] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
@@ -10,45 +18,62 @@ export const AttackQrCode = () => {
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     setScanned(true);
     setScannerVisible(false);
-    alert(`QR code scanned: ${data}`);
-    console.log(`scanned qr code with data: ${data}`);
+    onQrScan(data);
   };
+
+  const currentTeamColor =
+    stratego.self.teamId === 'red'
+      ? TeamColors.red.color
+      : TeamColors.blue.color;
 
   return (
     <>
-      <Button title="Scan QR Code" onPress={() => setScannerVisible(true)} />
+      <TouchableOpacity
+        style={[
+          styles.permissionButtonContainer,
+          { backgroundColor: currentTeamColor },
+        ]}
+        onPress={() => setScannerVisible(true)}>
+        <Text style={styles.buttonText}>Scan QR Code</Text>
+      </TouchableOpacity>
       <Modal visible={scannerVisible} animationType="slide">
-        <View style={{ flex: 1 }}>
+        <View style={styles.container}>
           {!permission?.granted ? (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
+            <View style={styles.cameraPermission}>
               <Text>Camera permission is required.</Text>
-              <Button title="Grant Permission" onPress={requestPermission} />
-              <Button title="Close" onPress={() => setScannerVisible(false)} />
+              <TouchableOpacity
+                style={[
+                  styles.permissionButtonContainer,
+                  { backgroundColor: currentTeamColor },
+                ]}
+                onPress={requestPermission}>
+                <Text style={styles.buttonText}>Grant Permission</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.permissionButtonContainer,
+                  { backgroundColor: currentTeamColor },
+                ]}
+                onPress={() => setScannerVisible(false)}>
+                <Text style={styles.buttonText}>Close</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <CameraView
-              style={{ flex: 1 }}
+              style={styles.cameraView}
               barcodeScannerSettings={{
                 barcodeTypes: ['qr'],
               }}
               onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}>
-              <View
-                style={{
-                  position: 'absolute',
-                  bottom: 40,
-                  left: 0,
-                  right: 0,
-                  alignItems: 'center',
-                }}>
-                <Button
-                  title="Close"
-                  onPress={() => setScannerVisible(false)}
-                />
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.permissionButtonContainer,
+                    { backgroundColor: currentTeamColor },
+                  ]}
+                  onPress={() => setScannerVisible(false)}>
+                  <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
               </View>
             </CameraView>
           )}
@@ -57,3 +82,36 @@ export const AttackQrCode = () => {
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  permissionButtonContainer: {
+    marginTop: 15,
+    alignSelf: 'center',
+    width: '70%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 30,
+    borderRadius: 5,
+  },
+  buttonText: {
+    fontWeight: 700,
+    color: 'white',
+  },
+  cameraPermission: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cameraViewContainer: {},
+  cameraView: {},
+  buttonsContainer: {
+    position: 'absolute',
+    bottom: 40,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+});
