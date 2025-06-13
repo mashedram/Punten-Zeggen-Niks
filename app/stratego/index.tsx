@@ -36,6 +36,8 @@ export default function Game() {
     trpc.stratego.attack.mutationOptions({}),
   );
 
+  const [showInfo, setShowInfo] = React.useState(false);
+
   const [enemyAttackCode, setEnemyAttackCode] = useState('');
   const [isPowerCardOpen, setPowerCardOpen] = React.useState(false);
   const [PowerUpsIndex, setPowerupsIndex] = React.useState<
@@ -185,6 +187,7 @@ export default function Game() {
       </View>
       {/* Einde test gedeelte gameloop */}
 
+      {/* power-up slidebar */}
       <Pressable
         style={{
           transform: [{ translateY: isPowerCardOpen ? '5%' : '80%' }],
@@ -226,6 +229,35 @@ export default function Game() {
           ))}
         </View>
       </Pressable>
+
+      {/* Info button */}
+
+      <View style={{ position: 'absolute', top: 40, right: 20, zIndex: 10 }}>
+        <Pressable onPress={() => setShowInfo(true)}>
+          <View style={styles.infoButton}>
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 22 }}>
+              i
+            </Text>
+          </View>
+        </Pressable>
+      </View>
+
+      {showInfo && (
+        <View style={styles.SpelregelinfoI}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>
+            Algemene spelregels:
+          </Text>
+          <Text style={{ textAlign: 'center', marginBottom: 8 }}>
+            • Hier staat extra informatie!
+            {'\n'}•{'\n'}•{'\n'}•{'\n'}•{'\n'}
+          </Text>
+          <Pressable onPress={() => setShowInfo(false)}>
+            <Text style={{ color: '#1976d2', fontWeight: 'bold' }}>
+              Sluiten
+            </Text>
+          </Pressable>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -442,5 +474,33 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     rowGap: 2,
+  },
+  infoButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#1976d2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  SpelregelinfoI: {
+    position: 'absolute',
+    top: '30%',
+    left: '50%',
+    transform: [{ translateX: -150 }, { translateY: -150 }],
+    width: '72%',
+    height: '30%',
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
   },
 });
