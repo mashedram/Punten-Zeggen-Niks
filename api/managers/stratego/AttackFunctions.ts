@@ -88,7 +88,6 @@ function draw(player: Player) {
     index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
     state: 'draw',
   };
-  player.sync();
 }
 
 function win(player: Player) {
@@ -98,7 +97,6 @@ function win(player: Player) {
     index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
     state: 'win',
   };
-  player.sync();
 }
 
 function defeat(player: Player) {

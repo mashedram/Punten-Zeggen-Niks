@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PlayerDataSchemaStratego } from '@/api/managers/statego/StrategoGame';
+import { PlayerDataSchemaStratego } from '@/api/managers/stratego/StrategoGame';
 
 export const PlayerGameDataSchema = z.discriminatedUnion('gameId', [
   z.object({

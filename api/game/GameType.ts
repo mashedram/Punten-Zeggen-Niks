@@ -1,6 +1,6 @@
 import { Lobby } from '../managers/lobby/Lobby';
 import { Player } from '../managers/lobby/Player';
-import { GameTypeStratego } from '../managers/statego/StrategoGame';
+import { GameTypeStratego } from '../managers/stratego/StrategoGame';
 import { LobbyGameData } from './lobby/LobbyGameData';
 import { PlayerGameData } from './player/PlayerGameData';
 

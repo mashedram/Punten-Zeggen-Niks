@@ -101,10 +101,10 @@ function setTeamLeader(lobby: Lobby, teamId: string): boolean {
   const players = lobby
     .getActivePlayers()
     .filter(
-      player => player.getGameData<PlayerDataStratego>().teamId === teamId,
+      player => player.getGameData<PlayerDataStratego>()?.teamId === teamId,
     );
   return !players.some(
-    player => player.getGameData<PlayerDataStratego>().isTeamLeader,
+    player => player.getGameData<PlayerDataStratego>()?.isTeamLeader,
   );
 }
 
@@ -173,12 +173,8 @@ function checkWinConditions(lobby: Lobby) {
 function checkActiveRoleCards(lobby: Lobby, teamId: string): boolean {
   const players = lobby
     .getActivePlayers()
-    .filter(
-      player => player.getGameData<PlayerDataStratego>().teamId === teamId,
-    );
-  return players.some(
-    player => player.getGameData<PlayerDataStratego>().roleCard === undefined,
-  );
+    .filter(player => getPlayerData(player).teamId === teamId);
+  return players.some(player => getPlayerData(player).roleCard === undefined);
 }
 
 //////////////////////
@@ -186,11 +182,15 @@ function checkActiveRoleCards(lobby: Lobby, teamId: string): boolean {
 //////////////////////
 
 export function getLobbyData(lobby: Lobby): LobbyDataStratego {
-  return lobby.getGameData<LobbyDataStratego>();
+  const value = lobby.getGameData<LobbyDataStratego>();
+  if (!value) throw new Error('Lobby data not found');
+  return value;
 }
 
 export function getPlayerData(player: Player): PlayerDataStratego {
-  return player.getGameData<PlayerDataStratego>();
+  const value = player.getGameData<PlayerDataStratego>();
+  if (!value) throw new Error('Player data not found');
+  return value;
 }
 
 export function endGame(lobby: Lobby, winningTeamId: string) {

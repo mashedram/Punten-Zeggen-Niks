@@ -57,7 +57,7 @@ export default function Game() {
     return;
   }
 
-  const availablePlayers = stratego.otherPlayers.filter(
+  const availablePlayers = stratego.players.filter(
     p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
   ).length;
   const teamRedDeck = stratego.lobby.teams.find(
