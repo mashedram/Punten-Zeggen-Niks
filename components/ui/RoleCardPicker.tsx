@@ -22,9 +22,7 @@ export const RoleCardPicker = () => {
     useState<string>('');
 
   const availableRoleCards = useQuery(
-    trpc.stratego.getAvailableRoleCards.queryOptions({
-      token: lobby.getToken(),
-    }),
+    trpc.stratego.getAvailableRoleCards.queryOptions(),
   );
 
   const sendReviveMutation = useMutation(
@@ -67,7 +65,7 @@ export const RoleCardPicker = () => {
           setSelectedPlayerToRevive(itemValue);
         }}>
         <Picker.Item label="Select player" value="" />
-        {stratego.otherPlayers
+        {stratego.players
           .filter(
             p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
           )

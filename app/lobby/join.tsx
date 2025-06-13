@@ -21,6 +21,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  TextInput,
 } from 'react-native';
 
 export default function EnterPinScreen() {
@@ -35,6 +36,8 @@ export default function EnterPinScreen() {
    * @type {[string, React.Dispatch<React.SetStateAction<string>>]}
    */
   const [code, setCode] = useState('');
+
+  const [name, setName] = useState('');
 
   if (lobby.loading) {
     return <Text>Loading...</Text>;
@@ -54,9 +57,19 @@ export default function EnterPinScreen() {
           <CodeInput
             code={code}
             onChange={code => setCode(code as string)}
-            style={styles.input}
-            placeholder="Enter game PIN"
+            style={styles.CodeInput}
+            placeholder="Vul game PIN in"
             placeholderTextColor="#888"
+          />
+
+          {/* Invoerveld voor de naam van de speler */}
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            style={styles.TextInput}
+            placeholder="Vul je naam in"
+            placeholderTextColor="#888"
+            autoCapitalize="words"
           />
 
           {/* Knop om de ingevoerde code te wissen */}
@@ -66,16 +79,18 @@ export default function EnterPinScreen() {
 
           {/* Knop om spel te joinen - alleen actief als er een code is ingevuld */}
           <Pressable
-            style={[styles.button, !code && styles.buttonDisabled]}
+            style={[styles.button, (!code || !name) && styles.buttonDisabled]}
             onPress={() => {
               if (!code.trim()) {
                 Alert.alert('Fout', 'Voer een PIN in om verder te gaan.');
+              } else if (!name.trim()) {
+                Alert.alert('Fout', 'Voer een naam in om verder te gaan.');
               } else {
-                lobby.join(code.trim()); // Join het spel met de ingevoerde code
+                lobby.join(code.trim(), name.trim()); // Join het spel met de ingevoerde code
                 router.push('/lobby'); // Navigeer naar de lobby-pagina
               }
             }}
-            disabled={!code.trim()} // Schakel knop uit als code leeg of alleen spaties is
+            disabled={!code.trim() || !name.trim()} // Schakel knop uit als code leeg of alleen spaties is
           >
             <Text style={styles.buttonText}>Enter Lobby</Text>
           </Pressable>
@@ -99,11 +114,13 @@ export default function EnterPinScreen() {
 // Stijlen voor componenten
 const styles = StyleSheet.create({
   ReturnButtonContainer: {
-    width: '20%',
+    width: '80%',
     height: 45,
     position: 'absolute',
-    left: '40%',
-    bottom: 35,
+    paddingLeft: 25,
+    paddingRight: 20,
+    marginTop: 35,
+    marginLeft: 40,
     flexShrink: 0,
     flexGrow: 1,
     paddingTop: 4,
@@ -140,7 +157,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 28,
     borderRadius: 16,
-    width: '85%',
+    width: '108%',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 4 },
@@ -149,11 +166,12 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginBottom: 40,
   },
-  input: {
+  CodeInput: {
     width: '100%',
     backgroundColor: '#D9D9D9',
     borderRadius: 10,
     paddingVertical: 18,
+    marginRight: 0,
     fontSize: 20,
     fontWeight: 'bold',
     color: '#444',
@@ -164,12 +182,40 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    display: 'flex',
+    flexDirection: 'row',
+    position: 'relative',
+  },
+  TextInput: {
+    width: '100%',
+    backgroundColor: '#D9D9D9',
+    borderRadius: 10,
+    paddingVertical: 18,
+    marginRight: 1,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#444',
+    marginBottom: 24,
+    textAlign: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    display: 'flex',
+    flexDirection: 'row',
   },
   button: {
     backgroundColor: '#7ACF71', // Groene kleur voor actieve knop
     paddingVertical: 16,
     borderRadius: 12,
     width: '100%',
+    height: '13%',
+    justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 4 },

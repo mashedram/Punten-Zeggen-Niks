@@ -1,67 +1,68 @@
 import { lobbyManager } from '@/api/managers/lobby/LobbyManager';
-import { PlayerToken } from '@/api/managers/lobby/PlayerToken';
-import { StrategoGame } from '@/api/managers/statego/StrategoGame';
+import { StrategoGame } from '@/api/managers/stratego/StrategoGame';
 import { publicProcedure, router } from '@/api/server';
 import { RoleCards } from '@/constants/RoleCards';
 import { z } from 'zod';
 
 export const strategoRouter = router({
   attack: publicProcedure
-    .input(z.object({ token: z.string(), attackCode: z.string() }))
-    .mutation(({ input }) => {
-      const entity = lobbyManager.getPlayer(
-        PlayerToken.fromString(input.token),
-      );
-      if (!entity) throw new Error('Lobby not found');
-      const [lobby, attacker] = entity;
-      StrategoGame.attack(lobby, attacker, input.attackCode);
+    .input(z.object({ attackCode: z.string() }))
+    .mutation(({ ctx, input }) => {
+      const client = ctx.client;
+      if (!client) throw new Error('Client not found');
+
+      const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
+      if (!lobby) throw new Error('Lobby not found');
+
+      StrategoGame.attack(lobby, player, input.attackCode);
     }),
 
   revive: publicProcedure
     .input(
       z.object({
-        token: z.string(),
         targetId: z.string(),
         roleCard: z.string(),
       }),
     )
-    .mutation(({ input }) => {
+    .mutation(({ ctx, input }) => {
+      const client = ctx.client;
+      if (!client) throw new Error('Client not found');
+      const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
+      if (!lobby) {
+        throw new Error('Lobby not found');
+      }
+
       const roleCard = RoleCards[input.roleCard];
       if (!roleCard) throw new Error('Invalid role card');
-      const entity = lobbyManager.getPlayer(
-        PlayerToken.fromString(input.token),
-      );
-      if (!entity) throw new Error('Lobby not found');
-      const [lobby, teamLeader] = entity;
       const targetPlayer = lobby
         .getPlayers()
         .find(p => p.getId() === input.targetId);
       if (!targetPlayer)
         throw new Error('Target player not found: stratego.revive');
-      StrategoGame.revive(lobby, teamLeader, targetPlayer, roleCard);
+      StrategoGame.revive(lobby, player, targetPlayer, roleCard);
     }),
 
   getAvailableRoleCards: publicProcedure
     .output(z.record(z.string(), z.number()))
-    .input(z.object({ token: z.string() }))
-    .query(({ input }) => {
-      const entity = lobbyManager.getPlayer(
-        PlayerToken.fromString(input.token),
-      );
-      if (!entity) throw new Error('Lobby not found');
-      const [lobby, player] = entity;
+    .query(({ ctx }) => {
+      const client = ctx.client;
+      if (!client) throw new Error('Client not found');
+      const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
+      if (!lobby) {
+        throw new Error('Lobby not found');
+      }
       return StrategoGame.getAvailableRoleCards(lobby, player);
     }),
 
   getPlayersWithoutRoleCards: publicProcedure
     .output(z.array(z.string()))
-    .input(z.object({ token: z.string() }))
-    .query(({ input }) => {
-      const entity = lobbyManager.getPlayer(
-        PlayerToken.fromString(input.token),
-      );
-      if (!entity) throw new Error('Lobby not found');
-      const [lobby, player] = entity;
+    .query(({ ctx }) => {
+      const client = ctx.client;
+      if (!client) throw new Error('Client not found');
+      const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
+      if (!lobby) {
+        throw new Error('Lobby not found');
+      }
       return StrategoGame.getPlayersWithoutRoleCards(lobby, player);
     }),
 });
