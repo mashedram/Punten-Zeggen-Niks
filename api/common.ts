@@ -7,8 +7,7 @@ export type TrpcContext = {
 };
 
 export const createContext = (opts: CreateWSSContextFnOptions): TrpcContext => {
-  // @ts-expect-error Type resolving doesn't go well on this bit
-  const token = opts.info.connectionParams.token;
+  const token = opts.info.connectionParams?.token;
   console.log(`Creating context for token: ${token}`);
   return {
     client: CLIENT_MANAGER.authClient(token),
