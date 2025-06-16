@@ -7,12 +7,23 @@ import { useEffect } from 'react';
 import { Button, Pressable } from 'react-native';
 
 export default function DevPage() {
-  const client = useClient();
   const lobby = useLobby();
   const tRPC = useTRPC();
   const joinDevLobbyMutation = useMutation(
     tRPC.lobby.joinDevLobby.mutationOptions({}),
   );
+
+  useEffect(() => {
+    const dev_lobbyCode = process.env.EXPO_PUBLIC_DEV_LOBBY_CODE;
+    if (!dev_lobbyCode) {
+      throw new Error('EXPO_PUBLIC_DEV_LOBBY_CODE is not defined');
+    }
+    if (joinDevLobbyMutation.isPending) {
+      return;
+    }
+    // Automatically join the dev lobby when the component mounts
+    joinDevLobbyMutation.mutate({ code: dev_lobbyCode });
+  });
 
   if (lobby.loading) {
     return;
