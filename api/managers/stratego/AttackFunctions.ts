@@ -3,6 +3,13 @@ import { Player } from '../lobby/Player';
 import { getPlayerData, endGame } from './StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
 
+type PlayerFightResult = {
+  index: number;
+  state: 'win' | 'lose' | 'draw' | 'explode';
+};
+
+type FightState = {};
+
 export function performAttack(
   lobby: Lobby,
   attacker: Player,
