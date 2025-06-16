@@ -22,6 +22,7 @@ import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
 import { AllRoleCards } from '@/constants/RoleCards';
 import { AttackButton } from '@/components/ui/AttackButton';
 import { FontAwesome } from '@expo/vector-icons';
+import { defaultDeckSize } from '@/constants/RoleCardDeck';
 
 export default function Game() {
   const lobby = useLobby();
@@ -60,26 +61,29 @@ export default function Game() {
   const availablePlayers = stratego.players.filter(
     p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
   ).length;
+
+  console.log(stratego.lobby.teams);
   const teamRedDeck = stratego.lobby.teams.find(
     team => team.id === 'red',
   )?.deck;
   const teamBlueDeck = stratego.lobby.teams.find(
     team => team.id === 'red',
   )?.deck;
+  console.log(teamBlueDeck);
+  console.log(teamRedDeck);
   const teamRedDeckSize = teamRedDeck
     ? Object.values(teamRedDeck).reduce((sum, value) => sum + value, 0)
-    : 60;
+    : defaultDeckSize;
+  console.log(teamRedDeckSize);
   const teamBlueDeckSize = teamBlueDeck
     ? Object.values(teamBlueDeck).reduce((sum, value) => sum + value, 0)
-    : 60;
+    : defaultDeckSize;
+  console.log(teamBlueDeckSize);
 
   return (
     <SafeAreaView style={styles.BackgroundView}>
       <View style={styles.CardStackTrackerContainer}>
-        <CardCountBar
-          blueCardCount={teamBlueDeckSize}
-          redCardCount={teamRedDeckSize}
-        />
+        <CardCountBar blueCardCount={60} redCardCount={60} />
       </View>
 
       {stratego.self.isTeamLeader && (

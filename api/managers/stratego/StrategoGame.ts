@@ -228,6 +228,7 @@ export function removeRoleCardFromDeck(
   if (team.deck[cardId] <= 0) {
     delete team.deck[cardId];
   }
+  lobby.sync();
 }
 
 //////////////////////////
