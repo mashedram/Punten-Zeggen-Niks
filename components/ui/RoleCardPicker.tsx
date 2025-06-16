@@ -107,7 +107,6 @@ export const RoleCardPicker = () => {
               return;
             }
             sendReviveMutation.mutate({
-              token: lobby.getToken(),
               targetId: selectedPlayer.id,
               roleCard: selectedRoleCard.id,
             });
