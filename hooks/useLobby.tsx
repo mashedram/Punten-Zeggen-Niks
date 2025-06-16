@@ -15,6 +15,7 @@ type LobbyDataExtended = {
 
 export type LobbyStateUnsafe = {
   get: () => LobbyDataExtended | undefined;
+  setLeader: (target: string, state: boolean) => void;
   leave: () => void;
   setGame: (gameId: string) => void;
 };
@@ -60,6 +61,9 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
   const lobbyData = useData<LobbyData>(LobbyDataDescriptor);
   const tRPC = useTRPC();
 
+  const setLeaderMutation = useMutation(
+    tRPC.lobby.setLeader.mutationOptions({}),
+  );
   const joinMutation = useMutation(tRPC.lobby.joinLobby.mutationOptions({}));
   const createMutation = useMutation(
     tRPC.lobby.createLobby.mutationOptions({}),
@@ -106,6 +110,14 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
       createMutation.mutate({ name });
     },
     [client, createMutation],
+  );
+
+  const setLeaderCallback = useCallback(
+    (target: string, state: boolean) => {
+      if (client.isLoading) return;
+      setLeaderMutation.mutate({ target, state });
+    },
+    [client.isLoading, setLeaderMutation],
   );
 
   const leaveLobbyCallback = useCallback(() => {
@@ -171,6 +183,7 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
     loading: false,
     inLobby: true,
     get: getLobby,
+    setLeader: setLeaderCallback,
     leave: leaveLobbyCallback,
     setGame: setGameCallback,
   };

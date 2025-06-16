@@ -31,6 +31,7 @@ export type PlayerData = {
   name: string;
   isAdmin: boolean;
   gameData: TrackedInstanceReference<PlayerDataStratego> | undefined;
+  isLeader: boolean;
 };
 
 export const PlayerDataDescriptor: DataInstanceDescriptor<PlayerData> = {

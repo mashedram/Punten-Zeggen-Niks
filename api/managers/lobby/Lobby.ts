@@ -16,6 +16,7 @@ import {
   LobbyDataGameInstanceDescriptor,
   PlayerDataGameInstanceDescriptor,
 } from '@/common/networking/tracking/descriptors/StrategoInstanceDescriptors';
+import { act } from 'react';
 
 type GameState<P extends PlayerGameData, L extends LobbyGameData> =
   | {
@@ -125,10 +126,16 @@ export class Lobby {
         this._tracker,
       );
     }
+
+    type.onGameStart?.(this);
   }
 
   public getPlayers(): Player[] {
     return Object.values(this._players);
+  }
+
+  public getPlayer(id: string): Player | undefined {
+    return this._players[id];
   }
 
   public getPlayerOfClient(client: Client): Player | undefined {
@@ -176,6 +183,18 @@ export class Lobby {
     this._data.data.players.push(player.getInstanceReference());
     this._data.sync('players');
     client.getData().lobby = { lobby: this, player };
+
+    const activeGame = this.getGameType();
+    if (activeGame !== undefined) {
+      player.setGameData(
+        PlayerDataGameInstanceDescriptor,
+        activeGame.createPlayerData(this, player),
+        this._tracker,
+      );
+
+      activeGame.onLateJoin?.(this, player);
+    }
+
     return player;
   }
 

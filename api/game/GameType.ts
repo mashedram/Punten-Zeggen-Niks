@@ -8,7 +8,8 @@ export type GameType<P extends PlayerGameData, L extends LobbyGameData> = {
   id: string;
   createLobbyData: () => L;
   createPlayerData: (lobbyData: Lobby, player: Player) => P;
-  registerEvents: (lobby: Lobby) => void;
+  onGameStart?: (lobby: Lobby) => void;
+  onLateJoin?: (lobby: Lobby, player: Player) => void;
 };
 
 export const GameTypes = [GameTypeStratego];

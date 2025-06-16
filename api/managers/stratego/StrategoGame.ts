@@ -78,37 +78,84 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
       battleLog: [],
     }),
     createPlayerData: (lobby, player) => {
-      const teamId = getNewPlayerTeam(lobby);
-      const isTeamLeader = setTeamLeader(lobby, teamId);
       const name = player.getName();
       return {
         gameId: StrategoGameId,
         name,
-        teamId,
-        isTeamLeader,
+        teamId: 'red', // Default team, will be changed later
+        isTeamLeader: false,
         hasRoleCard: false,
         roleCard: undefined,
         attackCode: generateAttackCode(),
       };
     },
-    registerEvents: lobby => {},
+    onGameStart: (lobby: Lobby) => {
+      assignTeams(lobby);
+
+      for (const team of getLobbyData(lobby).teams) {
+        assignTeamLeader(lobby, team.id);
+      }
+    },
+    onLateJoin: (lobby: Lobby, player: Player) => {
+      const data = getPlayerData(player);
+      data.teamId = getNewPlayerTeam(lobby);
+    },
   };
 
 /////////////////
 /// FUNCTIONS ///
 /////////////////
 
-// for now the first player to join a team is the team leader.
-// This needs to be changed later to allow players to choose their team leader.
-function setTeamLeader(lobby: Lobby, teamId: string): boolean {
-  const players = lobby
-    .getActivePlayers()
-    .filter(
-      player => player.getGameData<PlayerDataStratego>()?.teamId === teamId,
-    );
-  return !players.some(
-    player => player.getGameData<PlayerDataStratego>()?.isTeamLeader,
-  );
+function assignTeams(lobby: Lobby) {
+  const sources: { player: Player; priority: number }[] = [];
+
+  // Add leaders
+  for (const player of lobby.getActivePlayers()) {
+    let score = 0;
+    if (getPlayerData(player).isTeamLeader) {
+      score = 1;
+    }
+    sources.push({ player, priority: score });
+  }
+
+  sources.sort((a, b) => b.priority - a.priority);
+
+  const teams = getLobbyData(lobby).teams;
+  for (let i = 0; i < sources.length; i++) {
+    const player = sources[i].player;
+    const playerData = getPlayerData(player);
+    const team = teams[i % teams.length];
+    playerData.teamId = team.id;
+  }
+
+  lobby.sync();
+}
+
+function assignTeamLeader(lobby: Lobby, teamId: string) {
+  const playerScores: { player: Player; score: number }[] = [];
+
+  const players = lobby.getActivePlayers().filter(player => {
+    return getPlayerData(player).teamId === teamId;
+  });
+
+  for (const player of players) {
+    let score = 0;
+
+    if (player.isAdmin()) {
+      score += 1;
+    }
+
+    if (player.isLeader()) {
+      score += 2;
+    }
+
+    playerScores.push({ player, score });
+  }
+
+  playerScores.sort((a, b) => b.score - a.score);
+
+  const playerData = getPlayerData(playerScores[0].player);
+  playerData.isTeamLeader = true;
 }
 
 function getPlayerFromAttackCode(
