@@ -25,6 +25,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { WinPopUp } from '@/components/ui/WinPopUp';
 import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
+import { defaultDeckSize } from '@/constants/RoleCardDeck';
 
 export default function Game() {
   const lobby = useLobby();
