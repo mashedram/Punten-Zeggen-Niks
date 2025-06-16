@@ -27,11 +27,7 @@ export class LobbyManager {
     const data = client.getData();
     if (!data.lobby) return [undefined, undefined];
     const lobby = data.lobby;
-
-    const player = lobby.getPlayerOfClient(client);
-    if (!player) return [undefined, undefined];
-
-    return [lobby, player];
+    return [lobby.lobby, lobby.player];
   }
 
   public deleteLobby(code: string): void {

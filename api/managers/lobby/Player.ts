@@ -1,3 +1,7 @@
+import { EventEmitter, on as on } from 'events';
+import { z } from 'zod';
+import { PlayerToken } from './PlayerToken';
+import { LOBBY_CONSTANTS } from './LobbyManager';
 import { Lobby } from './Lobby';
 import { DataTracker } from '@/common/networking/tracking/tracker/DataTracker';
 import { TrackedInstance } from '@/common/networking/tracking/tracker/TrackedInstance';
@@ -92,6 +96,12 @@ export class Player {
     });
 
     this._gameData = playerData;
+    console.log(
+      'Set game data for player',
+      this._data.data.id,
+      ':',
+      playerData,
+    );
   }
 
   public getGameData<T extends PlayerGameData>(): T | undefined {

@@ -82,7 +82,7 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
       return {
         gameId: StrategoGameId,
         teamId,
-        isTeamLeader: isTeamLeader,
+        isTeamLeader,
         hasRoleCard: false,
         roleCard: undefined,
         attackCode: generateAttackCode(),
