@@ -217,7 +217,8 @@ export function removeRoleCardFromDeck(
   cardId: string,
 ) {
   const lobbyData = getLobbyData(lobby);
-  const team = lobbyData.teams.find(team => team.id === teamId);
+  const teams = lobbyData.teams;
+  const team = teams.find(team => team.id === teamId);
   if (!team || !team.deck || !team.deck[cardId]) {
     throw new Error(`Card ${cardId} not found in team ${teamId} deck.`);
   }
@@ -228,6 +229,8 @@ export function removeRoleCardFromDeck(
   if (team.deck[cardId] <= 0) {
     delete team.deck[cardId];
   }
+  console.log(lobbyData);
+  lobbyData.teams = teams;
   lobby.sync();
 }
 
