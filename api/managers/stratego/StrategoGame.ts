@@ -299,6 +299,7 @@ export const StrategoGame = {
     if (team.deck.vlag > 0) {
       return { vlag: 1 };
     }
+    lobby.sync();
     return team.deck;
   },
 
@@ -318,7 +319,7 @@ export const StrategoGame = {
         playersWithoutRoleCards.push(p.getId());
       }
     }
-
+    lobby.sync();
     return playersWithoutRoleCards;
   },
 };
