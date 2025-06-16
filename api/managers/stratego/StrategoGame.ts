@@ -38,6 +38,7 @@ export type LobbyDataStratego = z.infer<typeof LobbyDataSchemaStratego>;
 
 export const PlayerDataSchemaStratego = z.object({
   gameId: z.literal(StrategoGameId),
+  name: z.string(),
   teamId: z.string(),
   roleCard: z.string().optional(),
   attackCode: z.string(),
@@ -79,8 +80,10 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
     createPlayerData: (lobby, player) => {
       const teamId = getNewPlayerTeam(lobby);
       const isTeamLeader = setTeamLeader(lobby, teamId);
+      const name = player.getName();
       return {
         gameId: StrategoGameId,
+        name,
         teamId,
         isTeamLeader,
         hasRoleCard: false,
@@ -214,7 +217,8 @@ export function removeRoleCardFromDeck(
   cardId: string,
 ) {
   const lobbyData = getLobbyData(lobby);
-  const team = lobbyData.teams.find(team => team.id === teamId);
+  const teams = lobbyData.teams;
+  const team = teams.find(team => team.id === teamId);
   if (!team || !team.deck || !team.deck[cardId]) {
     throw new Error(`Card ${cardId} not found in team ${teamId} deck.`);
   }
@@ -225,6 +229,9 @@ export function removeRoleCardFromDeck(
   if (team.deck[cardId] <= 0) {
     delete team.deck[cardId];
   }
+  console.log(lobbyData);
+  lobbyData.teams = teams;
+  lobby.sync();
 }
 
 //////////////////////////
@@ -295,6 +302,7 @@ export const StrategoGame = {
     if (team.deck.vlag > 0) {
       return { vlag: 1 };
     }
+    lobby.sync();
     return team.deck;
   },
 
@@ -314,7 +322,7 @@ export const StrategoGame = {
         playersWithoutRoleCards.push(p.getId());
       }
     }
-
+    lobby.sync();
     return playersWithoutRoleCards;
   },
 };

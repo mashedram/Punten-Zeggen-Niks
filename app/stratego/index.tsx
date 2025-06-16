@@ -22,10 +22,11 @@ import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
 import { AllRoleCards } from '@/constants/RoleCards';
 import { AttackButton } from '@/components/ui/AttackButton';
 import { FontAwesome } from '@expo/vector-icons';
+import { defaultDeckSize } from '@/constants/RoleCardDeck';
 
 export default function Game() {
   const lobby = useLobby();
-  const stratego = useStratego(lobby);
+  const stratego = useStratego();
 
   const [isLeaderPopupOpen, setLeaderPopupOpen] = useState(false);
 
@@ -60,18 +61,19 @@ export default function Game() {
   const availablePlayers = stratego.players.filter(
     p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
   ).length;
+
   const teamRedDeck = stratego.lobby.teams.find(
     team => team.id === 'red',
   )?.deck;
   const teamBlueDeck = stratego.lobby.teams.find(
-    team => team.id === 'red',
+    team => team.id === 'blue',
   )?.deck;
   const teamRedDeckSize = teamRedDeck
     ? Object.values(teamRedDeck).reduce((sum, value) => sum + value, 0)
-    : 60;
+    : defaultDeckSize;
   const teamBlueDeckSize = teamBlueDeck
     ? Object.values(teamBlueDeck).reduce((sum, value) => sum + value, 0)
-    : 60;
+    : defaultDeckSize;
 
   return (
     <SafeAreaView style={styles.BackgroundView}>
@@ -109,6 +111,7 @@ export default function Game() {
       <View style={styles.roleContainer}>
         <PlayerRole
           teamId={stratego.self.teamId}
+          attackCode={stratego.self.attackCode}
           roleCard={AllRoleCards.find(
             card => card.id === stratego.self.roleCard,
           )}
