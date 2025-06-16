@@ -48,6 +48,23 @@ export default function Game() {
     }).start();
   }, [isLeaderPopupOpen, slideAnim]);
   const [showInfo, setShowInfo] = React.useState(false);
+  const [infoSlide, setInfoSlide] = React.useState(0);
+  const infoSlides = [
+    {
+      title: 'Algemene spelregels:',
+      text: `• Je wint zodra je de vlag van het andere team (blauw/rood) verovert.
+• Als spelers elkaar aanvallen, wint de speler met de hoogste rang.
+• Als je wordt verslagen, haal je een nieuwe rolkaart bij je teamleider.
+• Als je wordt aangetikt moet je verdedigen!!`,
+    },
+    {
+      title: 'Specifieke rol spelregels:',
+      text: `• De rolkaarten "Bom" en "Vlag" kunnen geen aanval initiëren.
+• De Bom kan alleen door de Mineur (3) worden verslagen.
+• De Spion (1) verslaat de Maarschalk (10), maar alleen als de Spion de aanval initieert.
+• Als spelers met dezelfde rang elkaar aanvallen, worden ze allebei verslagen.`,
+    },
+  ];
 
 
   if (lobby.loading) {
@@ -221,15 +238,52 @@ export default function Game() {
       </View>
 
       {showInfo && (
-        <View style={styles.SpelregelinfoI}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>
-            Algemene spelregels:
+        <View style={styles.Info}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: 'bold',
+              marginBottom: 8,
+            }}>
+            {infoSlides[infoSlide].title}
           </Text>
-          <Text style={{ textAlign: 'center', marginBottom: 8 }}>
-            • Je wint zodra je de vlag van het andere team (blauw/rood) verovert
-            {'\n'}•{'\n'}•{'\n'}•{'\n'}•{'\n'}
+          <Text style={{ textAlign: 'left', fontSize: 16, fontWeight: '600' }}>
+            {infoSlides[infoSlide].text}
           </Text>
-          <Pressable onPress={() => setShowInfo(false)}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: 8,
+            }}>
+            {infoSlide > 0 && (
+              <Pressable onPress={() => setInfoSlide(infoSlide - 1)}>
+                <Text
+                  style={{
+                    fontSize: 38,
+                    marginHorizontal: 16,
+                    fontWeight: 'bold',
+                  }}>
+                  {'←'}
+                </Text>
+              </Pressable>
+            )}
+            {infoSlide < infoSlides.length - 1 && (
+              <Pressable onPress={() => setInfoSlide(infoSlide + 1)}>
+                <Text
+                  style={{
+                    fontSize: 38,
+                    marginHorizontal: 16,
+                    fontWeight: 'bold',
+                  }}>
+                  {'→'}
+                </Text>
+              </Pressable>
+            )}
+          </View>
+          <Pressable
+            onPress={() => setShowInfo(false)}
+            style={{ marginTop: 8 }}>
             <Text style={{ color: '#1976d2', fontWeight: 'bold' }}>
               Sluiten
             </Text>
@@ -315,5 +369,19 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.3,
     shadowRadius: 10,
+  },
+  Info: {
+    position: 'absolute',
+    top: 80,
+    right: 20,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    alignItems: 'center',
+    zIndex: 20,
+    width: 250,
   },
 });
