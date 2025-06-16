@@ -1,6 +1,7 @@
+import { publicDecrypt } from 'crypto';
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { getPlayerData, endGame } from './StrategoGame';
+import { getPlayerData, endGame, PlayerDataStratego } from './StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
 
 type PlayerFightResult = {
@@ -8,153 +9,165 @@ type PlayerFightResult = {
   state: 'win' | 'lose' | 'draw' | 'explode';
 };
 
-type FightState = {};
+class PlayerFightState {
+  private _index: number;
+  private _player: Player;
+  private _roleCard: RoleCard;
+  private _defeated: boolean;
+
+  constructor(index: number, player: Player, roleCard: RoleCard) {
+    this._index = index;
+    this._player = player;
+    this._roleCard = roleCard;
+    this._defeated = false;
+  }
+
+  public getPlayer(): Player {
+    return this._player;
+  }
+
+  public getRoleCard(): RoleCard {
+    return this._roleCard;
+  }
+
+  public defeat() {
+    this._defeated = true;
+  }
+}
+
+type FightState = {
+  attacker: PlayerFightState;
+  defender: PlayerFightState;
+};
+
+function getFightIndex(playerData: PlayerDataStratego): number {
+  return (playerData.lastFightResult?.index ?? 0) + 1;
+}
+
+function buildPlayerFightState(
+  player: Player,
+  data: PlayerDataStratego = getPlayerData(player),
+): PlayerFightState {
+  const index = getFightIndex(data);
+  const roleCard = getRoleCard(data.roleCard);
+  if (!roleCard) {
+    console.warn(`Player ${player.getName()} has no role card.`);
+    throw new Error(`Player ${player.getName()} has no role card.`);
+  }
+  return new PlayerFightState(index, player, roleCard);
+}
+
+function buildFightState(attacker: Player, defender: Player): FightState {
+  const attackerData = getPlayerData(attacker);
+  const defenderData = getPlayerData(defender);
+
+  if (attackerData.teamId === defenderData.teamId) {
+    console.warn('Cannot attack a player from the same team.');
+    throw new Error('Cannot attack a player from the same team.');
+  }
+
+  const attackerState = buildPlayerFightState(attacker, attackerData);
+  const defenderState = buildPlayerFightState(defender, defenderData);
+
+  return {
+    attacker: attackerState,
+    defender: defenderState,
+  };
+}
+
+function shouldForceWin(from: PlayerFightState, to: PlayerFightState): boolean {
+  const forceWins = from.getRoleCard().forceWins;
+  if (!forceWins || forceWins.length === 0) {
+    return false;
+  }
+
+  const toCard = to.getRoleCard();
+  return forceWins.includes(toCard.id);
+}
+
+function handleForceWin(
+  attacker: PlayerFightState,
+  defender: PlayerFightState,
+): boolean {
+  if (shouldForceWin(attacker, defender)) {
+    console.log(
+      `Attacker ${attacker.getPlayer().getId()} forces a win against defender ${defender.getPlayer().getId()}.`,
+    );
+    defender.defeat();
+    return true;
+  }
+
+  if (shouldForceWin(defender, attacker)) {
+    console.log(
+      `Defender ${defender.getPlayer().getId()} forces a win against attacker ${attacker.getPlayer().getId()}.`,
+    );
+    attacker.defeat();
+    return true;
+  }
+  return false;
+}
+
+function handleValueComparison(
+  attacker: PlayerFightState,
+  defender: PlayerFightState,
+) {
+  const attackerValue = attacker.getRoleCard().value;
+  const defenderValue = defender.getRoleCard().value;
+
+  if (attackerValue === defenderValue) {
+    return;
+  }
+
+  if (attackerValue > defenderValue) {
+    console.log(
+      `Attacker ${attacker.getPlayer().getId()} wins against defender ${defender.getPlayer().getId()}.`,
+    );
+    defender.defeat();
+    return;
+  }
+  x;
+  attacker.defeat();
+}
+
+function handleAttackLogic(
+  lobby: Lobby,
+  attacker: Player,
+  defender: Player,
+): FightState {
+  const state = buildFightState(attacker, defender);
+
+  if (handleForceWin(state.attacker, state.defender)) {
+    return state;
+  }
+
+  handleValueComparison(state.attacker, state.defender);
+
+  return state;
+}
+
+function setErrorState(player: Player, errorMessage: string) {
+  const playerData = getPlayerData(player);
+  playerData.lastFightResult = {
+    type: 'error',
+    index: getFightIndex(playerData),
+    message: errorMessage,
+  };
+  console.error(`Error for player ${player.getId()}: ${errorMessage}`);
+  player.sync();
+}
 
 export function performAttack(
   lobby: Lobby,
   attacker: Player,
   defender: Player,
 ) {
-  const attackerData = getPlayerData(attacker);
-  const defenderData = getPlayerData(defender);
-  if (!attackerData || !defenderData) {
-    console.warn('Player data not found for attacker or defender.');
+  let result: FightState;
+  try {
+    result = handleAttackLogic(lobby, attacker, defender);
+  } catch (error: Error) {
+    console.error(error);
+    setErrorState(attacker, `Attack failed: ${error}`);
+    setErrorState(defender, `Attack failed: ${error}`);
     return;
   }
-  const attackerCard = getRoleCard(attackerData.roleCard);
-  const defenderCard = getRoleCard(defenderData.roleCard);
-
-  // check for team conflict
-  if (attackerData.teamId === defenderData.teamId) {
-    console.warn('Cannot attack a player from the same team.');
-    return;
-  }
-
-  // no role card for attacker or defender
-  if (!attackerCard || !defenderCard) {
-    console.warn(
-      'Attacker or defender does not have a role card.',
-      attackerCard,
-      defenderCard,
-    );
-    return;
-  }
-
-  // check if attacker can attack
-  if (!attackerCard.canAttack) {
-    console.warn(
-      `Attacker ${attacker.getId()} cannot attack with card ${attackerCard.id}.`,
-    );
-    return;
-  }
-
-  // check if defender has a flag
-  if (defenderCard.id === RoleCards.vlag.id) {
-    endGame(lobby, attackerData.teamId);
-    console.log(
-      `Team ${attackerData.teamId} has captured the flag of team ${defenderData.teamId}.`,
-    );
-    return;
-  }
-
-  if (attackerCard.beats.includes(defenderCard)) {
-    console.log(
-      `Attacker ${attacker.getId()}, ${attackerCard.id} wins against defender ${defender.getId()}, ${defenderCard.id}.`,
-    );
-    win(attacker);
-    defeat(defender);
-    return;
-  }
-
-  if (defenderCard.beats.includes(attackerCard)) {
-    console.log(
-      `Defender ${defender.getId()} wins against attacker ${attacker.getId()}.`,
-    );
-    if (defenderCard.id === RoleCards.bom.id) {
-      explode(defender);
-    } else {
-      win(defender);
-    }
-    defeat(attacker);
-    return;
-  }
-
-  if (attackerCard === defenderCard) {
-    console.log(
-      `Both players ${attacker.getId()} and ${defender.getId()} have the same card. It's a draw.`,
-    );
-    draw(attacker);
-    draw(defender);
-    return;
-  }
-}
-
-function draw(player: Player) {
-  const data = getPlayerData(player);
-  data.lastFightResult = {
-    index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
-    state: 'draw',
-  };
-}
-
-function win(player: Player) {
-  console.log(`Player ${player.getId()} wins the fight.`);
-  const data = getPlayerData(player);
-  data.lastFightResult = {
-    index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
-    state: 'win',
-  };
-}
-
-function defeat(player: Player) {
-  console.log(`Player ${player.getId()} loses the fight.`);
-  const playerData = getPlayerData(player);
-  deleteRoleCard(player);
-  playerData.lastFightResult = {
-    index: playerData.lastFightResult
-      ? playerData.lastFightResult.index + 1
-      : 0,
-    state: 'lose',
-  };
-  player.sync();
-}
-
-function explode(player: Player) {
-  console.log(`Player ${player.getId()} explodes.`);
-  const playerData = getPlayerData(player);
-  deleteRoleCard(player);
-  playerData.lastFightResult = {
-    index: playerData.lastFightResult
-      ? playerData.lastFightResult.index + 1
-      : 0,
-    state: 'explode',
-  };
-  player.sync();
-}
-
-function getRoleCard(cardId?: string): RoleCard | undefined {
-  console.log(`Getting role card for cardId: ${cardId}`);
-  if (cardId === undefined) {
-    console.warn(`Role card with id ${cardId} not found.`);
-    return undefined;
-  }
-
-  const RoleCard = RoleCards[cardId];
-  if (!RoleCard) {
-    console.warn(`Role card with id ${cardId} not found.`);
-    return undefined;
-  }
-  return RoleCards[cardId];
-}
-
-function deleteRoleCard(player: Player) {
-  const playerData = getPlayerData(player);
-  const lobby = player.getLobby();
-  if (!playerData.roleCard) {
-    console.warn(`Player ${player.getId()} has no role card to remove.`);
-    return;
-  }
-  playerData.roleCard = undefined;
-  playerData.hasRoleCard = false;
-  lobby.sync();
 }
