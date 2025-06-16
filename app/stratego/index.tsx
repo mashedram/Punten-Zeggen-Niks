@@ -27,6 +27,7 @@ import { GameState } from '@/constants/GameState';
 import { CardCountBar } from '@/components/ui/CardCountBar';
 import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
 import { AllRoleCards } from '@/constants/RoleCards';
+import { SpelregelI } from '@/components/Spelersrollen/SpelregelI';
 
 export default function Game() {
   const lobby = useLobby();
@@ -41,10 +42,11 @@ export default function Game() {
   const infoSlides = [
     {
       title: 'Algemene spelregels:',
-      text: `• Je wint zodra je de vlag van het andere team (blauw/rood) verovert.
-• Als spelers elkaar aanvallen, wint de speler met de hoogste rang.
-• Als je wordt verslagen, haal je een nieuwe rolkaart bij je teamleider.
-• Als je wordt aangetikt moet je verdedigen!!`,
+      text: `• Een pot bestaat uit de rolkaarten 1 t/m 10 (minus 2) + de bom en de vlag.
+ • Je wint zodra je de vlag van het andere team (blauw/rood) verovert.
+ • Als spelers elkaar aanvallen, wint de speler met de hoogste rang.
+ • Als je wordt verslagen, haal je een nieuwe rolkaart bij je teamleider.
+ • Als je wordt aangetikt moet je verdedigen!!`,
     },
     {
       title: 'Specifieke rol spelregels:',
@@ -249,69 +251,7 @@ export default function Game() {
 
       {/* Info button */}
 
-      <View style={{ position: 'absolute', top: 40, right: 20, zIndex: 10 }}>
-        <Pressable onPress={() => setShowInfo(true)}>
-          <View style={styles.infoButton}>
-            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 22 }}>
-              i
-            </Text>
-          </View>
-        </Pressable>
-      </View>
-
-      {showInfo && (
-        <View style={styles.Info}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: 'bold',
-              marginBottom: 8,
-            }}>
-            {infoSlides[infoSlide].title}
-          </Text>
-          <Text style={{ textAlign: 'left', fontSize: 16, fontWeight: '600' }}>
-            {infoSlides[infoSlide].text}
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 8,
-            }}>
-            {infoSlide > 0 && (
-              <Pressable onPress={() => setInfoSlide(infoSlide - 1)}>
-                <Text
-                  style={{
-                    fontSize: 38,
-                    marginHorizontal: 16,
-                    fontWeight: 'bold',
-                  }}>
-                  {'←'}
-                </Text>
-              </Pressable>
-            )}
-            {infoSlide < infoSlides.length - 1 && (
-              <Pressable onPress={() => setInfoSlide(infoSlide + 1)}>
-                <Text
-                  style={{
-                    fontSize: 38,
-                    marginHorizontal: 16,
-                    fontWeight: 'bold',
-                  }}>
-                  {'→'}
-                </Text>
-              </Pressable>
-            )}
-          </View>
-          <Pressable
-            onPress={() => setShowInfo(false)}
-            style={{ marginTop: 8 }}>
-            <Text style={{ color: '#1976d2', fontWeight: 'bold' }}>
-              Sluiten
-            </Text>
-          </Pressable>
-        </View>
-      )}
+      <SpelregelI />
     </SafeAreaView>
   );
 }
