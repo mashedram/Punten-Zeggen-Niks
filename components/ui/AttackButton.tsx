@@ -33,7 +33,8 @@ export const AttackButton = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.attackCodeContainer}>
+      <View
+        style={[styles.attackCodeContainer, { borderColor: currentTeamColor }]}>
         <Text>Your attack code:</Text>
         <Text style={styles.attackCodeText}>{stratego.self.attackCode}</Text>
         <Text style={[{ fontSize: 12 }]}>
@@ -48,7 +49,7 @@ export const AttackButton = () => {
               placeholder="Enter enemy attack code here"
               onChangeText={text => setEnemyAttackCode(text)}
               value={enemyAttackCode}
-              style={styles.codeInput}
+              style={[styles.codeInput, { borderColor: currentTeamColor }]}
             />
           </View>
           <TouchableOpacity
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 80,
     borderRadius: 5,
-    borderWidth: 1,
+    borderWidth: 3,
   },
   attackCodeText: {
     fontWeight: 700,
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
   codeInput: {
     backgroundColor: '#c1cece',
     height: 30,
-    borderWidth: 1,
+    borderWidth: 3,
     textAlign: 'center',
     borderRadius: 5,
   },

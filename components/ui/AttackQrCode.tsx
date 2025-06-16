@@ -12,12 +12,12 @@ export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
   const stratego = useStrategoUnsafe();
 
   const [scannerVisible, setScannerVisible] = useState(false);
-  const [scanned, setScanned] = useState(false);
+  const [cameraKey, setCameraKey] = useState(0);
   const [permission, requestPermission] = useCameraPermissions();
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
-    setScanned(true);
     setScannerVisible(false);
+    setCameraKey(prev => prev + 1);
     onQrScan(data);
   };
 
@@ -60,11 +60,13 @@ export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
             </View>
           ) : (
             <CameraView
+              key={cameraKey}
               style={styles.cameraView}
               barcodeScannerSettings={{
                 barcodeTypes: ['qr'],
               }}
-              onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}>
+              onBarcodeScanned={handleBarCodeScanned}
+              autofocus="on">
               <View style={styles.buttonsContainer}>
                 <TouchableOpacity
                   style={[
