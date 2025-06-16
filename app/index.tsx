@@ -2,6 +2,7 @@ import { CreateButton } from '@/components/Home_page/CreateButton';
 import { JoinButton } from '@/components/Home_page/JoinButton';
 import { useLobby } from '@/hooks/useLobby';
 import { Redirect } from 'expo-router';
+import { useState } from 'react';
 import { Image } from 'react-native';
 
 import {
@@ -15,8 +16,17 @@ import {
 export default function HomePage() {
   const lobby = useLobby();
 
-  if (!lobby.loading && lobby.inLobby) {
+  if (lobby.loading) {
+    return;
+  }
+
+  if (lobby.inLobby) {
     return <Redirect href="/lobby" />;
+  }
+
+  const dev_lobbyCode = process.env.EXPO_PUBLIC_DEV_LOBBY_CODE;
+  if (dev_lobbyCode) {
+    return <Redirect href={`/dev`} />;
   }
 
   return (

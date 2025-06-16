@@ -146,10 +146,7 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
     return (
       <PlayerDataContext.Provider
         value={{
-          loading: false,
-          inLobby: false,
-          join: joinLobbyCallback,
-          create: createLobbyCallback,
+          loading: true,
         }}>
         {children}
       </PlayerDataContext.Provider>

@@ -68,6 +68,7 @@ export function ClientProvider({ children }: { children?: React.ReactNode }) {
   const tRPC = useTRPC();
   const [id, setId] = useState<string>('');
   const [token, setToken] = useToken();
+  const [isLoading, setIsLoading] = useState(true);
   const [tokenCapture, setTokenCapture] = useState<
     { value: string | undefined } | undefined
   >(undefined);
@@ -90,6 +91,7 @@ export function ClientProvider({ children }: { children?: React.ReactNode }) {
         console.debug('Setting token and id', packet.id);
         setId(packet.id);
         setToken(packet.token);
+        setIsLoading(false);
         return;
       }
 
@@ -181,26 +183,27 @@ export function ClientProvider({ children }: { children?: React.ReactNode }) {
     ),
   );
 
-  const context: ClientContextType = token.isLoading
-    ? {
-        isLoading: true,
-      }
-    : ({
-        isLoading: false,
-        getId: () => id,
-        getToken: () => token.value,
-        getInstance: <T extends PacketDataLayout>(
-          descriptor: DataInstanceDescriptor<T>,
-        ) => {
-          const object = data.current.find(descriptor);
-          if (!object) {
-            console.debug('Object not found', descriptor);
-            return undefined;
-          }
-          return object;
-        },
-        getStore: () => data.current,
-      } as ClientContextType);
+  const context: ClientContextType =
+    token.isLoading || isLoading
+      ? {
+          isLoading: true,
+        }
+      : ({
+          isLoading: false,
+          getId: () => id,
+          getToken: () => token.value,
+          getInstance: <T extends PacketDataLayout>(
+            descriptor: DataInstanceDescriptor<T>,
+          ) => {
+            const object = data.current.find(descriptor);
+            if (!object) {
+              console.debug('Object not found', descriptor);
+              return undefined;
+            }
+            return object;
+          },
+          getStore: () => data.current,
+        } as ClientContextType);
 
   return (
     <ClientContext.Provider value={context}>{children}</ClientContext.Provider>
