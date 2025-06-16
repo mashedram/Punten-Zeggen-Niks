@@ -2,7 +2,6 @@ import { useTRPC } from '@/api/query';
 import { TeamColors } from '@/constants/Colors';
 import { AllRoleCards } from '@/constants/RoleCards';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
-import { useLobbyUnsafe } from '@/hooks/useLobbyUnsafe';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
@@ -15,7 +14,6 @@ import {
 
 export const AttackButton = () => {
   const trpc = useTRPC();
-  const lobby = useLobbyUnsafe();
   const stratego = useStrategoUnsafe();
 
   const sendAttackMutation = useMutation(
@@ -56,7 +54,6 @@ export const AttackButton = () => {
             ]}
             onPress={() =>
               sendAttackMutation.mutate({
-                token: lobby.getToken(),
                 attackCode: enemyAttackCode,
               })
             }>

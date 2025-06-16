@@ -22,10 +22,13 @@ import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
 import { AllRoleCards } from '@/constants/RoleCards';
 import { AttackButton } from '@/components/ui/AttackButton';
 import { FontAwesome } from '@expo/vector-icons';
+import { WinPopUp } from '@/components/ui/WinPopUp';
+import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
+import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
 
 export default function Game() {
   const lobby = useLobby();
-  const stratego = useStratego(lobby);
+  const stratego = useStratego();
 
   const [isLeaderPopupOpen, setLeaderPopupOpen] = useState(false);
 
@@ -55,6 +58,25 @@ export default function Game() {
       return <Redirect href="/lobby" />;
     }
     return;
+  }
+
+  let fightPopUp = null;
+  console.log(stratego.self.lastFightResult?.type);
+  if (stratego.self.lastFightResult?.type === 'success') {
+    console.log('fight result', stratego.self.lastFightResult.state);
+    if (stratego.self.lastFightResult.state === 'win') {
+      console.log('win');
+      fightPopUp = <WinPopUp />;
+    } else if (stratego.self.lastFightResult.state === 'lose') {
+      console.log('lose');
+      fightPopUp = <VerlorenPopUp />;
+    } else if (stratego.self.lastFightResult.state === 'draw') {
+      console.log('draw');
+      fightPopUp = <GelijkPopUp />;
+    } else if (stratego.self.lastFightResult.state === 'explode') {
+      console.log('explode');
+      fightPopUp = <VerlorenPopUp />;
+    }
   }
 
   const availablePlayers = stratego.players.filter(
@@ -113,6 +135,10 @@ export default function Game() {
             card => card.id === stratego.self.roleCard,
           )}
         />
+      </View>
+
+      <View style={{ flex: 1, width: '100%', position: 'relative', bottom: 0 }}>
+        {fightPopUp}
       </View>
 
       <View style={styles.playerAttackContainer}>

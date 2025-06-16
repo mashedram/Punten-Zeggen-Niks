@@ -85,6 +85,7 @@ export function performAttack(
 function draw(player: Player) {
   const data = getPlayerData(player);
   data.lastFightResult = {
+    type: 'success',
     index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
     state: 'draw',
   };
@@ -94,6 +95,7 @@ function win(player: Player) {
   console.log(`Player ${player.getId()} wins the fight.`);
   const data = getPlayerData(player);
   data.lastFightResult = {
+    type: 'success',
     index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
     state: 'win',
   };
@@ -104,6 +106,7 @@ function defeat(player: Player) {
   const playerData = getPlayerData(player);
   deleteRoleCard(player);
   playerData.lastFightResult = {
+    type: 'success',
     index: playerData.lastFightResult
       ? playerData.lastFightResult.index + 1
       : 0,
@@ -117,6 +120,7 @@ function explode(player: Player) {
   const playerData = getPlayerData(player);
   deleteRoleCard(player);
   playerData.lastFightResult = {
+    type: 'success',
     index: playerData.lastFightResult
       ? playerData.lastFightResult.index + 1
       : 0,

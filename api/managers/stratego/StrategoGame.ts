@@ -44,10 +44,18 @@ export const PlayerDataSchemaStratego = z.object({
   isTeamLeader: z.boolean(),
   hasRoleCard: z.boolean(),
   lastFightResult: z
-    .object({
-      index: z.number(),
-      state: z.enum(['win', 'lose', 'draw', 'explode']),
-    })
+    .discriminatedUnion('type', [
+      z.object({
+        type: z.literal('success'),
+        index: z.number(),
+        state: z.enum(['win', 'lose', 'draw', 'explode']),
+      }),
+      z.object({
+        type: z.literal('error'),
+        index: z.number(),
+        error: z.string(),
+      }),
+    ])
     .optional(),
 });
 export type PlayerDataStratego = z.infer<typeof PlayerDataSchemaStratego>;
