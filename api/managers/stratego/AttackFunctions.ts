@@ -84,6 +84,7 @@ export function performAttack(
 
 function draw(player: Player) {
   const data = getPlayerData(player);
+  deleteRoleCard(player);
   data.lastFightResult = {
     index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
     state: 'draw',
