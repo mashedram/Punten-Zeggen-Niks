@@ -99,6 +99,8 @@ function win(player: Player) {
     index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
     state: 'win',
   };
+  console.log(data);
+  player.sync();
 }
 
 function defeat(player: Player) {
@@ -129,9 +131,9 @@ function explode(player: Player) {
   player.sync();
 }
 
-function getRoleCard(cardId?: string): RoleCard | undefined {
+function getRoleCard(cardId: string | null): RoleCard | undefined {
   console.log(`Getting role card for cardId: ${cardId}`);
-  if (cardId === undefined) {
+  if (cardId == null) {
     console.warn(`Role card with id ${cardId} not found.`);
     return undefined;
   }
@@ -151,7 +153,7 @@ function deleteRoleCard(player: Player) {
     console.warn(`Player ${player.getId()} has no role card to remove.`);
     return;
   }
-  playerData.roleCard = undefined;
+  playerData.roleCard = null;
   playerData.hasRoleCard = false;
   lobby.sync();
 }

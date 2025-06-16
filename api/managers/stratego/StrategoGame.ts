@@ -39,7 +39,7 @@ export type LobbyDataStratego = z.infer<typeof LobbyDataSchemaStratego>;
 export const PlayerDataSchemaStratego = z.object({
   gameId: z.literal(StrategoGameId),
   teamId: z.string(),
-  roleCard: z.string().optional(),
+  roleCard: z.string().nullable(),
   attackCode: z.string(),
   isTeamLeader: z.boolean(),
   hasRoleCard: z.boolean(),
@@ -56,7 +56,7 @@ export const PlayerDataSchemaStratego = z.object({
         error: z.string(),
       }),
     ])
-    .optional(),
+    .nullable(),
 });
 export type PlayerDataStratego = z.infer<typeof PlayerDataSchemaStratego>;
 
@@ -92,8 +92,9 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         teamId,
         isTeamLeader,
         hasRoleCard: false,
-        roleCard: undefined,
+        roleCard: null,
         attackCode: generateAttackCode(),
+        lastFightResult: null,
       };
     },
     registerEvents: lobby => {},

@@ -41,9 +41,7 @@ export default function LobbyPage() {
     );
   }
 
-  const canStart =
-    process.env.NODE_ENV === 'development' ||
-    (activeLobby.players.length >= 2 && activeLobby.self.isAdmin);
+  const canStart = activeLobby.players.length >= 2 && activeLobby.self.isAdmin;
 
   return (
     <View style={stylesheet.BackgroundContainer}>

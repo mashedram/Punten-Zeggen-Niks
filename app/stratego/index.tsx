@@ -29,6 +29,9 @@ import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
 export default function Game() {
   const lobby = useLobby();
   const stratego = useStratego();
+  const [lastFightPopup, setLastFightPopup] = useState<number | undefined>(
+    undefined,
+  );
 
   const [isLeaderPopupOpen, setLeaderPopupOpen] = useState(false);
 
@@ -60,22 +63,32 @@ export default function Game() {
     return;
   }
 
+  const lastFightResult = stratego.self.lastFightResult;
   let fightPopUp = null;
-  console.log(stratego.self.lastFightResult?.type);
-  if (stratego.self.lastFightResult?.type === 'success') {
-    console.log('fight result', stratego.self.lastFightResult.state);
-    if (stratego.self.lastFightResult.state === 'win') {
-      console.log('win');
-      fightPopUp = <WinPopUp />;
-    } else if (stratego.self.lastFightResult.state === 'lose') {
-      console.log('lose');
-      fightPopUp = <VerlorenPopUp />;
-    } else if (stratego.self.lastFightResult.state === 'draw') {
-      console.log('draw');
-      fightPopUp = <GelijkPopUp />;
-    } else if (stratego.self.lastFightResult.state === 'explode') {
-      console.log('explode');
-      fightPopUp = <VerlorenPopUp />;
+  if (
+    lastFightResult?.type === 'success' &&
+    lastFightResult.index !== lastFightPopup
+  ) {
+    if (lastFightResult.state === 'win') {
+      fightPopUp = (
+        <WinPopUp onClose={() => setLastFightPopup(lastFightResult.index)} />
+      );
+    } else if (lastFightResult.state === 'lose') {
+      fightPopUp = (
+        <VerlorenPopUp
+          onClose={() => setLastFightPopup(lastFightResult.index)}
+        />
+      );
+    } else if (lastFightResult.state === 'draw') {
+      fightPopUp = (
+        <GelijkPopUp onClose={() => setLastFightPopup(lastFightResult.index)} />
+      );
+    } else if (lastFightResult.state === 'explode') {
+      fightPopUp = (
+        <VerlorenPopUp
+          onClose={() => setLastFightPopup(lastFightResult.index)}
+        />
+      );
     }
   }
 
@@ -137,10 +150,6 @@ export default function Game() {
         />
       </View>
 
-      <View style={{ flex: 1, width: '100%', position: 'relative', bottom: 0 }}>
-        {fightPopUp}
-      </View>
-
       <View style={styles.playerAttackContainer}>
         <AttackButton />
       </View>
@@ -165,6 +174,17 @@ export default function Game() {
           <RoleCardPicker />
         </View>
       </Animated.View>
+
+      <View
+        style={{
+          flex: 1,
+          width: '100%',
+          position: 'absolute',
+          marginTop: 200,
+          zIndex: 100,
+        }}>
+        {fightPopUp}
+      </View>
 
       {/* Gameloop test gedeelte kan later weg */}
       <View>
