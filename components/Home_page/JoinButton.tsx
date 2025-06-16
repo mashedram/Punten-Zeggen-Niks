@@ -8,7 +8,7 @@ export const JoinButton = () => {
     <TouchableOpacity
       style={styles.joinButton}
       onPress={() => router.navigate('/lobby/join')}>
-      <Text style={styles.joinText}>Join a game</Text>
+      <Text style={styles.joinText}>Doe mee aan een spel</Text>
     </TouchableOpacity>
   );
 };
