@@ -7,9 +7,7 @@ import {
   Text,
   TouchableOpacity,
   ImageBackground,
-  Alert,
   Image,
-  SafeAreaView,
   Platform,
   StatusBar,
   ScrollView,
@@ -33,10 +31,6 @@ export default function LobbyPage() {
   const activeLobby = lobby.get();
   console.debug('activeLobby', activeLobby);
 
-  const handlePress = () => {
-    Alert.alert('Je hebt op de afbeelding gedrukt!');
-  };
-
   if (!activeLobby) {
     return <Redirect href="/" />;
   }
@@ -52,21 +46,21 @@ export default function LobbyPage() {
     (activeLobby.players.length >= 2 && activeLobby.self.isAdmin);
 
   return (
-    <SafeAreaView style={stylesheet.BackgroundContainer}>
+    <View style={stylesheet.BackgroundContainer}>
       <View style={stylesheet.CodeContainer}>
-        <View style={stylesheet.QrButton}>
-          <QrButton />
+        <View style={stylesheet.CodeBox}>
+          <View style={stylesheet.QrButton}>
+            <QrButton />
+          </View>
+          <Text style={stylesheet.Cijfercode}>{lobby.get()?.code}</Text>
         </View>
-        <Text style={stylesheet.Cijfercode}>{lobby.get()?.code}</Text>
       </View>
 
       <View style={stylesheet.StrategoContainer}>
-        <TouchableOpacity onPress={handlePress}>
-          <Image
-            source={require('@/assets/images/stratego.png')}
-            style={stylesheet.StrategoImage}
-          />
-        </TouchableOpacity>
+        <Image
+          source={require('@/assets/images/stratego.png')}
+          style={stylesheet.StrategoImage}
+        />
       </View>
 
       <View style={stylesheet.SpelerlijstContainer}>
@@ -99,7 +93,7 @@ export default function LobbyPage() {
         <View style={stylesheet.settingsAndPlayers}>
           <SettingsButton />
           <Text style={stylesheet.title}>
-            Players: {activeLobby.players.length}
+            Spelers: {activeLobby.players.length}
           </Text>
         </View>
       </View>
@@ -124,43 +118,61 @@ export default function LobbyPage() {
             lobby.leave();
             router.navigate('/');
           }}>
-          <Text style={stylesheet.PlayText}>Return</Text>
+          <Text style={stylesheet.PlayText}>Terug</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const stylesheet = StyleSheet.create({
   BackgroundContainer: {
-    position: 'relative',
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
     backgroundColor: 'rgba(92, 163, 194, 1)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    flex: 1,
+    flex: 0,
     justifyContent: 'center',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 2,
     margin: -1.2,
   },
 
   bottomCard: {
     width: '100%',
+    height: '20%',
+    position: 'absolute',
+    display: 'flex',
+    flexDirection: 'column',
     backgroundColor: 'white',
     paddingVertical: 24,
     paddingHorizontal: 20,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     alignItems: 'center',
-    marginTop: 200,
+    marginTop: 595,
   },
 
   CodeContainer: {
-    marginVertical: 10,
+    position: 'absolute',
+    width: '100%',
+    height: '130%',
+    marginTop: 50,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 0,
+    marginBottom: 680,
+  },
+
+  CodeBox: {
     position: 'relative',
     flexShrink: 0,
-    height: 44,
-    width: 394,
+    height: '5%',
+    width: '98%',
     backgroundColor: 'rgba(71, 72, 73, 1)',
     display: 'flex',
     flexDirection: 'row',
@@ -168,7 +180,7 @@ const stylesheet = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 10,
     borderRadius: 8,
-    marginTop: 30,
+    margin: '1%',
   },
 
   Cijfercode: {
@@ -185,7 +197,7 @@ const stylesheet = StyleSheet.create({
   PlayButtonContainer: {
     position: 'relative',
     flexShrink: 0,
-    height: 45,
+    height: '40%',
     width: '100%',
     paddingTop: 4,
     paddingBottom: 3,
@@ -202,7 +214,7 @@ const stylesheet = StyleSheet.create({
   PlayButtonContainerDisabled: {
     position: 'relative',
     flexShrink: 0,
-    height: 45,
+    height: '40%',
     width: '100%',
     paddingTop: 4,
     paddingBottom: 3,
@@ -218,7 +230,7 @@ const stylesheet = StyleSheet.create({
 
   ReturnButtonContainer: {
     width: '100%',
-    height: 45,
+    height: '40%',
     position: 'relative',
     flexShrink: 0,
     flexGrow: 1,
@@ -270,11 +282,12 @@ const stylesheet = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     flexShrink: 0,
-    height: '38%',
+    height: '43%',
     width: '90%',
     paddingTop: 18,
     paddingBottom: 0,
-    marginTop: 2,
+    marginTop: 20,
+    marginBottom: -40,
     backgroundColor: 'rgba(255, 255, 255, 1)',
     shadowColor: 'rgba(0, 0, 0, 0.25)',
     shadowOffset: {
@@ -290,12 +303,15 @@ const stylesheet = StyleSheet.create({
   list: {
     position: 'absolute',
     flexShrink: 0,
-    height: 290,
-    width: 344,
+    height: '90%',
+    width: '100%',
   },
   listContentContainer: {
     alignItems: 'center',
     flexDirection: 'column',
+    justifyContent: 'center',
+    display: 'flex',
+    position: 'relative',
     rowGap: 2,
     paddingHorizontal: 4,
     paddingVertical: 0,
@@ -347,7 +363,7 @@ const stylesheet = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 35,
     marginRight: 50,
-    marginTop: -275,
+    marginTop: -240,
   },
   title: {
     textAlign: 'center',
@@ -359,12 +375,12 @@ const stylesheet = StyleSheet.create({
   },
   StrategoContainer: {
     display: 'flex',
-    position: 'relative',
+    position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    width: 120,
-    height: 120,
+    width: '38%',
+    height: '22%',
     borderStyle: 'solid',
     backgroundColor: 'rgba(255, 255, 255, 1)',
     shadowColor: 'rgba(0, 0, 0, 0.25)',
@@ -376,14 +392,17 @@ const stylesheet = StyleSheet.create({
     borderWidth: 4,
     borderColor: 'rgba(0, 0, 0, 1)',
     borderRadius: 36,
-    marginVertical: 10,
+    marginBottom: 420,
   },
   StrategoImage: {
     position: 'relative',
     flexGrow: 1,
-    width: 100,
-    height: 100,
-    borderRadius: 20,
+    width: '88%',
+    height: '890%',
+    marginTop: 20,
+    marginBottom: 20,
+    resizeMode: 'contain',
+    borderRadius: 300,
   },
   QrButton: {
     marginRight: 10,

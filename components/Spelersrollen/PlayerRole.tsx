@@ -72,6 +72,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
-    margin: 10,
+    marginLeft: 90,
   },
 });
