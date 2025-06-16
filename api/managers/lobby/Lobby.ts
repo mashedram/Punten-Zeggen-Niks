@@ -51,9 +51,9 @@ export class Lobby {
     id: null,
   };
 
-  constructor(manager: LobbyManager) {
+  constructor(manager: LobbyManager, code?: string) {
     this.manager = manager;
-    this.code = generateRandomCode(LOBBY_CONSTANTS.LOBBY_CODE_LENGTH);
+    this.code = code ?? generateRandomCode(LOBBY_CONSTANTS.LOBBY_CODE_LENGTH);
 
     this._clients = new ClientPool();
     this._tracker = SERVER_DATA_STORE.createDataTracker(
@@ -151,6 +151,16 @@ export class Lobby {
   }
 
   public createPlayer(name: string, client: Client): Player {
+    const existingPlayer = client.getData().lobby;
+    if (existingPlayer?.lobby) {
+      if (existingPlayer.lobby.getCode() === this.getCode()) {
+        return existingPlayer.player;
+      }
+
+      // If the client is already in a different lobby, remove them from that lobby first
+      existingPlayer.lobby.removePlayer(existingPlayer.player.getId());
+    }
+
     this._clients.addClient(client);
     const player = new Player(
       client.getId(),

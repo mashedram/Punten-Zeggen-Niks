@@ -27,6 +27,23 @@ export const lobbyRouter = router({
 
       lobby.createPlayer(input.name, client);
     }),
+  joinDevLobby: publicProcedure
+    .input(z.object({ code: z.string() }))
+    .mutation(({ ctx, input }) => {
+      if (Bun.env.EXPO_PUBLIC_DEV_LOBBY_CODE !== input.code) {
+        throw new Error('Invalid dev lobby code');
+      }
+
+      const client = ctx.client;
+      if (!client) throw new Error('Client not found');
+
+      let lobby = lobbyManager.getLobby(input.code);
+      if (!lobby) {
+        lobby = lobbyManager.createLobby(input.code);
+      }
+      console.log('Joining dev lobby');
+      lobby.createPlayer('Dev Player', client);
+    }),
   setGame: publicProcedure
     .input(
       z.object({

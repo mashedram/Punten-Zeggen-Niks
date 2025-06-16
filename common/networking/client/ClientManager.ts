@@ -60,7 +60,6 @@ export class ClientManager {
   }
 
   public getClientByToken(token: string): Client | undefined {
-    console.log('token', token, this._tokenMap);
     return this._tokenMap[token];
   }
 
@@ -78,14 +77,27 @@ export class ClientManager {
     }
   }
 
-  public async *listen(ctx: TrpcContext, token?: string, signal?: AbortSignal) {
-    try {
-      if (token) {
-        ctx.client = this.getClientByToken(token);
+  public authClient(token: string | undefined): Client {
+    if (token) {
+      console.log(`ClientManager: Found token ${token}`);
+      const client = this.getClientByToken(token);
+      if (client) {
+        console.log(
+          `ClientManager: Authenticated client with id ${client.getId()}`,
+        );
+        return client;
+      } else {
+        console.warn(`ClientManager: No client found for token ${token}`);
       }
+    }
 
-      if (ctx.client === undefined) {
-        ctx.client = this.createClient();
+    return this.createClient();
+  }
+
+  public async *listen(ctx: TrpcContext, signal?: AbortSignal) {
+    try {
+      if (!ctx.client) {
+        throw new Error('Client not found in context');
       }
 
       const listener = on(ctx.client.getEventEmitter(), 'packet', {
