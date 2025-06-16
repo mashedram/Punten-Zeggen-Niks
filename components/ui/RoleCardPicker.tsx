@@ -59,7 +59,7 @@ export const RoleCardPicker = () => {
             return (
               <Picker.Item
                 key={player.id}
-                label={player.id}
+                label={player.name}
                 value={player.id}
               />
             );
