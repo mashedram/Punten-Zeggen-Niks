@@ -30,7 +30,8 @@ export type PlayerData = {
   id: string;
   name: string;
   isAdmin: boolean;
-  gameData: TrackedInstanceReference<PlayerDataStratego> | undefined;
+  gameData: TrackedInstanceReference<PlayerDataStratego> | null;
+  isLeader: boolean;
 };
 
 export const PlayerDataDescriptor: DataInstanceDescriptor<PlayerData> = {
@@ -48,7 +49,7 @@ export const PlayerDataDescriptor: DataInstanceDescriptor<PlayerData> = {
     const gameData =
       value.gameData && store.getFromRef(value.gameData)?.deref(store);
     if (gameData === LoadingSymbol) return LoadingSymbol;
-    if (value.gameData && gameData === undefined) return LoadingSymbol;
+    if (value.gameData && gameData === null) return LoadingSymbol;
     return {
       ...value,
       gameData,
