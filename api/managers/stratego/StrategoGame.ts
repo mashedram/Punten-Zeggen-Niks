@@ -40,16 +40,24 @@ export const PlayerDataSchemaStratego = z.object({
   gameId: z.literal(StrategoGameId),
   name: z.string(),
   teamId: z.string(),
-  roleCard: z.string().optional(),
+  roleCard: z.string().nullable(),
   attackCode: z.string(),
   isTeamLeader: z.boolean(),
   hasRoleCard: z.boolean(),
   lastFightResult: z
-    .object({
-      index: z.number(),
-      state: z.enum(['win', 'lose', 'draw', 'explode']),
-    })
-    .optional(),
+    .discriminatedUnion('type', [
+      z.object({
+        type: z.literal('success'),
+        index: z.number(),
+        state: z.enum(['win', 'lose', 'draw', 'explode']),
+      }),
+      z.object({
+        type: z.literal('error'),
+        index: z.number(),
+        error: z.string(),
+      }),
+    ])
+    .nullable(),
 });
 export type PlayerDataStratego = z.infer<typeof PlayerDataSchemaStratego>;
 
@@ -85,8 +93,9 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         teamId: 'red', // Default team, will be changed later
         isTeamLeader: false,
         hasRoleCard: false,
-        roleCard: undefined,
+        roleCard: null,
         attackCode: generateAttackCode(),
+        lastFightResult: null,
       };
     },
     onGameStart: (lobby: Lobby) => {

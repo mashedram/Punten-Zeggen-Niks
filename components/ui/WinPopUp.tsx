@@ -1,17 +1,17 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 
-export const WinPopUp = () => {
+export const WinPopUp = ({ onClose }: { onClose: () => void }) => {
   return (
     <View style={styles.PopUpBox}>
       <Image
         source={require('@/assets/images/Groen-duimpje.png')}
         style={styles.GroeneDuimImage}
       />
-      <View style={styles.DeleteButton}>
+      <TouchableOpacity style={styles.DeleteButton} onPress={onClose}>
         <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}>
           X
         </Text>
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.TekstContainer}>
         <Text style={styles.PopUpTekstTitel}>Gewonnen</Text>
@@ -29,14 +29,16 @@ export const WinPopUp = () => {
 const styles = StyleSheet.create({
   PopUpBox: {
     width: '90%',
-    height: '50%',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     justifyContent: 'center',
-    position: 'relative',
+    position: 'absolute',
     alignItems: 'center',
     backgroundColor: 'rgb(255, 255, 255)',
     borderRadius: 20,
+    left: '5%',
+    top: '-25%',
+    padding: 40,
   },
   TekstContainer: {
     display: 'flex',
@@ -49,7 +51,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '30%',
     height: '52%',
-    marginTop: -115,
+    resizeMode: 'contain',
+    marginTop: -125,
     flexShrink: 0,
   },
   DeleteButton: {

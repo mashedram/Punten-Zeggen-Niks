@@ -74,7 +74,7 @@ export default function EnterPinScreen() {
 
           {/* Knop om de ingevoerde code te wissen */}
           <Pressable style={styles.clearButton} onPress={() => setCode('')}>
-            <Text style={styles.clearButtonText}>Delete</Text>
+            <Text style={styles.clearButtonText}>Verwijder</Text>
           </Pressable>
 
           {/* Knop om spel te joinen - alleen actief als er een code is ingevuld */}
@@ -92,7 +92,7 @@ export default function EnterPinScreen() {
             }}
             disabled={!code.trim() || !name.trim()} // Schakel knop uit als code leeg of alleen spaties is
           >
-            <Text style={styles.buttonText}>Enter Lobby</Text>
+            <Text style={styles.buttonText}>Naar lobby</Text>
           </Pressable>
         </View>
 
@@ -103,7 +103,7 @@ export default function EnterPinScreen() {
             onPress={() => {
               router.navigate('/');
             }}>
-            <Text style={styles.PlayText}>Return</Text>
+            <Text style={styles.PlayText}>Terug</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

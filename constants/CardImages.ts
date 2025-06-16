@@ -8,7 +8,7 @@ export const CardImages: Record<string, ImageSourcePropType> = {
   kolonel: require('@/assets/images/Kolonel.png'),
   mineur: require('@/assets/images/Mineur.png'),
   vlag: require('@/assets/images/Vlag.png'),
-  general: require('@/assets/images/Generaal.png'),
+  generaal: require('@/assets/images/Generaal.png'),
   verkenner: require('@/assets/images/Verkenner.png'),
   sergeant: require('@/assets/images/Sergeant.png'),
   bom: require('@/assets/images/Bom.png'),

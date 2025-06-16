@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   ImageBackground,
   Image,
-  SafeAreaView,
   Platform,
   StatusBar,
   ScrollView,
@@ -43,12 +42,10 @@ export default function LobbyPage() {
     );
   }
 
-  const canStart =
-    process.env.NODE_ENV === 'development' ||
-    (activeLobby.players.length >= 2 && activeLobby.self.isAdmin);
+  const canStart = activeLobby.players.length >= 2 && activeLobby.self.isAdmin;
 
   return (
-    <SafeAreaView style={stylesheet.BackgroundContainer}>
+    <View style={stylesheet.BackgroundContainer}>
       <View style={stylesheet.CodeContainer}>
         <View style={stylesheet.CodeBox}>
           <View style={stylesheet.QrButton}>
@@ -104,7 +101,7 @@ export default function LobbyPage() {
         <View style={stylesheet.settingsAndPlayers}>
           <SettingsButton />
           <Text style={stylesheet.title}>
-            Players: {activeLobby.players.length}
+            Spelers: {activeLobby.players.length}
           </Text>
         </View>
       </View>
@@ -129,23 +126,25 @@ export default function LobbyPage() {
             lobby.leave();
             router.navigate('/');
           }}>
-          <Text style={stylesheet.PlayText}>Return</Text>
+          <Text style={stylesheet.PlayText}>Terug</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const stylesheet = StyleSheet.create({
   BackgroundContainer: {
-    position: 'relative',
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
     backgroundColor: 'rgba(92, 163, 194, 1)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    flex: 1,
+    flex: 0,
     justifyContent: 'center',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 2,
     margin: -1.2,
   },
 
@@ -161,7 +160,7 @@ const stylesheet = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     alignItems: 'center',
-    marginTop: 590,
+    marginTop: 595,
   },
 
   CodeContainer: {
@@ -396,8 +395,8 @@ const stylesheet = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    width: '35%',
-    height: '20%',
+    width: '38%',
+    height: '22%',
     borderStyle: 'solid',
     backgroundColor: 'rgba(255, 255, 255, 1)',
     shadowColor: 'rgba(0, 0, 0, 0.25)',
@@ -414,9 +413,12 @@ const stylesheet = StyleSheet.create({
   StrategoImage: {
     position: 'relative',
     flexGrow: 1,
-    width: '95%',
-    height: '10%',
-    borderRadius: 20,
+    width: '88%',
+    height: '890%',
+    marginTop: 20,
+    marginBottom: 20,
+    resizeMode: 'contain',
+    borderRadius: 300,
   },
   QrButton: {
     marginRight: 10,

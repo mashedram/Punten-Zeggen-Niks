@@ -22,11 +22,17 @@ import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
 import { AllRoleCards } from '@/constants/RoleCards';
 import { AttackButton } from '@/components/ui/AttackButton';
 import { FontAwesome } from '@expo/vector-icons';
+import { WinPopUp } from '@/components/ui/WinPopUp';
+import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
+import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
 import { defaultDeckSize } from '@/constants/RoleCardDeck';
 
 export default function Game() {
   const lobby = useLobby();
   const stratego = useStratego();
+  const [lastFightPopup, setLastFightPopup] = useState<number | undefined>(
+    undefined,
+  );
 
   const [isLeaderPopupOpen, setLeaderPopupOpen] = useState(false);
 
@@ -56,6 +62,35 @@ export default function Game() {
       return <Redirect href="/lobby" />;
     }
     return;
+  }
+
+  const lastFightResult = stratego.self.lastFightResult;
+  let fightPopUp = null;
+  if (
+    lastFightResult?.type === 'success' &&
+    lastFightResult.index !== lastFightPopup
+  ) {
+    if (lastFightResult.state === 'win') {
+      fightPopUp = (
+        <WinPopUp onClose={() => setLastFightPopup(lastFightResult.index)} />
+      );
+    } else if (lastFightResult.state === 'lose') {
+      fightPopUp = (
+        <VerlorenPopUp
+          onClose={() => setLastFightPopup(lastFightResult.index)}
+        />
+      );
+    } else if (lastFightResult.state === 'draw') {
+      fightPopUp = (
+        <GelijkPopUp onClose={() => setLastFightPopup(lastFightResult.index)} />
+      );
+    } else if (lastFightResult.state === 'explode') {
+      fightPopUp = (
+        <VerlorenPopUp
+          onClose={() => setLastFightPopup(lastFightResult.index)}
+        />
+      );
+    }
   }
 
   const availablePlayers = stratego.players.filter(
@@ -142,6 +177,17 @@ export default function Game() {
           <RoleCardPicker />
         </View>
       </Animated.View>
+
+      <View
+        style={{
+          flex: 1,
+          width: '100%',
+          position: 'absolute',
+          marginTop: 200,
+          zIndex: 100,
+        }}>
+        {fightPopUp}
+      </View>
 
       {/* Gameloop test gedeelte kan later weg */}
       <View>

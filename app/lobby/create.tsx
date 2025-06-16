@@ -85,7 +85,7 @@ export default function EnterPinScreen() {
             onPress={() => {
               router.navigate('/');
             }}>
-            <Text style={styles.PlayText}>Return</Text>
+            <Text style={styles.PlayText}>Terug</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

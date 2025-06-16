@@ -188,6 +188,13 @@ export class TrackedInstance<T = never> implements Dereferable<T> {
     }
     const packet = this.getDataPacket(client);
 
+    if (Object.keys(packet.data).length === 0) {
+      console.debug(
+        `No data to send for ${this.getName()} on client ${client.getId()}`,
+      );
+      return;
+    }
+
     clientData.step = packet.step;
     client.sendEncoded(packet as Packet<never>);
   }
