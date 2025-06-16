@@ -14,7 +14,6 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
-  Pressable,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { GameState } from '@/constants/GameState';
@@ -27,6 +26,7 @@ import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
 import { defaultDeckSize } from '@/constants/RoleCardDeck';
 import { FeedbackForm } from '@/components/ui/FeedbackForm';
+import { SpelregelI } from '@/components/Spelersrollen/SpelregelI';
 
 export default function Game() {
   const lobby = useLobby();
@@ -47,24 +47,6 @@ export default function Game() {
       useNativeDriver: true,
     }).start();
   }, [isLeaderPopupOpen, slideAnim]);
-  const [showInfo, setShowInfo] = React.useState(false);
-  const [infoSlide, setInfoSlide] = React.useState(0);
-  const infoSlides = [
-    {
-      title: 'Algemene spelregels:',
-      text: `• Je wint zodra je de vlag van het andere team (blauw/rood) verovert.
-• Als spelers elkaar aanvallen, wint de speler met de hoogste rang.
-• Als je wordt verslagen, haal je een nieuwe rolkaart bij je teamleider.
-• Als je wordt aangetikt moet je verdedigen!!`,
-    },
-    {
-      title: 'Specifieke rol spelregels:',
-      text: `• De rolkaarten "Bom" en "Vlag" kunnen geen aanval initiëren.
-• De Bom kan alleen door de Mineur (3) worden verslagen.
-• De Spion (1) verslaat de Maarschalk (10), maar alleen als de Spion de aanval initieert.
-• Als spelers met dezelfde rang elkaar aanvallen, worden ze allebei verslagen.`,
-    },
-  ];
 
 
   if (lobby.loading) {
@@ -227,69 +209,7 @@ export default function Game() {
 
       {/* Info button */}
 
-      <View style={{ position: 'absolute', top: 40, right: 20, zIndex: 10 }}>
-        <Pressable onPress={() => setShowInfo(true)}>
-          <View style={styles.infoButton}>
-            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 22 }}>
-              i
-            </Text>
-          </View>
-        </Pressable>
-      </View>
-
-      {showInfo && (
-        <View style={styles.Info}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: 'bold',
-              marginBottom: 8,
-            }}>
-            {infoSlides[infoSlide].title}
-          </Text>
-          <Text style={{ textAlign: 'left', fontSize: 16, fontWeight: '600' }}>
-            {infoSlides[infoSlide].text}
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 8,
-            }}>
-            {infoSlide > 0 && (
-              <Pressable onPress={() => setInfoSlide(infoSlide - 1)}>
-                <Text
-                  style={{
-                    fontSize: 38,
-                    marginHorizontal: 16,
-                    fontWeight: 'bold',
-                  }}>
-                  {'←'}
-                </Text>
-              </Pressable>
-            )}
-            {infoSlide < infoSlides.length - 1 && (
-              <Pressable onPress={() => setInfoSlide(infoSlide + 1)}>
-                <Text
-                  style={{
-                    fontSize: 38,
-                    marginHorizontal: 16,
-                    fontWeight: 'bold',
-                  }}>
-                  {'→'}
-                </Text>
-              </Pressable>
-            )}
-          </View>
-          <Pressable
-            onPress={() => setShowInfo(false)}
-            style={{ marginTop: 8 }}>
-            <Text style={{ color: '#1976d2', fontWeight: 'bold' }}>
-              Sluiten
-            </Text>
-          </Pressable>
-        </View>
-      )}
+      <SpelregelI />
     </SafeAreaView>
   );
 }
