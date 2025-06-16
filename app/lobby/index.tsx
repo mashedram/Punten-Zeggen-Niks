@@ -13,6 +13,7 @@ import {
   Platform,
   StatusBar,
   ScrollView,
+  Pressable,
 } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { QrButton } from '@/components/lobby_host/QrButton';
@@ -77,10 +78,13 @@ export default function LobbyPage() {
             {activeLobby.players.map(player => {
               console.log(player.name);
               return (
-                <>
+                <View style={[stylesheet.SpelerNaamEntity]}>
                   <Text
                     key={player.id}
-                    style={[stylesheet.NaamTekst, { marginBottom: 10 }]}>
+                    style={[stylesheet.NaamTekst]}
+                    onPress={() => {
+                      lobby.setLeader(player.id, !player.isLeader);
+                    }}>
                     {player.name}
                   </Text>
                   {player.isAdmin && (
@@ -89,7 +93,13 @@ export default function LobbyPage() {
                       source={require('@/assets/images/CrownImage.png')}
                     />
                   )}
-                </>
+                  {player.isLeader && (
+                    <ImageBackground
+                      style={stylesheet.LeaderImage}
+                      source={require('@/assets/images/CrownImage.png')}
+                    />
+                  )}
+                </View>
               );
             })}
           </View>
@@ -241,14 +251,12 @@ const stylesheet = StyleSheet.create({
     fontSize: 16,
     fontWeight: 700,
   },
-
-  NaamTekst: {
+  SpelerNaamEntity: {
     color: 'rgb(255, 255, 255)',
     position: 'relative',
-    flexShrink: 0,
     marginTop: 10,
-    height: 35,
-    width: 340,
+    width: '100%',
+    height: 40,
     backgroundColor: 'rgb(179,179,179)',
     shadowColor: 'rgba(0, 0, 0, 0.25)',
     shadowOffset: {
@@ -257,11 +265,30 @@ const stylesheet = StyleSheet.create({
     },
     shadowRadius: 4,
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    columnGap: 8,
     borderRadius: 20,
+  },
+  NaamTekst: {
+    position: 'absolute',
     fontSize: 18,
+  },
+  CrownImage: {
+    position: 'absolute',
+    alignSelf: 'flex-start',
+    width: 20,
+    height: 20,
+    color: 'rgb(255, 255, 255)',
+    margin: 20,
+  },
+  LeaderImage: {
+    position: 'absolute',
+    alignSelf: 'flex-end',
+    width: 20,
+    height: 20,
+    color: 'rgb(255, 255, 255)',
+    margin: 20,
   },
 
   SpelerlijstContainer: {
@@ -317,15 +344,6 @@ const stylesheet = StyleSheet.create({
   logo: {
     position: 'relative',
     flexShrink: 0,
-  },
-  CrownImage: {
-    flexShrink: 0,
-    marginTop: -25,
-    top: -13,
-    left: -129,
-    width: 20,
-    height: 20,
-    color: 'rgb(255, 255, 255)',
   },
   check: {
     position: 'absolute',

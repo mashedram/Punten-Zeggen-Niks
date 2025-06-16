@@ -5,7 +5,7 @@ import {
 } from '@/common/networking/tracking/descriptors/DataInstanceDescriptor';
 import { Deref } from '@/common/networking/tracking/tracker/TrackedInstanceReference';
 import { useTRPC } from '@/api/query';
-import { skipToken, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
 import {
   createContext,
@@ -168,19 +168,16 @@ export function ClientProvider({ children }: { children?: React.ReactNode }) {
   );
 
   useSubscription(
-    tRPC.sync.listen.subscriptionOptions(
-      tokenCapture !== undefined ? tokenCapture.value : skipToken,
-      {
-        onData: event => {
-          const packet = data.current.decode(event.data);
-          handlePacket(packet);
-        },
-        onStarted: () => {
-          console.debug('Started listening');
-          data.current.clear();
-        },
+    tRPC.sync.listen.subscriptionOptions(undefined, {
+      onData: event => {
+        const packet = data.current.decode(event.data);
+        handlePacket(packet);
       },
-    ),
+      onStarted: () => {
+        console.debug('Started listening');
+        data.current.clear();
+      },
+    }),
   );
 
   const context: ClientContextType =
