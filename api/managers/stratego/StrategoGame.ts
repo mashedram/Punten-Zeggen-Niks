@@ -38,8 +38,9 @@ export type LobbyDataStratego = z.infer<typeof LobbyDataSchemaStratego>;
 
 export const PlayerDataSchemaStratego = z.object({
   gameId: z.literal(StrategoGameId),
+  name: z.string(),
   teamId: z.string(),
-  roleCard: z.string().optional(),
+  roleCard: z.string().nullable(),
   attackCode: z.string(),
   isTeamLeader: z.boolean(),
   hasRoleCard: z.boolean(),
@@ -53,10 +54,10 @@ export const PlayerDataSchemaStratego = z.object({
       z.object({
         type: z.literal('error'),
         index: z.number(),
-        message: z.string(),
+        error: z.string(),
       }),
     ])
-    .optional(),
+    .nullable(),
 });
 export type PlayerDataStratego = z.infer<typeof PlayerDataSchemaStratego>;
 
@@ -85,35 +86,85 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
       battleLog: [],
     }),
     createPlayerData: (lobby, player) => {
-      const teamId = getNewPlayerTeam(lobby);
-      const isTeamLeader = setTeamLeader(lobby, teamId);
+      const name = player.getName();
       return {
         gameId: StrategoGameId,
-        teamId,
-        isTeamLeader: isTeamLeader,
+        name,
+        teamId: 'red', // Default team, will be changed later
+        isTeamLeader: false,
         hasRoleCard: false,
-        roleCard: undefined,
+        roleCard: null,
         attackCode: generateAttackCode(),
+        lastFightResult: null,
       };
     },
-    registerEvents: lobby => {},
+    onGameStart: (lobby: Lobby) => {
+      assignTeams(lobby);
+
+      for (const team of getLobbyData(lobby).teams) {
+        assignTeamLeader(lobby, team.id);
+      }
+    },
+    onLateJoin: (lobby: Lobby, player: Player) => {
+      const data = getPlayerData(player);
+      data.teamId = getNewPlayerTeam(lobby);
+    },
   };
 
 /////////////////
 /// FUNCTIONS ///
 /////////////////
 
-// for now the first player to join a team is the team leader.
-// This needs to be changed later to allow players to choose their team leader.
-function setTeamLeader(lobby: Lobby, teamId: string): boolean {
-  const players = lobby
-    .getActivePlayers()
-    .filter(
-      player => player.getGameData<PlayerDataStratego>()?.teamId === teamId,
-    );
-  return !players.some(
-    player => player.getGameData<PlayerDataStratego>()?.isTeamLeader,
-  );
+function assignTeams(lobby: Lobby) {
+  const sources: { player: Player; priority: number }[] = [];
+
+  // Add leaders
+  for (const player of lobby.getActivePlayers()) {
+    let score = 0;
+    if (getPlayerData(player).isTeamLeader) {
+      score = 1;
+    }
+    sources.push({ player, priority: score });
+  }
+
+  sources.sort((a, b) => b.priority - a.priority);
+
+  const teams = getLobbyData(lobby).teams;
+  for (let i = 0; i < sources.length; i++) {
+    const player = sources[i].player;
+    const playerData = getPlayerData(player);
+    const team = teams[i % teams.length];
+    playerData.teamId = team.id;
+  }
+
+  lobby.sync();
+}
+
+function assignTeamLeader(lobby: Lobby, teamId: string) {
+  const playerScores: { player: Player; score: number }[] = [];
+
+  const players = lobby.getActivePlayers().filter(player => {
+    return getPlayerData(player).teamId === teamId;
+  });
+
+  for (const player of players) {
+    let score = 0;
+
+    if (player.isAdmin()) {
+      score += 1;
+    }
+
+    if (player.isLeader()) {
+      score += 2;
+    }
+
+    playerScores.push({ player, score });
+  }
+
+  playerScores.sort((a, b) => b.score - a.score);
+
+  const playerData = getPlayerData(playerScores[0].player);
+  playerData.isTeamLeader = true;
 }
 
 function getPlayerFromAttackCode(
@@ -222,7 +273,8 @@ export function removeRoleCardFromDeck(
   cardId: string,
 ) {
   const lobbyData = getLobbyData(lobby);
-  const team = lobbyData.teams.find(team => team.id === teamId);
+  const teams = lobbyData.teams;
+  const team = teams.find(team => team.id === teamId);
   if (!team || !team.deck || !team.deck[cardId]) {
     throw new Error(`Card ${cardId} not found in team ${teamId} deck.`);
   }
@@ -233,6 +285,9 @@ export function removeRoleCardFromDeck(
   if (team.deck[cardId] <= 0) {
     delete team.deck[cardId];
   }
+  console.log(lobbyData);
+  lobbyData.teams = teams;
+  lobby.sync();
 }
 
 //////////////////////////
@@ -303,6 +358,7 @@ export const StrategoGame = {
     if (team.deck.vlag > 0) {
       return { vlag: 1 };
     }
+    lobby.sync();
     return team.deck;
   },
 
@@ -322,7 +378,7 @@ export const StrategoGame = {
         playersWithoutRoleCards.push(p.getId());
       }
     }
-
+    lobby.sync();
     return playersWithoutRoleCards;
   },
 };

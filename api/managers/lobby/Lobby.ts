@@ -16,6 +16,7 @@ import {
   LobbyDataGameInstanceDescriptor,
   PlayerDataGameInstanceDescriptor,
 } from '@/common/networking/tracking/descriptors/StrategoInstanceDescriptors';
+import { act } from 'react';
 
 type GameState<P extends PlayerGameData, L extends LobbyGameData> =
   | {
@@ -51,9 +52,9 @@ export class Lobby {
     id: null,
   };
 
-  constructor(manager: LobbyManager) {
+  constructor(manager: LobbyManager, code?: string) {
     this.manager = manager;
-    this.code = generateRandomCode(LOBBY_CONSTANTS.LOBBY_CODE_LENGTH);
+    this.code = code ?? generateRandomCode(LOBBY_CONSTANTS.LOBBY_CODE_LENGTH);
 
     this._clients = new ClientPool();
     this._tracker = SERVER_DATA_STORE.createDataTracker(
@@ -125,10 +126,16 @@ export class Lobby {
         this._tracker,
       );
     }
+
+    type.onGameStart?.(this);
   }
 
   public getPlayers(): Player[] {
     return Object.values(this._players);
+  }
+
+  public getPlayer(id: string): Player | undefined {
+    return this._players[id];
   }
 
   public getPlayerOfClient(client: Client): Player | undefined {
@@ -151,6 +158,16 @@ export class Lobby {
   }
 
   public createPlayer(name: string, client: Client): Player {
+    const existingPlayer = client.getData().lobby;
+    if (existingPlayer?.lobby) {
+      if (existingPlayer.lobby.getCode() === this.getCode()) {
+        return existingPlayer.player;
+      }
+
+      // If the client is already in a different lobby, remove them from that lobby first
+      existingPlayer.lobby.removePlayer(existingPlayer.player.getId());
+    }
+
     this._clients.addClient(client);
     const player = new Player(
       client.getId(),
@@ -166,6 +183,18 @@ export class Lobby {
     this._data.data.players.push(player.getInstanceReference());
     this._data.sync('players');
     client.getData().lobby = { lobby: this, player };
+
+    const activeGame = this.getGameType();
+    if (activeGame !== undefined) {
+      player.setGameData(
+        PlayerDataGameInstanceDescriptor,
+        activeGame.createPlayerData(this, player),
+        this._tracker,
+      );
+
+      activeGame.onLateJoin?.(this, player);
+    }
+
     return player;
   }
 

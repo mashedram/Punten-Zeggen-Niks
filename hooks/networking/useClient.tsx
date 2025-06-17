@@ -5,7 +5,7 @@ import {
 } from '@/common/networking/tracking/descriptors/DataInstanceDescriptor';
 import { Deref } from '@/common/networking/tracking/tracker/TrackedInstanceReference';
 import { useTRPC } from '@/api/query';
-import { skipToken, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
 import {
   createContext,
@@ -68,6 +68,7 @@ export function ClientProvider({ children }: { children?: React.ReactNode }) {
   const tRPC = useTRPC();
   const [id, setId] = useState<string>('');
   const [token, setToken] = useToken();
+  const [isLoading, setIsLoading] = useState(true);
   const [tokenCapture, setTokenCapture] = useState<
     { value: string | undefined } | undefined
   >(undefined);
@@ -90,6 +91,7 @@ export function ClientProvider({ children }: { children?: React.ReactNode }) {
         console.debug('Setting token and id', packet.id);
         setId(packet.id);
         setToken(packet.token);
+        setIsLoading(false);
         return;
       }
 
@@ -166,41 +168,39 @@ export function ClientProvider({ children }: { children?: React.ReactNode }) {
   );
 
   useSubscription(
-    tRPC.sync.listen.subscriptionOptions(
-      tokenCapture !== undefined ? tokenCapture.value : skipToken,
-      {
-        onData: event => {
-          const packet = data.current.decode(event.data);
-          handlePacket(packet);
-        },
-        onStarted: () => {
-          console.debug('Started listening');
-          data.current.clear();
-        },
+    tRPC.sync.listen.subscriptionOptions(undefined, {
+      onData: event => {
+        const packet = data.current.decode(event.data);
+        handlePacket(packet);
       },
-    ),
+      onStarted: () => {
+        console.debug('Started listening');
+        data.current.clear();
+      },
+    }),
   );
 
-  const context: ClientContextType = token.isLoading
-    ? {
-        isLoading: true,
-      }
-    : ({
-        isLoading: false,
-        getId: () => id,
-        getToken: () => token.value,
-        getInstance: <T extends PacketDataLayout>(
-          descriptor: DataInstanceDescriptor<T>,
-        ) => {
-          const object = data.current.find(descriptor);
-          if (!object) {
-            console.debug('Object not found', descriptor);
-            return undefined;
-          }
-          return object;
-        },
-        getStore: () => data.current,
-      } as ClientContextType);
+  const context: ClientContextType =
+    token.isLoading || isLoading
+      ? {
+          isLoading: true,
+        }
+      : ({
+          isLoading: false,
+          getId: () => id,
+          getToken: () => token.value,
+          getInstance: <T extends PacketDataLayout>(
+            descriptor: DataInstanceDescriptor<T>,
+          ) => {
+            const object = data.current.find(descriptor);
+            if (!object) {
+              console.debug('Object not found', descriptor);
+              return undefined;
+            }
+            return object;
+          },
+          getStore: () => data.current,
+        } as ClientContextType);
 
   return (
     <ClientContext.Provider value={context}>{children}</ClientContext.Provider>

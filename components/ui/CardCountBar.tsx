@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { defaultDeckSize } from '@/constants/RoleCardDeck';
+import { TeamColors } from '@/constants/Colors';
 
 type CardCountBarProps = {
   blueCardCount?: number;
@@ -26,11 +27,11 @@ export const CardCountBar: React.FC<CardCountBarProps> = ({
     <View style={styles.container}>
       <Text style={styles.text}>{blueCount}</Text>
       <View style={styles.barContainer}>
-        <View style={styles.edge} />
+        <View style={[styles.blueFiller, { flex: 1 - teamBlueRatio }]} />
         <View style={[styles.blueBar, { flex: teamBlueRatio }]} />
         <View style={styles.centerSeparator} />
         <View style={[styles.redBar, { flex: teamRedRatio }]} />
-        <View style={styles.edge} />
+        <View style={[styles.redBarFiller, { flex: 1 - teamRedRatio }]} />
       </View>
       <Text style={styles.text}>{redCount}</Text>
     </View>
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#5DA3B5',
+    backgroundColor: 'rgba(92, 163, 194, 1)',
     padding: 4,
     borderRadius: 4,
   },
@@ -62,20 +63,27 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     overflow: 'hidden',
+    borderWidth: 2,
   },
   edge: {
     width: 4,
     backgroundColor: 'white',
   },
   blueBar: {
-    backgroundColor: 'blue',
+    backgroundColor: TeamColors.blue.color,
+  },
+  blueFiller: {
+    backgroundColor: 'white',
   },
   centerSeparator: {
     width: 8,
     backgroundColor: 'black',
   },
   redBar: {
-    backgroundColor: 'red',
+    backgroundColor: TeamColors.red.color,
+  },
+  redBarFiller: {
+    backgroundColor: 'white',
   },
 });
 

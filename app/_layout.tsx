@@ -61,6 +61,12 @@ export default function RootLayout() {
     // Networking init
     const wsClient = createWSClient({
       url: remote_server_address,
+      connectionParams: () => {
+        const token = localStorage.getItem('player_token') ?? undefined;
+        return {
+          token,
+        };
+      },
     });
 
     return createTRPCClient<AppRouter>({

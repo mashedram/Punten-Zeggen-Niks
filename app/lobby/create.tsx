@@ -63,8 +63,8 @@ export default function EnterPinScreen() {
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.screen}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.card}>
+        behavior={Platform.OS === 'android' ? 'padding' : undefined}>
+        <View style={styles.createContainer}>
           {/* Invoerveld voor de naam van de speler */}
           <TextInput
             value={name}
@@ -78,8 +78,15 @@ export default function EnterPinScreen() {
 
           {/* Knop om spel te joinen - alleen actief als er een code is ingevuld */}
           <Pressable
-            style={[styles.button, !name && styles.buttonDisabled]}
-            onPress={createLobby}
+            style={[styles.createButton, !name && styles.buttonDisabled]}
+            onPress={async () => {
+              if (!name.trim()) {
+                Alert.alert('Fout', 'Voer een naam in om verder te gaan.');
+              } else {
+                await lobby.create(name.trim()); // Join het spel met de ingevoerde code
+                router.push('/lobby'); // Navigeer naar de lobby-pagina
+              }
+            }}
             disabled={!name.trim()} // Schakel knop uit als code leeg of alleen spaties is
           >
             <Text style={styles.buttonText}>Lobby aanmaken</Text>
@@ -87,13 +94,13 @@ export default function EnterPinScreen() {
         </View>
 
         {/* Decoratief onderste blok */}
-        <View style={styles.rectangle47Container}>
+        <View style={styles.bottomContainer}>
           <TouchableOpacity
             style={styles.ReturnButtonContainer}
             onPress={() => {
               router.navigate('/');
             }}>
-            <Text style={styles.PlayText}>Return</Text>
+            <Text style={styles.PlayText}>Terug</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -144,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
   },
-  card: {
+  createContainer: {
     backgroundColor: 'white',
     padding: 28,
     borderRadius: 16,
@@ -155,7 +162,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 5,
-    marginBottom: 40,
+    marginBottom: 130,
   },
   CodeInput: {
     width: '100%',
@@ -200,12 +207,12 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
   },
-  button: {
+  createButton: {
     backgroundColor: '#7ACF71', // Groene kleur voor actieve knop
     paddingVertical: 16,
     borderRadius: 12,
     width: '100%',
-    height: '24%',
+    height: '28%',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -241,11 +248,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  rectangle47Container: {
+  bottomContainer: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 112,
+    height: '15%',
     backgroundColor: 'white',
     shadowColor: 'rgba(0, 0, 0, 0.25)',
     shadowOffset: { width: 0, height: 4 },

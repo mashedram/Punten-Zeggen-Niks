@@ -1,39 +1,31 @@
-import React from 'react';
-import { useState } from 'react';
-import { StyleSheet, Image, TouchableOpacity } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
+import React, { useRef, useState } from 'react';
+import { StyleSheet, Image, Animated, TouchableOpacity } from 'react-native';
 import { View } from 'react-native';
 import { Text } from 'react-native';
 import { RoleCard } from '@/constants/RoleCards';
 import { CardImages } from '@/constants/CardImages';
-import { Animated } from 'react-native';
-import { useRef } from 'react';
+import { TeamColors } from '@/constants/Colors';
+import QRCode from 'react-native-qrcode-svg';
 
 interface Rolecardprops {
+  teamId: string;
   attackCode: string;
   roleCard: RoleCard | undefined;
 }
 
-export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
-  const [imageToggled, setToggled] = useState(false);
-  const flipAnim = useRef(new Animated.Value(0)).current;
-  if (roleCard === undefined) {
-    return (
-      <View style={[styles.image]}>
-        <Text style={styles.text}>Je hebt (nog) geen rol gekregen!</Text>
-      </View>
-    );
-  }
+export const PlayerRole = ({ teamId, attackCode, roleCard }: Rolecardprops) => {
   const image = roleCard ? CardImages[roleCard.id?.toLowerCase()] : undefined;
+  const [showQRcode, setShowQRcode] = useState(false);
+  const flipAnim = useRef(new Animated.Value(0)).current;
 
-  const handleToggle = () => {
-    const toValue = imageToggled ? 0 : 1;
+  const handleFlipImg = () => {
+    const toValue = showQRcode ? 0 : 1;
     Animated.timing(flipAnim, {
       toValue: 0.5,
       duration: 250,
       useNativeDriver: true,
     }).start(() => {
-      setToggled(prev => !prev);
+      setShowQRcode(prev => !prev);
       Animated.timing(flipAnim, {
         toValue,
         duration: 250,
@@ -41,26 +33,59 @@ export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
       }).start();
     });
   };
+
   const rotateY = flipAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '180deg'],
   });
 
+  if (roleCard === undefined) {
+    return (
+      <View
+        style={[
+          styles.container,
+          {
+            borderColor:
+              teamId === 'red' ? TeamColors.red.color : TeamColors.blue.color,
+          },
+        ]}>
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>You have no role card assigned</Text>
+          <Text style={styles.text}>
+            Go to your team leader to get a role assigned
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
-    <Animated.View style={[styles.image, { transform: [{ rotateY }] }]}>
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          borderColor:
+            teamId === 'red' ? TeamColors.red.color : TeamColors.blue.color,
+          transform: [{ rotateY }],
+        },
+      ]}>
       <TouchableOpacity
-        style={styles.container}
-        onPress={handleToggle}
+        style={styles.button}
+        onPress={handleFlipImg}
         activeOpacity={0.8}>
-        {imageToggled ? (
-          <View style={styles.image}>
-            <View style={{ transform: [{ rotateY: '180deg' }] }}>
-              <QRCode value={`${roleCard.id}?${attackCode}`} size={220} />
-            </View>
+        {showQRcode ? (
+          <View
+            style={[
+              styles.qrCodeContainer,
+              { transform: [{ rotateY: '180deg' }] },
+            ]}>
+            <QRCode value={`${attackCode}`} size={160} />
           </View>
-        ) : image ? (
-          <Image style={styles.image} source={image} resizeMode="cover" />
-        ) : null}
+        ) : (
+          <View style={styles.imageContainer}>
+            <Image source={image} style={styles.image} resizeMode="center" />
+          </View>
+        )}
       </TouchableOpacity>
     </Animated.View>
   );
@@ -68,25 +93,42 @@ export const PlayerRole = ({ attackCode, roleCard }: Rolecardprops) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 0,
-    height: 320,
-    width: 240,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    borderWidth: 4,
+    width: 200,
+    height: 200,
+    alignItems: 'center',
+  },
+  button: {
+    width: '100%',
+    height: '100%',
+  },
+  qrCodeContainer: {
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
-    borderRadius: 20,
+  },
+  imageContainer: {
+    width: '100%',
+    height: '100%',
   },
   image: {
-    height: 320,
-    width: 240,
     borderRadius: 20,
-    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  textContainer: {
     justifyContent: 'center',
+    width: '100%',
+    height: '100%',
   },
   text: {
-    color: 'white',
-    fontSize: 18,
+    color: 'black',
+    fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+    marginLeft: 90,
   },
 });

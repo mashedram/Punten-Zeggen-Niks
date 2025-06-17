@@ -24,3 +24,12 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+export const TeamColors = {
+  red: {
+    color: 'red',
+  },
+  blue: {
+    color: 'blue',
+  },
+};

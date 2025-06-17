@@ -33,9 +33,11 @@ export const syncRouter = router({
       }
       instance.resend(client, input.step, input.reinstantiate);
     }),
-  listen: publicProcedure
-    .input(z.string().optional())
-    .subscription(async function* ({ ctx, input, signal }) {
-      return yield* CLIENT_MANAGER.listen(ctx, input, signal);
-    }),
+  listen: publicProcedure.subscription(async function* ({
+    ctx,
+    input,
+    signal,
+  }) {
+    return yield* CLIENT_MANAGER.listen(ctx, signal);
+  }),
 });

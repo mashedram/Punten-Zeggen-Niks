@@ -37,6 +37,7 @@ export class Player {
         name,
         gameData: undefined,
         isAdmin: false,
+        isLeader: false,
       },
       tracker,
     );
@@ -50,9 +51,19 @@ export class Player {
     return this._data.data.isAdmin;
   }
 
+  public isLeader(): boolean {
+    return this._data.data.isLeader;
+  }
+
   public setAdmin(value: boolean) {
     this._data.modify(data => {
       data.set('isAdmin', value);
+    });
+  }
+
+  public setLeader(value: boolean) {
+    this._data.modify(data => {
+      data.set('isLeader', value);
     });
   }
 

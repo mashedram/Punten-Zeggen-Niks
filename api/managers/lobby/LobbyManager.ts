@@ -11,8 +11,8 @@ export const LOBBY_CONSTANTS = {
 export class LobbyManager {
   private lobbies: { [key: string]: Lobby } = {};
 
-  public createLobby(): Lobby {
-    const lobby = new Lobby(this);
+  public createLobby(code?: string): Lobby {
+    const lobby = new Lobby(this, code);
     this.lobbies[lobby.getCode()] = lobby;
     return lobby;
   }
