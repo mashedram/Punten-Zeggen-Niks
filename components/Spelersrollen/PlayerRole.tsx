@@ -98,7 +98,6 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     width: 200,
     height: 200,
-    alignItems: 'center',
   },
   button: {
     width: '100%',
@@ -107,8 +106,6 @@ const styles = StyleSheet.create({
   qrCodeContainer: {
     width: '100%',
     height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   imageContainer: {
     width: '100%',
@@ -129,6 +126,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginLeft: 90,
   },
 });

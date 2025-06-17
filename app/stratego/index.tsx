@@ -145,6 +145,7 @@ export default function Game() {
           <Text style={styles.CaptainIcon}>🎖</Text>
         </TouchableOpacity>
       )}
+
       <View style={styles.roleContainer}>
         <PlayerRole
           teamId={stratego.self.teamId}
@@ -172,6 +173,7 @@ export default function Game() {
           }}>
           <FontAwesome name="close" size={24} color="black" />
         </TouchableOpacity>
+
         <View style={styles.roleCardPickerContainer}>
           <Text style={styles.rolePickerText}>
             Select a player and role to rivive the chosen player.
@@ -257,7 +259,6 @@ const styles = StyleSheet.create({
   },
   roleContainer: {
     marginTop: 90,
-    alignItems: 'center',
   },
   roleCardSelectionContainer: {
     width: 250,
