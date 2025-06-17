@@ -13,7 +13,10 @@ export const feeddbackRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      fs.mkdirSync(`./feedback/`);
+      if (fs.existsSync('./feedback') === false) {
+        fs.mkdirSync('./feedback');
+      }
+
       const data = {
         name: input.name,
         type: input.type,
