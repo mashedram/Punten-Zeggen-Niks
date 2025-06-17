@@ -84,7 +84,9 @@ export function performAttack(
 
 function draw(player: Player) {
   const data = getPlayerData(player);
+  deleteRoleCard(player);
   data.lastFightResult = {
+    type: 'success',
     index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
     state: 'draw',
   };
@@ -94,9 +96,12 @@ function win(player: Player) {
   console.log(`Player ${player.getId()} wins the fight.`);
   const data = getPlayerData(player);
   data.lastFightResult = {
+    type: 'success',
     index: data.lastFightResult ? data.lastFightResult.index + 1 : 0,
     state: 'win',
   };
+  console.log(data);
+  player.sync();
 }
 
 function defeat(player: Player) {
@@ -104,6 +109,7 @@ function defeat(player: Player) {
   const playerData = getPlayerData(player);
   deleteRoleCard(player);
   playerData.lastFightResult = {
+    type: 'success',
     index: playerData.lastFightResult
       ? playerData.lastFightResult.index + 1
       : 0,
@@ -117,6 +123,7 @@ function explode(player: Player) {
   const playerData = getPlayerData(player);
   deleteRoleCard(player);
   playerData.lastFightResult = {
+    type: 'success',
     index: playerData.lastFightResult
       ? playerData.lastFightResult.index + 1
       : 0,
@@ -125,9 +132,9 @@ function explode(player: Player) {
   player.sync();
 }
 
-function getRoleCard(cardId?: string): RoleCard | undefined {
+function getRoleCard(cardId: string | null): RoleCard | undefined {
   console.log(`Getting role card for cardId: ${cardId}`);
-  if (cardId === undefined) {
+  if (cardId == null) {
     console.warn(`Role card with id ${cardId} not found.`);
     return undefined;
   }
@@ -147,7 +154,7 @@ function deleteRoleCard(player: Player) {
     console.warn(`Player ${player.getId()} has no role card to remove.`);
     return;
   }
-  playerData.roleCard = undefined;
+  playerData.roleCard = null;
   playerData.hasRoleCard = false;
   lobby.sync();
 }

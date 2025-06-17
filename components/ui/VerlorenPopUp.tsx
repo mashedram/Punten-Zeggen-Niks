@@ -1,17 +1,17 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 
-export const VerlorenPopUp = () => {
+export const VerlorenPopUp = ({ onClose }: { onClose: () => void }) => {
   return (
     <View style={styles.PopUpBox}>
       <Image
         source={require('@/assets/images/Rood-duimpje.png')}
         style={styles.RoodDuimpjeImage}
       />
-      <View style={styles.DeleteButton}>
+      <TouchableOpacity style={styles.DeleteButton} onPress={onClose}>
         <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}>
           X
         </Text>
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.TekstContainer}>
         <Text style={styles.PopUpTekstTitel}>Verloren</Text>
@@ -27,14 +27,16 @@ export const VerlorenPopUp = () => {
 const styles = StyleSheet.create({
   PopUpBox: {
     width: '90%',
-    height: '50%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    position: 'relative',
+    position: 'absolute',
     alignItems: 'center',
     backgroundColor: 'rgb(255, 255, 255)',
     borderRadius: 20,
+    left: '5%',
+    top: '-25%',
+    padding: 40,
   },
   TekstContainer: {
     display: 'flex',
@@ -47,8 +49,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '30%',
     height: '51%',
-    marginTop: -115,
+    marginTop: -125,
     flexShrink: 0,
+    resizeMode: 'contain',
   },
   DeleteButton: {
     position: 'absolute',
