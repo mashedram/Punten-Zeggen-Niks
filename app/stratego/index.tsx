@@ -26,6 +26,7 @@ import { WinPopUp } from '@/components/ui/WinPopUp';
 import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
 import { defaultDeckSize } from '@/constants/RoleCardDeck';
+import { FeedbackForm } from '@/components/ui/FeedbackForm';
 
 export default function Game() {
   const lobby = useLobby();
@@ -112,6 +113,7 @@ export default function Game() {
 
   return (
     <SafeAreaView style={styles.BackgroundView}>
+      <FeedbackForm />
       <View style={styles.CardStackTrackerContainer}>
         <CardCountBar
           blueCardCount={teamBlueDeckSize}

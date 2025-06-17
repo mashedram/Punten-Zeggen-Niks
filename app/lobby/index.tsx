@@ -42,7 +42,7 @@ export default function LobbyPage() {
     );
   }
 
-  const canStart = activeLobby.players.length >= 2 && activeLobby.self.isAdmin;
+  const canStart = activeLobby.self.isAdmin;
 
   return (
     <View style={stylesheet.BackgroundContainer}>
