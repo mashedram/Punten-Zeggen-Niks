@@ -40,7 +40,7 @@ export default function Game() {
 
   useEffect(() => {
     Animated.timing(slideAnim, {
-      toValue: isLeaderPopupOpen ? -1500 : -600,
+      toValue: isLeaderPopupOpen ? -600 : -1500,
       duration: 300,
       easing: Easing.out(Easing.ease),
       useNativeDriver: true,
@@ -165,7 +165,7 @@ export default function Game() {
           { transform: [{ translateY: slideAnim }] },
         ]}
         pointerEvents={isLeaderPopupOpen ? 'auto' : 'none'}>
-        <RoleCardPicker />
+        <RoleCardPicker onClose={() => setLeaderPopupOpen(false)} />
       </Animated.View>
 
       <View
@@ -249,6 +249,7 @@ const styles = StyleSheet.create({
   roleCardPickerContainer: {
     marginTop: 20,
     alignItems: 'center',
+    zIndex: 100,
   },
   playerAttackContainer: {
     marginTop: 10,
