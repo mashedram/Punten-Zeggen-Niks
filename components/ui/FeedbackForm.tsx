@@ -1,6 +1,5 @@
 import { useTRPC } from '@/api/query';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
-import { useLobbyUnsafe } from '@/hooks/useLobbyUnsafe';
 import { Picker } from '@react-native-picker/picker';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
