@@ -40,18 +40,18 @@ function useToken() {
   const [token, setToken] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    setToken(localStorage.getItem(KEY) ?? undefined);
+    setToken(sessionStorage.getItem(KEY) ?? undefined);
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
     if (isLoading) return;
     if (token) {
-      localStorage.setItem(KEY, token);
+      sessionStorage.setItem(KEY, token);
       return;
     }
 
-    localStorage.removeItem(KEY);
+    sessionStorage.removeItem(KEY);
   }, [isLoading, token]);
 
   const value = {
@@ -136,29 +136,23 @@ export function ClientProvider({ children }: { children?: React.ReactNode }) {
         }
 
         // If we receive a partial packet when the object is supposed to be reloading, or if we receive a packet that's too far ahead, we should refetch
-        if (
-          object.isLoading() ||
-          packet.clientExpectedStep > object.getStep()
-        ) {
+        if (packet.clientExpectedStep > object.getStep()) {
           if (token.isLoading) throw new Error('No token');
           if (!token.value) throw new Error('No token');
           refetchMutation.mutate({
             instanceId: packet.instanceId,
             descriptorId: packet.descriptorId,
-            step: packet.step,
+            step: object.getStep(),
           });
           console.debug(
-            'refetching',
-            packet.instanceId,
-            packet.clientExpectedStep,
-            object.getStep(),
-            packet.step,
+            `Refetching instance ${packet.instanceId} with descriptor ${packet.descriptorId}, expected step: ${packet.clientExpectedStep}, received step: ${packet.step}, known step: ${object.getStep()}`,
           );
           return;
         }
 
         console.debug(
-          `Client expected step: ${packet.clientExpectedStep}, received step: ${packet.step}`,
+          `Object ${object.getInstanceName()} upgraded from: ${object.getStep()}, to received step: ${packet.step}. All okay!`,
+          packet.data,
         );
         object.applyDataPacket(packet);
         refreshState();
