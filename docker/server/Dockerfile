@@ -24,6 +24,7 @@ COPY --from=install /temp/prod/package.json .
 COPY api api
 COPY server server
 COPY constants constants
+COPY common common
 COPY tsconfig.json .
 
 # run the app

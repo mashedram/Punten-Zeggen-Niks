@@ -1,0 +1,32 @@
+services:
+  web:
+    container_name: puntenzeggenniks_web
+    build:
+      context: ./
+      dockerfile: docker/web/Dockerfile
+    environment:
+      EXPO_PUBLIC_SERVER_ADDRESS: wss://puntenzeggenniksapi.stbakker.nl
+      VIRTUAL_HOST: puntenzeggenniks.stbakker.nl
+      VIRUTAL_PORT: 8081
+      LETSENCRYPT_HOST: puntenzeggenniks.stbakker.nl
+    expose:
+      - 8081
+    networks:
+      - proxy
+  server:
+    container_name: puntenzeggenniks_server
+    build:
+      context: ./
+      dockerfile: docker/server/Dockerfile
+    environment:
+      VIRTUAL_HOST: puntenzeggenniksapi.stbakker.nl
+      VIRTUAL_PORT: 3001
+      LETSENCRYPT_HOST: puntenzeggenniksapi.stbakker.nl
+    expose:
+      - 3001
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

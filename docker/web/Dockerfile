@@ -30,6 +30,7 @@ COPY --chown=node:node assets assets
 COPY --chown=node:node constants constants
 COPY --chown=node:node components components
 COPY --chown=node:node api api
+COPY --chown=node:node common common
 
 ENTRYPOINT ["npm", "run"]
 CMD ["web"]

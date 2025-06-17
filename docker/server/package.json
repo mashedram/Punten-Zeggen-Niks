@@ -14,6 +14,7 @@
     "@trpc/tanstack-react-query": "^11.0.3",
     "@types/bun": "^1.2.9",
     "@types/cors": "^2.8.17",
+    "superjson": "^2.2.2",
     "ws": "^8.18.1",
     "zod": "^3.24.2"
   },
