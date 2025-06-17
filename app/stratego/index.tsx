@@ -22,10 +22,11 @@ import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
 import { AllRoleCards } from '@/constants/RoleCards';
 import { AttackButton } from '@/components/ui/AttackButton';
 import { FontAwesome } from '@expo/vector-icons';
+import { FeedbackForm } from '@/components/ui/FeedbackForm';
 
 export default function Game() {
   const lobby = useLobby();
-  const stratego = useStratego(lobby);
+  const stratego = useStratego();
 
   const [isLeaderPopupOpen, setLeaderPopupOpen] = useState(false);
 
@@ -75,6 +76,7 @@ export default function Game() {
 
   return (
     <SafeAreaView style={styles.BackgroundView}>
+      <FeedbackForm />
       <View style={styles.CardStackTrackerContainer}>
         <CardCountBar
           blueCardCount={teamBlueDeckSize}
