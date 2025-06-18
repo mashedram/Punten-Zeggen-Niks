@@ -190,7 +190,7 @@ export class TrackedInstance<T = never> implements Dereferable<T> {
 
     if (Object.keys(packet.data).length === 0) {
       console.debug(
-        `No data to send for ${this.getName()} on client ${client.getId()}`,
+        `No data to send for ${this.getName()} on client ${client.getId()}. Skipping send.`,
       );
       return;
     }

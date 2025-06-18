@@ -42,49 +42,37 @@ export const AttackButton = () => {
         </Text>
       </View>
 
-      {((playerRoleCard?.canAttack ?? false) && (
-        <>
-          <View style={styles.codeInputContainer}>
-            <TextInput
-              placeholder="Enter enemy attack code here"
-              onChangeText={text => setEnemyAttackCode(text)}
-              value={enemyAttackCode}
-              style={[styles.codeInput, { borderColor: currentTeamColor }]}
-            />
-          </View>
-          <TouchableOpacity
-            style={[
-              styles.attackButtonContainer,
-              { backgroundColor: currentTeamColor },
-            ]}
-            onPress={() =>
-              sendAttackMutation.mutate({
-                attackCode: enemyAttackCode,
-              })
-            }>
-            <Text style={styles.buttonText}>Attack</Text>
-          </TouchableOpacity>
-          <View style={styles.qrContainer}>
-            <AttackQrCode
-              onQrScan={qrAttackCode =>
-                sendAttackMutation.mutate({ attackCode: qrAttackCode })
-              }
-            />
-          </View>
-        </>
-      )) || (
-        <View style={styles.cantAttackContainer}>
-          {(playerRoleCard === undefined && (
-            <Text style={[{ textAlign: 'center' }]}>
-              You don't have a role yet
-            </Text>
-          )) || (
-            <Text style={[{ textAlign: 'center' }]}>
-              Your role can't attack
-            </Text>
-          )}
-        </View>
-      )}
+      <View style={styles.codeInputContainer}>
+        <TextInput
+          placeholder="Enter enemy attack code here"
+          onChangeText={text => setEnemyAttackCode(text)}
+          value={enemyAttackCode}
+          style={[styles.codeInput, { borderColor: currentTeamColor }]}
+        />
+      </View>
+      <TouchableOpacity
+        style={[
+          styles.attackButtonContainer,
+          { backgroundColor: currentTeamColor },
+        ]}
+        onPress={() => {
+          if (playerRoleCard?.canAttack) {
+            sendAttackMutation.mutate({
+              attackCode: enemyAttackCode,
+            });
+          }
+        }}>
+        <Text style={styles.buttonText}>Attack</Text>
+      </TouchableOpacity>
+      <View style={styles.qrContainer}>
+        <AttackQrCode
+          onQrScan={qrAttackCode => {
+            if (playerRoleCard?.canAttack) {
+              sendAttackMutation.mutate({ attackCode: qrAttackCode });
+            }
+          }}
+        />
+      </View>
     </View>
   );
 };
