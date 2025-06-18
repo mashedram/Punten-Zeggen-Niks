@@ -22,6 +22,8 @@ services:
       VIRTUAL_HOST: puntenzeggenniksapi.stbakker.nl
       VIRTUAL_PORT: 3001
       LETSENCRYPT_HOST: puntenzeggenniksapi.stbakker.nl
+    volumes:
+      - ~/data/puntenzeggenniks/feedback:/usr/src/app/feedback:rw
     expose:
       - 3001
     networks:
