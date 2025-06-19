@@ -4,7 +4,7 @@ import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
 import { GameState } from '@/constants/GameState';
-import { createRoleCardDeck } from '@/constants/RoleCardDeck';
+import { createRoleCardDeck, defaultDeckSize } from '@/constants/RoleCardDeck';
 import { console } from 'inspector';
 import { performAttack } from './AttackFunctions';
 
@@ -22,6 +22,7 @@ export const LobbyDataSchemaStratego = z.object({
       name: z.string(),
       deck: z.record(z.string(), z.number()),
       hasFlag: z.boolean(),
+      score: z.number(),
     }),
   ),
   gameState: z.enum(Object.values(GameState) as [string, ...string[]]),
@@ -77,12 +78,14 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
           name: 'Rood',
           deck: createRoleCardDeck(),
           hasFlag: false,
+          score: defaultDeckSize,
         },
         {
           id: 'blue',
           name: 'Blauw',
           deck: createRoleCardDeck(),
           hasFlag: false,
+          score: defaultDeckSize,
         },
       ],
       gameState: String(GameState.playing),

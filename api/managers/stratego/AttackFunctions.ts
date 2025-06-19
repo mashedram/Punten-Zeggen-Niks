@@ -1,6 +1,6 @@
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { getPlayerData, endGame } from './StrategoGame';
+import { getPlayerData, endGame, getLobbyData } from './StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
 
 export function performAttack(
@@ -150,11 +150,13 @@ function getRoleCard(cardId: string | null): RoleCard | undefined {
 function deleteRoleCard(player: Player) {
   const playerData = getPlayerData(player);
   const lobby = player.getLobby();
+  const lobbyData = getLobbyData(lobby);
   if (!playerData.roleCard) {
     console.warn(`Player ${player.getId()} has no role card to remove.`);
     return;
   }
   playerData.roleCard = null;
   playerData.hasRoleCard = false;
+
   lobby.sync();
 }
