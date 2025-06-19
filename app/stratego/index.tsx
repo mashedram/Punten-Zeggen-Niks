@@ -37,26 +37,6 @@ export default function Game() {
     trpc.stratego.attack.mutationOptions({}),
   );
 
-  const [showInfo, setShowInfo] = React.useState(false);
-  const [infoSlide, setInfoSlide] = React.useState(0);
-  const infoSlides = [
-    {
-      title: 'Algemene spelregels:',
-      text: `• Een pot bestaat uit de rolkaarten 1 t/m 10 (minus 2) + de bom en de vlag.
- • Je wint zodra je de vlag van het andere team (blauw/rood) verovert.
- • Als spelers elkaar aanvallen, wint de speler met de hoogste rang.
- • Als je wordt verslagen, haal je een nieuwe rolkaart bij je teamleider.
- • Als je wordt aangetikt moet je verdedigen!!`,
-    },
-    {
-      title: 'Specifieke rol spelregels:',
-      text: `• De rolkaarten "Bom" en "Vlag" kunnen geen aanval initiëren.
-• De Bom kan alleen door de Mineur (3) worden verslagen.
-• De Spion (1) verslaat de Maarschalk (10), maar alleen als de Spion de aanval initieert.
-• Als spelers met dezelfde rang elkaar aanvallen, worden ze allebei verslagen.`,
-    },
-  ];
-
   const [enemyAttackCode, setEnemyAttackCode] = useState('');
   const [isPowerCardOpen, setPowerCardOpen] = React.useState(false);
   const [PowerUpsIndex, setPowerupsIndex] = React.useState<
@@ -468,47 +448,5 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     rowGap: 2,
-  },
-  infoButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#1976d2',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  SpelregelinfoI: {
-    position: 'absolute',
-    top: '30%',
-    left: '50%',
-    transform: [{ translateX: -150 }, { translateY: -150 }],
-    width: '72%',
-    height: '30%',
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-  },
-  Info: {
-    position: 'absolute',
-    top: 80,
-    right: 20,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    alignItems: 'center',
-    zIndex: 20,
-    width: 250,
   },
 });

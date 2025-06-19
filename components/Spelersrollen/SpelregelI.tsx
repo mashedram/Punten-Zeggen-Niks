@@ -8,9 +8,11 @@ const infoSlides = [
     tekst: `• Je valt aan door de cijfer- of qr code van een tegenstander te scannen/in te voeren. 
     \n\
  • Je wint zodra je de vlag van het andere team (blauw/rood) verovert.`,
-    subtitel: 'Teamleider',
-    subtekst:
-      'Als teamleider kies je welke rol je aan welk teamlid geeft, breng je teamleden terug in het spel en zie je het beschikbaar aantal kaarten van een rol.',
+  },
+  {
+    titel: 'Teamleider',
+    tekst:
+      'Als teamleider kies je welke rol je aan welk teamlid geeft, breng je teamleden terug in het spel en zie je het beschikbaar aantal kaarten van een rol door op het 🎖 icoon te drukken.',
   },
   {
     titel: 'Algemene spelregels:',
@@ -20,9 +22,7 @@ const infoSlides = [
  \n\
  • Als je wordt aangetikt moet je verdedigen met je rolkaart.
  
- • Als je wordt verslagen, haal je een nieuwe rolkaart bij je teamleider.
- \n\
- • Als teamleider geef je een verslagen teamlid een nieuwe kaart door op het 🎖 icoon te drukken. `,
+ • Als je wordt verslagen, haal je een nieuwe rolkaart bij je teamleider.`,
   },
   {
     titel: 'Specifieke rol spelregels:',
@@ -33,6 +33,21 @@ const infoSlides = [
  • De Spion (1) verslaat de Maarschalk (10), maar alleen als de Spion de aanval initieert.
  \n\
  • Als spelers met dezelfde rang elkaar aanvallen verliezen ze allebei.`,
+  },
+  {
+    subtitel: 'Lijst met rollen:',
+    subtekst:
+      'Vlag \n\
+Bom \n\
+Spion = 1 \n\
+Mineur = 3 \n\
+Sergeant = 4 \n\
+Luitenant = 5 \n\
+Kapitein = 6 \n\
+Majoor = 7 \n\
+Kolonel = 8 \n\
+Generaal = 9 \n\
+Maarschalk = 10',
   },
 ];
 
@@ -50,10 +65,10 @@ export const SpelregelI = () => {
         <View style={styles.SpelregelContainer}>
           <Text style={styles.TitelStyling}>{infoSlides[infoSlide].titel}</Text>
           <Text style={styles.TekstStyling}>{infoSlides[infoSlide].tekst}</Text>
-          {infoSlide === 0 && (
+          {infoSlide === 4 && (
             <>
-              <Text style={styles.Subtitel}>{infoSlides[0].subtitel}</Text>
-              <Text style={styles.Subtekst}>{infoSlides[0].subtekst}</Text>
+              <Text style={styles.Subtitel}>{infoSlides[4].subtitel}</Text>
+              <Text style={styles.Subtekst}>{infoSlides[4].subtekst}</Text>
             </>
           )}
           <View style={styles.ButtonContainerStyling}>
@@ -154,22 +169,22 @@ const styles = StyleSheet.create({
   },
   TekstStyling: {
     textAlign: 'left',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
   TitelStyling: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 8,
   },
   Subtitel: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginTop: 18,
   },
   Subtekst: {
-    textAlign: 'left',
-    fontSize: 16,
+    textAlign: 'center',
+    fontSize: 18,
     fontWeight: '600',
     marginTop: 10,
   },
