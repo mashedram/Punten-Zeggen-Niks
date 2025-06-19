@@ -344,32 +344,6 @@ export const StrategoGame = {
   revive(lobby: Lobby, player: Player, target: Player, roleCard: RoleCard) {
     const playerData = getPlayerData(player);
     const targetData = getPlayerData(target);
-    const lobbyData = getLobbyData(lobby);
-    if (!playerData.isTeamLeader) {
-      throw new Error('Only team leaders can revive players.');
-    }
-    if (targetData.roleCard) {
-      throw new Error(`Target player is already active. ${player.getName()}`);
-    }
-    if (targetData.teamId !== playerData.teamId) {
-      throw new Error('Target player is not on the same team.');
-    }
-    if (
-      Object.keys(
-        lobbyData.teams.find(team => team.id === playerData.teamId)!.deck,
-      ).length <= 0
-    ) {
-      throw new Error('Team has no role cards left to revive players.');
-    }
-    const availableRoleCards = StrategoGame.getAvailableRoleCards(
-      lobby,
-      player,
-    );
-    if (!Object.keys(availableRoleCards).some(key => key === roleCard.id)) {
-      throw new Error(
-        `Role card ${roleCard.id} is not available in the team deck.`,
-      );
-    }
     targetData.roleCard = roleCard.id;
     targetData.hasRoleCard = true;
     removeRoleCardFromDeck(lobby, playerData.teamId, roleCard.id);
@@ -385,15 +359,6 @@ export const StrategoGame = {
     const lobbyData = getLobbyData(lobby);
     const teams = lobbyData.teams;
     const team = teams.find(team => team.id === playerData.teamId);
-    if (!playerData.isTeamLeader) {
-      throw new Error('Only team leaders can revive players.');
-    }
-    if (targetData.roleCard) {
-      throw new Error(`Target player is already active. ${player.getName()}`);
-    }
-    if (targetData.teamId !== playerData.teamId) {
-      throw new Error('Target player is not on the same team.');
-    }
     if (team === undefined) {
       throw new Error('Could not find team while assigning a flag.');
     }
