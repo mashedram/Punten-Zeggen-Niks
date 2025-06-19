@@ -1,7 +1,6 @@
-import { publicDecrypt } from 'crypto';
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { getPlayerData, endGame, PlayerDataStratego } from './StrategoGame';
+import { getPlayerData, PlayerDataStratego } from './StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
 import { callHook } from './PowerCardManager';
 

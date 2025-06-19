@@ -1,3 +1,9 @@
+import { PowerCard } from '@/common/stratego/powercard/PowerCard';
+import {
+  PowerCardImages,
+  PowerCardKeys,
+} from '@/constants/powercard/PowerCardImages';
+import { PowerCards } from '@/constants/powercard/PowerCards';
 import {
   View,
   Text,
@@ -9,22 +15,15 @@ import {
 } from 'react-native';
 
 interface PowerUpPopUpProps {
-  name: string;
-  description: string;
-  image: ImageSourcePropType;
-  onDelete?: () => void;
-  onInzet?: () => void;
-  ingezet?: boolean;
+  cardId: PowerCardKeys;
+  inUse: boolean;
+  close: () => void;
 }
 
-export const PowerUpPopUp = ({
-  name,
-  description,
-  image,
-  onDelete,
-  onInzet,
-  ingezet,
-}: PowerUpPopUpProps) => {
+export const PowerUpPopUp = ({ cardId, inUse, close }: PowerUpPopUpProps) => {
+  const card = PowerCards[cardId];
+  const image = PowerCardImages[cardId];
+
   return (
     <View style={styles.popUpContainer}>
       <View style={styles.PopUpBox}>
@@ -32,13 +31,15 @@ export const PowerUpPopUp = ({
           <Image source={image} style={styles.cardImage} />
         </View>
         <View style={styles.rightColumn}>
-          <Text style={styles.cardName}>{name}</Text>
-          <Text>{description}</Text>
+          <Text style={styles.cardName}>{card.name}</Text>
+          <Text>{card.description}</Text>
           <View style={styles.buttonContainer}>
-            <Pressable style={styles.useButton} onPress={onDelete}>
-              <Text>{ingezet ? 'Ingezet' : 'Inzetten'}</Text>
+            <Pressable
+              style={styles.useButton}
+              onPress={() => console.log('hi')}>
+              <Text>{inUse ? 'Ingezet' : 'Inzetten'}</Text>
             </Pressable>
-            <Pressable style={styles.closeButton} onPress={onDelete}>
+            <Pressable style={styles.closeButton} onPress={close}>
               <Text>Sluiten</Text>
             </Pressable>
           </View>

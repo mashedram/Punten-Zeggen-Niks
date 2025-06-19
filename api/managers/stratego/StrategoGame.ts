@@ -97,7 +97,7 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         hasRoleCard: false,
         roleCard: null,
         activePowercardIndex: null,
-        powercards: [],
+        powercards: ['kamikazi'],
         attackCode: generateAttackCode(),
         lastFightResult: null,
       };
