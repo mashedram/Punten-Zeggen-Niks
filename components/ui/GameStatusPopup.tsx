@@ -23,7 +23,6 @@ const GameStatusPopup: React.FC<GameStatusPopupProps> = ({
 
   const handleButtonPress = () => {
     navigation.navigate('Join');
-    console.log('Knop is ingedrukt!');
   };
 
   return (
