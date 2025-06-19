@@ -1,13 +1,17 @@
-import { Lobby } from '../lobby/Lobby';
-import { Player } from '../lobby/Player';
-import { getPlayerData, endGame, getLobbyData } from './StrategoGame';
+import { Lobby } from '../../lobby/Lobby';
+import { Player } from '../../lobby/Player';
+import { getPlayerData, getLobbyData } from '../StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
+import { endGame } from './GameLogicFunctions';
 
 export function performAttack(
   lobby: Lobby,
   attacker: Player,
   defender: Player,
 ) {
+  console.log(
+    `performing attack with attacker, ${attacker.getName()} and defender, ${defender.getName()}`,
+  );
   const attackerData = getPlayerData(attacker);
   const defenderData = getPlayerData(defender);
   if (!attackerData || !defenderData) {
@@ -162,6 +166,7 @@ function deleteRoleCard(player: Player) {
   if (!team) {
     throw new Error(`Could not find team ${playerData.teamId}`);
   }
-
+  team.score = team.score - 1;
+  lobbyData.teams = teams;
   lobby.sync();
 }
