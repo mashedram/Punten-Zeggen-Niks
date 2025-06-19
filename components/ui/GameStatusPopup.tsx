@@ -15,18 +15,26 @@ const GameStatusPopup: React.FC<GameStatusPopupProps> = ({
   teamId,
   GameStateEnum,
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   const isPlaying = gameState === GameStateEnum.playing;
   const isWinner = gameState === teamId && !isPlaying;
   const isLoser = gameState !== teamId && !isPlaying;
 
+  const handleButtonPress = () => {
+    navigation.navigate('Join');
+    console.log('Knop is ingedrukt!');
+  };
+
   return (
     <Modal visible={isWinner || isLoser} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.popup}>
-          {isWinner && <Text style={styles.text}>Je hebt gewonnen!</Text>}
-          {isLoser && <Text style={styles.text}>Je hebt verloren.</Text>}
+          {isWinner && <Text style={styles.text}>Je hebt gewonnen</Text>}
+          {isLoser && <Text style={styles.text}>Je hebt verloren</Text>}
+          <View style={styles.buttonContainer}>
+            <Button title="Terug naar lobby" onPress={handleButtonPress} />
+          </View>
         </View>
       </View>
     </Modal>
@@ -46,6 +54,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     elevation: 10,
     alignItems: 'center',
+    width: '80%',
   },
   text: {
     fontSize: 18,
@@ -53,7 +62,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonContainer: {
-    marginTop: 10,
     width: '100%',
   },
 });
