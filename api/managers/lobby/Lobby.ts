@@ -16,7 +16,6 @@ import {
   LobbyDataGameInstanceDescriptor,
   PlayerDataGameInstanceDescriptor,
 } from '@/common/networking/tracking/descriptors/StrategoInstanceDescriptors';
-import { act } from 'react';
 
 type GameState<P extends PlayerGameData, L extends LobbyGameData> =
   | {
