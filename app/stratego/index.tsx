@@ -26,6 +26,7 @@ import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
 import { defaultDeckSize } from '@/constants/RoleCardDeck';
 import { FeedbackForm } from '@/components/ui/FeedbackForm';
+import GameStatusPopup from '@/components/ui/GameStatusPopup';
 import { SpelregelI } from '@/components/Spelersrollen/SpelregelI';
 
 export default function Game() {
@@ -180,30 +181,13 @@ export default function Game() {
         {fightPopUp}
       </View>
 
-      {/* Gameloop test gedeelte kan later weg */}
       <View>
-        {/* status van de game */}
-        <View>
-          {stratego.lobby.gameState === GameState.playing && (
-            <Text>Game is running...</Text>
-          )}
-          {stratego.lobby.gameState === stratego.self.teamId &&
-            stratego.lobby.gameState !== GameState.playing && (
-              <Text>
-                Je hebt gewonnen! Gefeliciteerd, {stratego.self.teamId} team!
-              </Text>
-            )}
-          {stratego.lobby.gameState !== stratego.self.teamId &&
-            stratego.lobby.gameState !== GameState.playing && (
-              <Text>
-                Je hebt verloren. Volgende keer beter team{' '}
-                {stratego.self.teamId}.
-              </Text>
-            )}
-        </View>
-        <Text>{stratego.self.name}</Text>
+        <GameStatusPopup
+          gameState={stratego.lobby.gameState}
+          teamId={stratego.self.teamId}
+          GameStateEnum={GameState}
+        />
       </View>
-      {/* Einde test gedeelte gameloop */}
       <SpelregelI />
     </SafeAreaView>
   );

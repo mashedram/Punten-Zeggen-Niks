@@ -46,7 +46,7 @@ export const lobbyRouter = router({
     .input(
       z.object({
         code: z.string(),
-        gameId: z.string(),
+        gameId: z.string().nullable(),
       }),
     )
     .mutation(({ ctx, input }) => {
@@ -56,6 +56,10 @@ export const lobbyRouter = router({
       }
       if (!player.isAdmin()) {
         throw new Error('Only lobby admins can set the game');
+      }
+      if (input.gameId === null) {
+        lobby.clearGame();
+        return;
       }
       lobby.setGame(input.gameId);
     }),
