@@ -38,16 +38,16 @@ const infoSlides = [
     subtitel: 'Lijst met rollen:',
     subtekst:
       'Vlag \n\
-Bom \n\
-Spion = 1 \n\
-Mineur = 3 \n\
-Sergeant = 4 \n\
-Luitenant = 5 \n\
-Kapitein = 6 \n\
-Majoor = 7 \n\
-Kolonel = 8 \n\
+Maarschalk = 10 \n\
 Generaal = 9 \n\
-Maarschalk = 10',
+Kolonel = 8 \n\
+Majoor = 7 \n\
+Kapitein = 6 \n\
+Luitenant = 5 \n\
+Sergeant = 4 \n\
+Mineur = 3 \n\
+Spion = 1 \n\
+Bom',
   },
 ];
 
