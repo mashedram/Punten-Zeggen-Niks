@@ -7,7 +7,7 @@ const infoSlides = [
     titel: 'Hoe speel je het spel:',
     tekst: `• Je valt aan door de cijfer- of qr code van een tegenstander te scannen/in te voeren. 
     \n\
- • Je wint zodra je de vlag van het andere team (blauw/rood) verovert.`,
+ • Je wint zodra je de vlag van het andere team (blauw/rood) hebt verovert.`,
   },
   {
     titel: 'Teamleider',
