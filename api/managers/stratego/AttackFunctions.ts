@@ -30,6 +30,10 @@ class PlayerFightState {
     return this._roleCard;
   }
 
+  public isDefeated(): boolean {
+    return this._defeated;
+  }
+
   public defeat() {
     this._defeated = true;
   }
@@ -156,6 +160,14 @@ function setErrorState(player: Player, errorMessage: string) {
   player.sync();
 }
 
+function toInt(value: boolean): number {
+  return value ? 1 : 0;
+}
+
+function applyResultToSelf(self: PlayerFightState, target: PlayerFightState) {
+  const defeatMap = [];
+}
+
 export function performAttack(
   lobby: Lobby,
   attacker: Player,
@@ -164,7 +176,7 @@ export function performAttack(
   let result: FightState;
   try {
     result = handleAttackLogic(lobby, attacker, defender);
-  } catch (error: Error) {
+  } catch (error) {
     console.error(error);
     setErrorState(attacker, `Attack failed: ${error}`);
     setErrorState(defender, `Attack failed: ${error}`);
