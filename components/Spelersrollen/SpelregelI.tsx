@@ -40,14 +40,14 @@ export const SpelregelI = () => {
   const [showInfo, setShowInfo] = React.useState(false);
   const [infoSlide, setInfoSlide] = React.useState(0);
   return (
-    <View style={styles.SpelregelIContainer}>
+    <View style={styles.InfoButtonContainer}>
       <Pressable onPress={() => setShowInfo(prev => !prev)}>
-        <View style={styles.infoButton}>
-          <Text style={styles.InfoButtonStyling}>i</Text>
+        <View style={styles.InfoIconContainer}>
+          <Text style={styles.InfoButtonIcon}>i</Text>
         </View>
       </Pressable>
       {showInfo && (
-        <View style={styles.SpelregelView}>
+        <View style={styles.SpelregelContainer}>
           <Text style={styles.TitelStyling}>{infoSlides[infoSlide].titel}</Text>
           <Text style={styles.TekstStyling}>{infoSlides[infoSlide].tekst}</Text>
           {infoSlide === 0 && (
@@ -56,7 +56,7 @@ export const SpelregelI = () => {
               <Text style={styles.Subtekst}>{infoSlides[0].subtekst}</Text>
             </>
           )}
-          <View style={styles.ButtonContainer}>
+          <View style={styles.ButtonContainerStyling}>
             <View style={styles.PijlContainerStyling}>
               {infoSlide > 0 && (
                 <Pressable onPress={() => setInfoSlide(infoSlide - 1)}>
@@ -82,7 +82,14 @@ export const SpelregelI = () => {
 };
 
 const styles = StyleSheet.create({
-  infoButton: {
+  InfoButtonContainer: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+  },
+
+  InfoIconContainer: {
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -93,24 +100,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
-  SpelregelinfoI: {
-    position: 'absolute',
-    top: '30%',
-    left: '50%',
-    transform: [{ translateX: -150 }, { translateY: -150 }],
-    width: '72%',
-    height: '30%',
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+
+  InfoButtonIcon: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 22,
   },
-  SpelregelView: {
+
+  SpelregelContainer: {
     position: 'absolute',
     top: 80,
     right: 20,
@@ -126,17 +123,6 @@ const styles = StyleSheet.create({
     height: 460,
   },
 
-  SpelregelIContainer: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    zIndex: 10,
-  },
-  InfoButtonStyling: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 22,
-  },
   SluitStyling: {
     color: '#1976d2',
     fontWeight: 'bold',
@@ -146,7 +132,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     fontWeight: 'bold',
   },
-  ButtonContainer: {
+  ButtonContainerStyling: {
     position: 'absolute',
     display: 'flex',
     justifyContent: 'center',
@@ -154,6 +140,7 @@ const styles = StyleSheet.create({
     width: '100%',
     bottom: 30,
   },
+
   PijlContainerStyling: {
     position: 'absolute',
     width: '100%',
