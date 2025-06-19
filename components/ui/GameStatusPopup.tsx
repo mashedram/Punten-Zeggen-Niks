@@ -21,20 +21,12 @@ const GameStatusPopup: React.FC<GameStatusPopupProps> = ({
   const isWinner = gameState === teamId && !isPlaying;
   const isLoser = gameState !== teamId && !isPlaying;
 
-  const handleGoToLobby = () => {
-    navigation.navigate('lobby'); // path nog invoeren
-  };
-
   return (
     <Modal visible={isWinner || isLoser} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.popup}>
           {isWinner && <Text style={styles.text}>Je hebt gewonnen!</Text>}
           {isLoser && <Text style={styles.text}>Je hebt verloren.</Text>}
-
-          <View style={styles.buttonContainer}>
-            <Button title="Terug naar lobby" onPress={handleGoToLobby} />
-          </View>
         </View>
       </View>
     </Modal>
