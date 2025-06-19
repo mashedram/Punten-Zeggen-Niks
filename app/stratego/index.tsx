@@ -21,7 +21,6 @@ import { CardCountBar } from '@/components/ui/CardCountBar';
 import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
 import { AllRoleCards } from '@/constants/RoleCards';
 import { AttackButton } from '@/components/ui/AttackButton';
-import { FontAwesome } from '@expo/vector-icons';
 import { WinPopUp } from '@/components/ui/WinPopUp';
 import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
@@ -37,11 +36,11 @@ export default function Game() {
 
   const [isLeaderPopupOpen, setLeaderPopupOpen] = useState(false);
 
-  const slideAnim = useRef(new Animated.Value(-500)).current;
+  const slideAnim = useRef(new Animated.Value(-1500)).current;
 
   useEffect(() => {
     Animated.timing(slideAnim, {
-      toValue: isLeaderPopupOpen ? 0 : -500,
+      toValue: isLeaderPopupOpen ? -600 : -1500,
       duration: 300,
       easing: Easing.out(Easing.ease),
       useNativeDriver: true,
@@ -162,24 +161,11 @@ export default function Game() {
 
       <Animated.View
         style={[
-          styles.roleCardSelectionContainer,
+          styles.roleCardPickerContainer,
           { transform: [{ translateY: slideAnim }] },
         ]}
         pointerEvents={isLeaderPopupOpen ? 'auto' : 'none'}>
-        <TouchableOpacity
-          style={styles.closeCardSelection}
-          onPress={() => {
-            setLeaderPopupOpen(!isLeaderPopupOpen);
-          }}>
-          <FontAwesome name="close" size={24} color="black" />
-        </TouchableOpacity>
-
-        <View style={styles.roleCardPickerContainer}>
-          <Text style={styles.rolePickerText}>
-            Select a player and role to rivive the chosen player.
-          </Text>
-          <RoleCardPicker />
-        </View>
+        <RoleCardPicker onClose={() => setLeaderPopupOpen(false)} />
       </Animated.View>
 
       <View
@@ -260,30 +246,10 @@ const styles = StyleSheet.create({
   roleContainer: {
     marginTop: 90,
   },
-  roleCardSelectionContainer: {
-    width: 250,
-    height: 250,
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 200,
-    zIndex: 100,
-  },
-  closeCardSelection: {
-    marginLeft: 210,
-  },
   roleCardPickerContainer: {
     marginTop: 20,
-    width: 200,
-  },
-  rolePickerText: {
-    textAlign: 'center',
-    marginBottom: 30,
-    fontWeight: 700,
-    fontSize: 16,
+    alignItems: 'center',
+    zIndex: 100,
   },
   playerAttackContainer: {
     marginTop: 10,
