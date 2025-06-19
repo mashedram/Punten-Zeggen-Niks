@@ -5,6 +5,7 @@ import {
   Image,
   ImageSourcePropType,
   Pressable,
+  Button,
 } from 'react-native';
 
 interface PowerUpPopUpProps {
@@ -25,118 +26,96 @@ export const PowerUpPopUp = ({
   ingezet,
 }: PowerUpPopUpProps) => {
   return (
-    <View style={styles.PopUpBox}>
-      <Image source={image} style={styles.PowerUpImage} />
-      <Pressable style={styles.DeleteButton} onPress={onDelete}>
-        <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}>
-          X
-        </Text>
-      </Pressable>
-
-      <View style={styles.TekstContainer}>
-        <Text style={styles.PopUpTekstTitel}>{name} </Text>
-        <Text style={styles.PopUpTextUitleg}>{description}</Text>
+    <View style={styles.popUpContainer}>
+      <View style={styles.PopUpBox}>
+        <View style={styles.leftColumn}>
+          <Image source={image} style={styles.cardImage} />
+        </View>
+        <View style={styles.rightColumn}>
+          <Text style={styles.cardName}>{name}</Text>
+          <Text>{description}</Text>
+          <View style={styles.buttonContainer}>
+            <Pressable style={styles.useButton} onPress={onDelete}>
+              <Text>{ingezet ? 'Ingezet' : 'Inzetten'}</Text>
+            </Pressable>
+            <Pressable style={styles.closeButton} onPress={onDelete}>
+              <Text>Sluiten</Text>
+            </Pressable>
+          </View>
+        </View>
       </View>
-
-      <Pressable style={styles.InzetButton} onPress={onInzet}>
-        <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-          Inzetten
-        </Text>
-      </Pressable>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  popUpContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 1000,
+  },
   PopUpBox: {
-    width: '90%',
-    height: '90%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    position: 'relative',
-    alignItems: 'center',
-    backgroundColor: 'rgb(255, 255, 255)',
-    borderRadius: 20,
-    borderColor: 'black',
-    borderWidth: 2,
-    shadowColor: 'black',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-  },
-  TekstContainer: {
-    display: 'flex',
-    position: 'relative',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 100,
-    marginBottom: 1,
-    marginLeft: 100,
-    borderColor: 'black',
-    borderWidth: 0,
-    width: '65%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    maxWidth: 400,
     height: '30%',
-  },
-  PowerUpImage: {
-    position: 'absolute',
-    width: '30%',
-    height: '56%',
-    marginTop: -115,
-    marginLeft: -220,
-    flexShrink: 0,
-  },
-  DeleteButton: {
-    position: 'absolute',
-    right: 0,
+    maxHeight: 400,
+
     display: 'flex',
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  leftColumn: {
+    width: '35%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '12%',
-    height: '15%',
-    backgroundColor: 'red',
-    borderRadius: 15,
-    marginTop: -180,
-    marginRight: 10,
   },
-  PopUpTextUitleg: {
-    fontSize: 18,
-    color: 'black',
+  rightColumn: {
+    marginLeft: '5%',
+    width: '60%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'baseline',
   },
-  PopUpTekstTitel: {
+  cardName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'black',
+    marginBottom: 10,
   },
-  InzetButton: {
-    position: 'relative',
-    flexShrink: 0,
-    width: '60%',
-    height: '13%',
-    backgroundColor: 'rgba(112, 194, 92, 1)',
-    shadowColor: 'rgba(0, 0, 0, 0.25)',
-    shadowRadius: 4,
-    borderRadius: 12,
-    marginTop: 40,
-    marginLeft: 10,
+  buttonContainer: {
+    width: '100%',
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
+    alignSelf: 'flex-end',
+  },
+  useButton: {
+    width: '100%',
+    padding: 10,
+    backgroundColor: '#70C25C',
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  closeButton: {
+    width: '100%',
+    padding: 10,
+    backgroundColor: 'red',
+    borderRadius: 5,
+  },
+  cardImage: {
+    resizeMode: 'center',
+    width: '100%',
   },
 });
-// {PowerUpsIndex !== undefined && (
-//             <PowerUpPopUp
-//               name={PowerUpList[PowerUpsIndex].name}
-//               description={PowerUpList[PowerUpsIndex].description}
-//               image={PowerUpList[PowerUpsIndex].image}
-//               onDelete={() => setPowerupsIndex(undefined)}
-//               onInzet={() => {
-//                 setIngezettePowerupIndex(PowerUpsIndex);
-//                 setPowerupsIndex(undefined);
-//               }}
-//             />
-//           )}

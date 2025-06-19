@@ -1,7 +1,9 @@
+import { PowerCardKeys } from '@/constants/powercard/PowerCardImages';
 import { Player } from '../lobby/Player';
+import { getPlayerData } from './StrategoGame';
 
 type HookContext = {
-  cardId: string;
+  cardId: PowerCardKeys;
   self: Player;
   target: Player;
 };
@@ -17,47 +19,114 @@ enum HookResult {
   CONSUMED = 'stop',
 }
 
-type PowerCardHooks = {
-  preAttackHook: (ctx: HookContext, handlers: HookHandlers) => HookResult;
-};
-
-type PowerCard = {
-  id: string;
-  name: string;
-  hooks: Partial<PowerCardHooks>;
-};
-
-const powerCards: PowerCard[] = [
-  {
-    id: 'kamikazi',
-    name: 'Kamikazi',
-    hooks: {
-      preAttackHook: (context, handlers) => {
-        handlers.defeat(context.self);
-        handlers.defeat(context.target);
-        return HookResult.CONSUMED;
-      },
-    },
-  },
+type PowerCardHook = [
+  priority: number,
+  (ctx: HookContext, handlers: HookHandlers) => HookResult,
 ];
 
-export function callPowerCardHook(
-  hookId: keyof PowerCardHooks,
-  context: HookContext,
+type PowerCardHooksType = {
+  preAttackHook: PowerCardHook;
+  useHook: PowerCardHook;
+};
+
+const PowerCardHooks: Record<PowerCardKeys, Partial<PowerCardHooksType>> = {
+  kamikazi: {
+    preAttackHook: [
+      100,
+      (ctx: HookContext, handlers: HookHandlers) => {
+        handlers.defeat(ctx.self);
+        handlers.defeat(ctx.target);
+        return HookResult.CONSUMED;
+      },
+    ],
+  },
+};
+
+function getPowerCardHook(
+  cardId: PowerCardKeys | null,
+  hookId: keyof PowerCardHooksType,
   handlers: HookHandlers,
-): boolean {
-  const card = powerCards.find(card => card.id === context.cardId);
+  contextBuilder: () => HookContext,
+): [number, () => HookResult] | null {
+  if (!cardId) {
+    console.warn('No power card is active.');
+    return null;
+  }
+
+  const card = PowerCardHooks[cardId];
   if (!card) {
-    throw new Error(`Power card with id ${context.cardId} not found.`);
+    console.error(`Power card ${cardId} does not exist.`);
+    return null;
   }
 
-  const hook = card.hooks[hookId];
+  const hook = card[hookId];
   if (!hook) {
-    console.warn(`Power card ${context.cardId} does not have hook ${hook}.`);
-    return false;
+    console.warn(`Power card ${cardId} does not have hook ${hookId}.`);
+    return null;
   }
 
-  const result = hook(context, handlers);
+  const context = contextBuilder();
+  const callback = hook[1];
+  return [
+    hook[0],
+    () => {
+      return callback(context, handlers);
+    },
+  ];
+}
 
-  return result === HookResult.CONSUMED;
+function buildHookCaller(hook: (() => HookResult) | null): () => boolean {
+  if (!hook) {
+    return () => true; // No hook, so we can continue
+  }
+
+  return () => {
+    const result = hook();
+    if (result === HookResult.CONSUMED) {
+      return false; // Hook consumed, stop further execution
+    }
+    return true; // Continue execution
+  };
+}
+
+export function callHook(
+  hookId: keyof PowerCardHooksType,
+  self: Player,
+  target: Player,
+  handlers: HookHandlers,
+): () => boolean {
+  const selfData = getPlayerData(self);
+  const targetData = getPlayerData(target);
+
+  const selfCardId = selfData.activePowercardIndex
+    ? (selfData.powercards[selfData.activePowercardIndex] as PowerCardKeys)
+    : null;
+  const targetCardId = targetData.activePowercardIndex
+    ? (targetData.powercards[targetData.activePowercardIndex] as PowerCardKeys)
+    : null;
+
+  const selfHook = getPowerCardHook(selfCardId, hookId, handlers, () => ({
+    cardId: selfCardId as PowerCardKeys,
+    self,
+    target,
+  }));
+
+  const targetHook = getPowerCardHook(targetCardId, hookId, handlers, () => ({
+    cardId: targetCardId as PowerCardKeys,
+    self,
+    target,
+  }));
+
+  const selfHookCaller = buildHookCaller(selfHook?.[1] ?? null);
+
+  const targetHookCaller = buildHookCaller(targetHook?.[1] ?? null);
+
+  const hookOrder =
+    (selfHook?.[0] ?? 0) >= (targetHook?.[0] ?? 0)
+      ? [selfHookCaller, targetHookCaller]
+      : [targetHookCaller, selfHookCaller];
+
+  return () => {
+    return hookOrder[0]() && hookOrder[1]();
+  };
 }

@@ -3,29 +3,34 @@ import { Client } from '@/common/networking/client/Client';
 import { CLIENT_MANAGER } from '@/common/networking/client/ClientManager';
 
 type EventMap = {
+  onClientAdded: [Client];
   onClientConnected: [Client];
+  onClientDisconnected: [Client];
   onClientRemoved: [Client];
 };
 
 /**
  * Represents a pool of clients.
  */
-export class ClientPool {
+export class ClientPool extends EventEmitter<EventMap> {
   private _clients: Set<Client>;
-  private _emitter: EventEmitter<EventMap>;
 
   constructor() {
+    super();
     this._clients = new Set();
-    this._emitter = new EventEmitter();
-    CLIENT_MANAGER.getEventEmitter().addListener(
-      'onClientConnected',
-      client => {
-        if (!this._clients.has(client)) return;
-        this._emitter.emit('onClientConnected', client);
-      },
-    );
+    CLIENT_MANAGER.getEventEmitter().on('onClientConnected', client => {
+      if (!this._clients.has(client)) return;
+      console.log(`ClientPool: Client connected: ${client.getId()}`);
+      this.emit('onClientConnected', client);
+    });
 
-    CLIENT_MANAGER.getEventEmitter().addListener('onClientRemoved', client => {
+    CLIENT_MANAGER.getEventEmitter().on('onClientDisconnected', client => {
+      if (!this._clients.has(client)) return;
+      console.log(`ClientPool: Client disconnected: ${client.getId()}`);
+      this.emit('onClientDisconnected', client);
+    });
+
+    CLIENT_MANAGER.getEventEmitter().on('onClientRemoved', client => {
       if (!this._clients.has(client)) return;
       this.removeClient(client);
     });
@@ -33,7 +38,7 @@ export class ClientPool {
 
   public addClient(client: Client): void {
     this._clients.add(client);
-    this._emitter.emit('onClientConnected', client);
+    this.emit('onClientAdded', client);
   }
 
   public hasClient(client: Client): boolean {
@@ -47,16 +52,12 @@ export class ClientPool {
   public removeClient(client: Client) {
     const success = this._clients.delete(client);
     if (!success) return;
-    this._emitter.emit('onClientRemoved', client);
-  }
-
-  public getEventEmitter(): EventEmitter {
-    return this._emitter;
+    this.emit('onClientRemoved', client);
   }
 
   public clear() {
     for (const client of this._clients) {
-      this._emitter.emit('onClientRemoved', client);
+      this.emit('onClientRemoved', client);
     }
     this._clients.clear();
   }

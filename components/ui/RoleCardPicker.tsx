@@ -33,6 +33,8 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
     trpc.stratego.getAvailableRoleCards.queryOptions(),
   );
 
+  console.log('availableRoleCards', availableRoleCards.data);
+
   const sendReviveMutation = useMutation(
     trpc.stratego.revive.mutationOptions({
       onError: error => {
@@ -51,10 +53,11 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
   }
 
   const revivePlayer = (targetPlayerId: string, roleCard: RoleCard) => {
-    const players = lobby.get()?.players ?? [];
-    const selectedPlayer = players.find(player => player.id === targetPlayerId);
-    if (!selectedPlayer) {
-      console.warn('could not find player');
+    console.log(
+      `Reviving player '${targetPlayerId}' with role card ${roleCard.id}`,
+    );
+    if (!allAvailablePlayers.some(p => p.id === targetPlayerId)) {
+      console.error(`Player '${targetPlayerId}' not found`);
       return;
     }
     sendReviveMutation.mutate({

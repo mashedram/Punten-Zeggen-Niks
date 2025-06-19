@@ -67,33 +67,35 @@ export default function LobbyPage() {
           style={stylesheet.list}
           contentContainerStyle={stylesheet.listContentContainer}>
           <View style={stylesheet.NaamBox}>
-            {activeLobby.players.map(player => {
-              console.log(player.name);
-              return (
-                <View style={[stylesheet.SpelerNaamEntity]}>
-                  <Text
-                    key={player.id}
-                    style={[stylesheet.NaamTekst]}
-                    onPress={() => {
-                      lobby.setLeader(player.id, !player.isLeader);
-                    }}>
-                    {player.name}
-                  </Text>
-                  {player.isAdmin && (
-                    <ImageBackground
-                      style={stylesheet.CrownImage}
-                      source={require('@/assets/images/CrownImage.png')}
-                    />
-                  )}
-                  {player.isLeader && (
-                    <ImageBackground
-                      style={stylesheet.LeaderImage}
-                      source={require('@/assets/images/CrownImage.png')}
-                    />
-                  )}
-                </View>
-              );
-            })}
+            {activeLobby.players
+              .filter(player => player.isConnected)
+              .map(player => {
+                console.log(player.name);
+                return (
+                  <View style={[stylesheet.SpelerNaamEntity]}>
+                    <Text
+                      key={player.id}
+                      style={[stylesheet.NaamTekst]}
+                      onPress={() => {
+                        lobby.setLeader(player.id, !player.isLeader);
+                      }}>
+                      {player.name}
+                    </Text>
+                    {player.isAdmin && (
+                      <ImageBackground
+                        style={stylesheet.CrownImage}
+                        source={require('@/assets/images/CrownImage.png')}
+                      />
+                    )}
+                    {player.isLeader && (
+                      <ImageBackground
+                        style={stylesheet.LeaderImage}
+                        source={require('@/assets/images/CrownImage.png')}
+                      />
+                    )}
+                  </View>
+                );
+              })}
           </View>
         </ScrollView>
 

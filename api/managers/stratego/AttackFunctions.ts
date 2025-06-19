@@ -3,11 +3,9 @@ import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
 import { getPlayerData, endGame, PlayerDataStratego } from './StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
+import { callHook } from './PowerCardManager';
 
-type PlayerFightResult = {
-  index: number;
-  state: 'win' | 'lose' | 'draw' | 'explode';
-};
+type FightResultType = 'win' | 'lose' | 'draw' | 'explode';
 
 class PlayerFightState {
   private _index: number;
@@ -37,6 +35,10 @@ class PlayerFightState {
   public defeat() {
     this._defeated = true;
   }
+
+  public getIndex(): number {
+    return this._index;
+  }
 }
 
 type FightState = {
@@ -53,7 +55,13 @@ function buildPlayerFightState(
   data: PlayerDataStratego = getPlayerData(player),
 ): PlayerFightState {
   const index = getFightIndex(data);
-  const roleCard = getRoleCard(data.roleCard);
+
+  if (data.roleCard === null) {
+    console.warn(`Player ${player.getName()} has no role card.`);
+    throw new Error(`Player ${player.getName()} has no role card.`);
+  }
+
+  const roleCard = RoleCards[data.roleCard];
   if (!roleCard) {
     console.warn(`Player ${player.getName()} has no role card.`);
     throw new Error(`Player ${player.getName()} has no role card.`);
@@ -129,7 +137,7 @@ function handleValueComparison(
     defender.defeat();
     return;
   }
-  x;
+
   attacker.defeat();
 }
 
@@ -139,6 +147,24 @@ function handleAttackLogic(
   defender: Player,
 ): FightState {
   const state = buildFightState(attacker, defender);
+
+  if (
+    callHook(
+      'preAttackHook',
+      state.attacker.getPlayer(),
+      state.defender.getPlayer(),
+      {
+        defeat: (player: Player) => {
+          if (player === state.attacker.getPlayer()) {
+            state.attacker.defeat();
+          } else {
+            state.defender.defeat();
+          }
+        },
+      },
+    )
+  )
+    return state;
 
   if (handleForceWin(state.attacker, state.defender)) {
     return state;
@@ -154,18 +180,49 @@ function setErrorState(player: Player, errorMessage: string) {
   playerData.lastFightResult = {
     type: 'error',
     index: getFightIndex(playerData),
-    message: errorMessage,
+    error: errorMessage,
   };
   console.error(`Error for player ${player.getId()}: ${errorMessage}`);
   player.sync();
 }
 
-function toInt(value: boolean): number {
-  return value ? 1 : 0;
+function toIndex(state: boolean): number {
+  return state ? 1 : 0;
 }
 
-function applyResultToSelf(self: PlayerFightState, target: PlayerFightState) {
-  const defeatMap = [];
+function applyResultToSelf(self: PlayerFightState, result: FightResultType) {
+  const player = self.getPlayer();
+  const playerData = getPlayerData(player);
+  playerData.lastFightResult = {
+    type: 'success',
+    index: self.getIndex(),
+    state: result,
+  };
+
+  if (result === 'lose' || result === 'explode') {
+    playerData.roleCard = null;
+  }
+
+  player.sync();
+}
+
+function applyStateToSelf(self: PlayerFightState, target: PlayerFightState) {
+  const defeatMap: [FightResultType, FightResultType][][] = [
+    [
+      ['draw', 'draw'],
+      ['lose', 'win'],
+    ],
+    [
+      ['explode', 'explode'],
+      ['win', 'lose'],
+    ],
+  ];
+
+  const [selfState, targetState] =
+    defeatMap[toIndex(self.isDefeated())][toIndex(target.isDefeated())];
+
+  applyResultToSelf(self, selfState);
+  applyResultToSelf(target, targetState);
 }
 
 export function performAttack(
@@ -182,4 +239,9 @@ export function performAttack(
     setErrorState(defender, `Attack failed: ${error}`);
     return;
   }
+
+  const attackerState = result.attacker;
+  const defenderState = result.defender;
+
+  applyStateToSelf(attackerState, defenderState);
 }

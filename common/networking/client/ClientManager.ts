@@ -7,6 +7,7 @@ import { TrpcContext } from '@/api/common';
 
 interface EventMap {
   onClientConnected: [client: Client];
+  onClientDisconnected: [client: Client];
   onClientCreated: [client: Client];
   onClientRemoved: [client: Client];
 }
@@ -27,7 +28,7 @@ export class ClientManager {
   }
 
   public createClient(): Client {
-    const client = new Client();
+    const client = new Client(this);
     this._clients[client.getId()] = client;
     this._tokenMap[client.getToken()] = client;
     this._eventEmitter.emit('onClientCreated', client);

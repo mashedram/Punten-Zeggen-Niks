@@ -44,6 +44,8 @@ export const PlayerDataSchemaStratego = z.object({
   attackCode: z.string(),
   isTeamLeader: z.boolean(),
   hasRoleCard: z.boolean(),
+  activePowercardIndex: z.number().nullable(),
+  powercards: z.array(z.string()),
   lastFightResult: z
     .discriminatedUnion('type', [
       z.object({
@@ -94,6 +96,8 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         isTeamLeader: false,
         hasRoleCard: false,
         roleCard: null,
+        activePowercardIndex: null,
+        powercards: [],
         attackCode: generateAttackCode(),
         lastFightResult: null,
       };
