@@ -26,6 +26,7 @@ import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
 import { defaultDeckSize } from '@/constants/RoleCardDeck';
 import { FeedbackForm } from '@/components/ui/FeedbackForm';
+import { SpelregelI } from '@/components/Spelersrollen/SpelregelI';
 
 export default function Game() {
   const lobby = useLobby();
@@ -203,6 +204,11 @@ export default function Game() {
         <Text>{stratego.self.name}</Text>
       </View>
       {/* Einde test gedeelte gameloop */}
+
+
+      {/* Info button */}
+
+      <SpelregelI />
     </SafeAreaView>
   );
 }
