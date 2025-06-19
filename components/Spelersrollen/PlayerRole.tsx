@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
   qrCodeContainer: {
     width: '100%',
     height: '100%',
+    justifyContent: 'center',
   },
   imageContainer: {
     width: '100%',

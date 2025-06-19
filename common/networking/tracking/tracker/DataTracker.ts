@@ -105,7 +105,7 @@ export class DataTracker {
 
   public registerClient(client: Client) {
     for (const instance of Object.values(this._trackedInstances)) {
-      instance.sendDataPacket(client);
+      instance.resend(client, 0, true);
     }
   }
 
