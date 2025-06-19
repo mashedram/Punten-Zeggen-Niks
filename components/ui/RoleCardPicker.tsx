@@ -48,6 +48,17 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
     }),
   );
 
+  const sendAssignFlagMutation = useMutation(
+    trpc.stratego.assignFlag.mutationOptions({
+      onError: error => {
+        console.error('Error assigning a flag', error);
+      },
+      onSuccess: () => {
+        setSelectedPlayerToRevive('');
+      },
+    }),
+  );
+
   if (availablePlayers.length === 0) {
     onClose();
     return;
@@ -70,6 +81,17 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
       targetId: targetPlayerId,
       roleCard: roleCard.id,
     });
+  };
+
+  const assignFlag = (targetPlayerId: string) => {
+    const selectedPlayer = stratego.players.find(
+      player => player.id === targetPlayerId,
+    );
+    if (!selectedPlayer) {
+      console.warn(`could not find player to assign flag, ${targetPlayerId}`);
+      return;
+    }
+    sendAssignFlagMutation.mutate(selectedPlayer.id);
   };
 
   return (
@@ -112,9 +134,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
               <View style={styles.roleButtonContainer}>
                 <View style={styles.vlagButton}>
                   <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.vlag)
-                    }
+                    onPress={() => assignFlag(selectedPlayerToRevive)}
                     roleCard={RoleCards.vlag}
                   />
                 </View>

@@ -44,6 +44,19 @@ export const strategoRouter = router({
       StrategoGame.revive(lobby, player, targetPlayer, roleCard);
     }),
 
+  assignFlag: publicProcedure.input(z.string()).mutation(({ ctx, input }) => {
+    const client = ctx.client;
+    if (!client) throw new Error('Client not found');
+    const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
+    if (!lobby) {
+      throw new Error('Lobby not found');
+    }
+    const targetPlayer = lobby.getPlayers().find(p => p.getId() === input);
+    if (!targetPlayer)
+      throw new Error(`Target player not found ${input}: stratego.revive`);
+    StrategoGame.assignFlag(lobby, player, targetPlayer);
+  }),
+
   getAvailableRoleCards: publicProcedure
     .output(z.record(z.string(), z.number()))
     .query(({ ctx }) => {

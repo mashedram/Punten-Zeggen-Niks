@@ -239,7 +239,36 @@ function checkActiveRoleCards(lobby: Lobby, teamId: string): boolean {
   return players.some(player => getPlayerData(player).roleCard === undefined);
 }
 
-function assignRandomRoleCards(lobby: Lobby, teamId: string) {}
+function assignRandomRoleCards(lobby: Lobby, teamId: string) {
+  const players = lobby
+    .getActivePlayers()
+    .filter(
+      player =>
+        getPlayerData(player).teamId === teamId &&
+        !getPlayerData(player).hasRoleCard,
+    );
+  for (const player of players) {
+    const playerData = getPlayerData(player);
+    const newRoleCard = getRandomRoleCard(lobby, teamId);
+    playerData.roleCard = newRoleCard.id;
+    playerData.hasRoleCard = true;
+    removeRoleCardFromDeck(lobby, teamId, newRoleCard.id);
+  }
+}
+
+function getRandomRoleCard(lobby: Lobby, teamId: string): RoleCard {
+  const lobbyData = getLobbyData(lobby);
+  const team = lobbyData.teams.find(team => team.id === teamId);
+  if (team === undefined) {
+    throw new Error(`no team found on id: ${teamId}`);
+  }
+  const availableCardIds = Object.keys(team.deck).filter(
+    cardId => team.deck[cardId] > 0,
+  );
+  const randomCardId =
+    availableCardIds[Math.floor(Math.random() * availableCardIds.length)];
+  return RoleCards[randomCardId];
+}
 
 //////////////////////
 /// External utils ///
@@ -290,13 +319,7 @@ export function removeRoleCardFromDeck(
   console.log(
     `Removed ${cardId} from deck in team ${teamId}, team has ${team.deck[cardId]} left of role ${cardId}`,
   );
-  if (cardId === RoleCards.vlag.id && !team.hasFlag) {
-    console.log(`Flag had been given to team ${team.id}`);
-    team.hasFlag = true;
-    assignRandomRoleCards(lobby, teamId);
-  }
   lobbyData.teams = teams;
-  lobby.sync();
 }
 
 //////////////////////////
@@ -353,6 +376,33 @@ export const StrategoGame = {
     console.log(
       `Player ${target.getId()}, ${target.getName()} has been revived with role card: ${targetData.roleCard}`,
     );
+    lobby.sync();
+  },
+
+  assignFlag(lobby: Lobby, player: Player, targetPlayer: Player) {
+    const playerData = getPlayerData(player);
+    const targetData = getPlayerData(targetPlayer);
+    const lobbyData = getLobbyData(lobby);
+    const teams = lobbyData.teams;
+    const team = teams.find(team => team.id === playerData.teamId);
+    if (!playerData.isTeamLeader) {
+      throw new Error('Only team leaders can revive players.');
+    }
+    if (targetData.roleCard) {
+      throw new Error(`Target player is already active. ${player.getName()}`);
+    }
+    if (targetData.teamId !== playerData.teamId) {
+      throw new Error('Target player is not on the same team.');
+    }
+    if (team === undefined) {
+      throw new Error('Could not find team while assigning a flag.');
+    }
+    targetData.roleCard = RoleCards.vlag.id;
+    targetData.hasRoleCard = true;
+    removeRoleCardFromDeck(lobby, playerData.teamId, RoleCards.vlag.id);
+    assignRandomRoleCards(lobby, playerData.teamId);
+    team.hasFlag = true;
+    lobbyData.teams = teams;
     lobby.sync();
   },
 
