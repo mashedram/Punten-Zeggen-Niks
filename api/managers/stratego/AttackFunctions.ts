@@ -157,6 +157,11 @@ function deleteRoleCard(player: Player) {
   }
   playerData.roleCard = null;
   playerData.hasRoleCard = false;
+  const teams = lobbyData.teams;
+  const team = teams.find(team => team.id === playerData.teamId);
+  if (!team) {
+    throw new Error(`Could not find team ${playerData.teamId}`);
+  }
 
   lobby.sync();
 }
