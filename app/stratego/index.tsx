@@ -27,6 +27,7 @@ import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
 import { defaultDeckSize } from '@/constants/RoleCardDeck';
 import { FeedbackForm } from '@/components/ui/FeedbackForm';
 import GameStatusPopup from '@/components/ui/GameStatusPopup';
+import { SpelregelI } from '@/components/Spelersrollen/SpelregelI';
 
 export default function Game() {
   const lobby = useLobby();
@@ -41,7 +42,7 @@ export default function Game() {
 
   useEffect(() => {
     Animated.timing(slideAnim, {
-      toValue: isLeaderPopupOpen ? -600 : -1500,
+      toValue: isLeaderPopupOpen ? -700 : -1500,
       duration: 300,
       easing: Easing.out(Easing.ease),
       useNativeDriver: true,
@@ -180,16 +181,15 @@ export default function Game() {
         {fightPopUp}
       </View>
 
-      {/* Gameloop test gedeelte kan later weg */}
       <View>
-        {/* status van de game */}
         <GameStatusPopup
           gameState={stratego.lobby.gameState}
           teamId={stratego.self.teamId}
           GameStateEnum={GameState}
         />
       </View>
-      {/* Einde test gedeelte gameloop */}
+
+      <SpelregelI />
     </SafeAreaView>
   );
 }
