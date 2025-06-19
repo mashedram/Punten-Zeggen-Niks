@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { StyleSheet } from 'react-native';
 
@@ -52,8 +52,8 @@ Maarschalk = 10',
 ];
 
 export const SpelregelI = () => {
-  const [showInfo, setShowInfo] = React.useState(false);
-  const [infoSlide, setInfoSlide] = React.useState(0);
+  const [showInfo, setShowInfo] = useState(false);
+  const [infoSlide, setInfoSlide] = useState(0);
   return (
     <View style={styles.InfoButtonContainer}>
       <Pressable onPress={() => setShowInfo(prev => !prev)}>
