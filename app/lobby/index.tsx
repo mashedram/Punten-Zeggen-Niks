@@ -11,7 +11,6 @@ import {
   Platform,
   StatusBar,
   ScrollView,
-  Pressable,
 } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { QrButton } from '@/components/lobby_host/QrButton';

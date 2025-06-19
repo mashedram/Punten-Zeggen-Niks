@@ -2,7 +2,6 @@ import { CreateButton } from '@/components/Home_page/CreateButton';
 import { JoinButton } from '@/components/Home_page/JoinButton';
 import { useLobby } from '@/hooks/useLobby';
 import { Redirect } from 'expo-router';
-import { useState } from 'react';
 import { Image } from 'react-native';
 
 import {
