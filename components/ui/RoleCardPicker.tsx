@@ -41,12 +41,14 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
       onSuccess: () => {
         availableRoleCards.refetch();
         setSelectedPlayerToRevive('Select player');
-        if (allAvailablePlayers.length === 0) {
-          onClose();
-        }
       },
     }),
   );
+
+  if (allAvailablePlayers.length === 0) {
+    onClose();
+    return;
+  }
 
   const revivePlayer = (targetPlayerId: string, roleCard: RoleCard) => {
     const players = lobby.get()?.players ?? [];
