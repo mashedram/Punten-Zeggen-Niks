@@ -40,7 +40,7 @@ export default function Game() {
 
   useEffect(() => {
     Animated.timing(slideAnim, {
-      toValue: isLeaderPopupOpen ? -600 : -1500,
+      toValue: isLeaderPopupOpen ? -700 : -1500,
       duration: 300,
       easing: Easing.out(Easing.ease),
       useNativeDriver: true,
@@ -200,6 +200,7 @@ export default function Game() {
               </Text>
             )}
         </View>
+        <Text>{stratego.self.name}</Text>
       </View>
       {/* Einde test gedeelte gameloop */}
     </SafeAreaView>
