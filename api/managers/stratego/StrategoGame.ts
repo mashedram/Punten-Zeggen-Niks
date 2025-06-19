@@ -7,6 +7,7 @@ import { GameState } from '@/constants/GameState';
 import { createRoleCardDeck } from '@/constants/RoleCardDeck';
 import { console } from 'inspector';
 import { performAttack } from './AttackFunctions';
+import { callHook as callPowerCardHook } from './PowerCardManager';
 
 export const StrategoGameId = 'stratego';
 
@@ -42,9 +43,9 @@ export const PlayerDataSchemaStratego = z.object({
   name: z.string(),
   teamId: z.string(),
   roleCard: z.string().nullable(),
+  hasRoleCard: z.boolean(),
   attackCode: z.string(),
   isTeamLeader: z.boolean(),
-  hasRoleCard: z.boolean(),
   activePowercardIndex: z.number().nullable(),
   powercards: z.array(z.string()),
   lastFightResult: z
@@ -170,7 +171,16 @@ function assignTeamLeader(lobby: Lobby, teamId: string) {
 
   playerScores.sort((a, b) => b.score - a.score);
 
-  const playerData = getPlayerData(playerScores[0].player);
+  const bestTeamLeader = playerScores[0];
+
+  if (!bestTeamLeader) {
+    console.warn(
+      `No team leader found for team ${teamId}, defaulting to first player.`,
+    );
+    return;
+  }
+
+  const playerData = getPlayerData(bestTeamLeader.player);
   playerData.isTeamLeader = true;
 }
 
@@ -408,5 +418,28 @@ export const StrategoGame = {
     }
     lobby.sync();
     return playersWithoutRoleCards;
+  },
+
+  usePowerCard: (player: Player, index: number) => {
+    const data = getPlayerData(player);
+    if (index < 0 || index >= data.powercards.length) {
+      throw new Error(`Invalid power card index: ${index}`);
+    }
+
+    if (
+      callPowerCardHook('useHook', player, null, {
+        defeat: () => {
+          data.lastFightResult = {
+            type: 'error',
+            index: index,
+            error: 'Power card cannot attack',
+          };
+        },
+      })
+    ) {
+      return;
+    }
+
+    data.activePowercardIndex = index;
   },
 };

@@ -8,6 +8,8 @@ import {
   PowerCardImages,
   PowerCardKeys,
 } from '@/constants/powercard/PowerCardImages';
+import { useMutation } from '@tanstack/react-query';
+import { useTRPC } from '@/api/query';
 
 const PowerupCard = ({
   id,
@@ -35,12 +37,19 @@ export const PowerupBar = () => {
   const [isOpen, setOpen] = useState(false);
   const [popupCardIndex, setPopupCardIndex] = useState<number | null>(null);
 
+  const tRPC = useTRPC();
+  const useCardMutation = useMutation(
+    tRPC.stratego.usePowerCard.mutationOptions({}),
+  );
+
   return (
     <>
-      {popupCardIndex && (
+      {popupCardIndex !== null && (
         <PowerUpPopUp
+          index={popupCardIndex}
           cardId={stratego.self.powercards[popupCardIndex] as PowerCardKeys}
-          inUse={false}
+          inUse={popupCardIndex === stratego.self.activePowercardIndex}
+          use={index => useCardMutation.mutateAsync({ index })}
           close={() => setPopupCardIndex(null)}
         />
       )}

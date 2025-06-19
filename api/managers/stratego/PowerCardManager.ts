@@ -1,11 +1,11 @@
 import { PowerCardKeys } from '@/constants/powercard/PowerCardImages';
 import { Player } from '../lobby/Player';
-import { getPlayerData } from './StrategoGame';
+import { getPlayerData, PlayerDataStratego } from './StrategoGame';
 
 type HookContext = {
   cardId: PowerCardKeys;
   self: Player;
-  target: Player;
+  target: Player | null;
 };
 
 type HookHandlers = {
@@ -34,8 +34,11 @@ const PowerCardHooks: Record<PowerCardKeys, Partial<PowerCardHooksType>> = {
     preAttackHook: [
       100,
       (ctx: HookContext, handlers: HookHandlers) => {
+        console.debug('Kamikazi preAttackHook');
         handlers.defeat(ctx.self);
-        handlers.defeat(ctx.target);
+        if (ctx.target) {
+          handlers.defeat(ctx.target);
+        }
         return HookResult.CONSUMED;
       },
     ],
@@ -75,35 +78,60 @@ function getPowerCardHook(
   ];
 }
 
-function buildHookCaller(hook: (() => HookResult) | null): () => boolean {
+function buildHookCaller(
+  hook: (() => HookResult) | null,
+  data: PlayerDataStratego | null,
+): () => boolean {
   if (!hook) {
-    return () => true; // No hook, so we can continue
+    return () => false; // No hook to call, continue execution
   }
 
   return () => {
     const result = hook();
     if (result === HookResult.CONSUMED) {
-      return false; // Hook consumed, stop further execution
+      if (data != null) {
+        if (data.activePowercardIndex != null) {
+          data.powercards.splice(data.activePowercardIndex, 1); // Remove the active power card
+        }
+        data.activePowercardIndex = null; // Clear active power card index
+      }
+      return true; // Hook consumed, stop further execution
     }
-    return true; // Continue execution
+    return false; // Hook did not consume, continue
   };
 }
 
+/**
+ * @returns True if the hook cancels the current function
+ */
 export function callHook(
   hookId: keyof PowerCardHooksType,
   self: Player,
-  target: Player,
+  target: Player | null,
   handlers: HookHandlers,
-): () => boolean {
+): boolean {
   const selfData = getPlayerData(self);
-  const targetData = getPlayerData(target);
+  const targetData = target ? getPlayerData(target) : null;
 
-  const selfCardId = selfData.activePowercardIndex
-    ? (selfData.powercards[selfData.activePowercardIndex] as PowerCardKeys)
-    : null;
-  const targetCardId = targetData.activePowercardIndex
-    ? (targetData.powercards[targetData.activePowercardIndex] as PowerCardKeys)
-    : null;
+  console.debug(
+    `Self power card: ${selfData.powercards}, selected: ${selfData.activePowercardIndex}`,
+  );
+  console.debug(
+    `Target power card: ${targetData?.powercards}, selected: ${targetData?.activePowercardIndex}`,
+  );
+
+  const selfCardId =
+    selfData.activePowercardIndex != null
+      ? (selfData.powercards[selfData.activePowercardIndex] as PowerCardKeys)
+      : null;
+  const targetCardId =
+    targetData?.activePowercardIndex != null
+      ? (targetData.powercards[
+          targetData.activePowercardIndex
+        ] as PowerCardKeys)
+      : null;
+
+  console.debug(`Self card ID: ${selfCardId}, Target card ID: ${targetCardId}`);
 
   const selfHook = getPowerCardHook(selfCardId, hookId, handlers, () => ({
     cardId: selfCardId as PowerCardKeys,
@@ -117,16 +145,14 @@ export function callHook(
     target,
   }));
 
-  const selfHookCaller = buildHookCaller(selfHook?.[1] ?? null);
+  const selfHookCaller = buildHookCaller(selfHook?.[1] ?? null, selfData);
 
-  const targetHookCaller = buildHookCaller(targetHook?.[1] ?? null);
+  const targetHookCaller = buildHookCaller(targetHook?.[1] ?? null, targetData);
 
   const hookOrder =
     (selfHook?.[0] ?? 0) >= (targetHook?.[0] ?? 0)
       ? [selfHookCaller, targetHookCaller]
       : [targetHookCaller, selfHookCaller];
 
-  return () => {
-    return hookOrder[0]() && hookOrder[1]();
-  };
+  return hookOrder[0]() || hookOrder[1]();
 }

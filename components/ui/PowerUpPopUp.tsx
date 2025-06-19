@@ -15,12 +15,20 @@ import {
 } from 'react-native';
 
 interface PowerUpPopUpProps {
+  index: number;
   cardId: PowerCardKeys;
   inUse: boolean;
+  use: (index: number) => void;
   close: () => void;
 }
 
-export const PowerUpPopUp = ({ cardId, inUse, close }: PowerUpPopUpProps) => {
+export const PowerUpPopUp = ({
+  index,
+  cardId,
+  inUse,
+  use,
+  close,
+}: PowerUpPopUpProps) => {
   const card = PowerCards[cardId];
   const image = PowerCardImages[cardId];
 
@@ -34,9 +42,7 @@ export const PowerUpPopUp = ({ cardId, inUse, close }: PowerUpPopUpProps) => {
           <Text style={styles.cardName}>{card.name}</Text>
           <Text>{card.description}</Text>
           <View style={styles.buttonContainer}>
-            <Pressable
-              style={styles.useButton}
-              onPress={() => console.log('hi')}>
+            <Pressable style={styles.useButton} onPress={() => use(index)}>
               <Text>{inUse ? 'Ingezet' : 'Inzetten'}</Text>
             </Pressable>
             <Pressable style={styles.closeButton} onPress={close}>

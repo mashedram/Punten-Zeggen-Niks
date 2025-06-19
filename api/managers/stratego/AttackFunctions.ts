@@ -130,21 +130,20 @@ function handleValueComparison(
   }
 
   if (attackerValue > defenderValue) {
-    console.log(
-      `Attacker ${attacker.getPlayer().getId()} wins against defender ${defender.getPlayer().getId()}.`,
+    console.debug(
+      `Attacker ${attacker.getPlayer().getId()} - ${attackerValue} wins against defender ${defender.getPlayer().getId()} - ${defenderValue}.`,
     );
     defender.defeat();
     return;
   }
 
+  console.debug(
+    `Defender ${defender.getPlayer().getId()} - ${defenderValue} wins against attacker ${attacker.getPlayer().getId()} - ${attackerValue}.`,
+  );
   attacker.defeat();
 }
 
-function handleAttackLogic(
-  lobby: Lobby,
-  attacker: Player,
-  defender: Player,
-): FightState {
+function handleAttackLogic(attacker: Player, defender: Player): FightState {
   const state = buildFightState(attacker, defender);
 
   if (
@@ -154,6 +153,7 @@ function handleAttackLogic(
       state.defender.getPlayer(),
       {
         defeat: (player: Player) => {
+          console.debug(`Defeat hook called for player ${player.getId()}`);
           if (player === state.attacker.getPlayer()) {
             state.attacker.defeat();
           } else {
@@ -166,10 +166,16 @@ function handleAttackLogic(
     return state;
 
   if (handleForceWin(state.attacker, state.defender)) {
+    console.debug(
+      `Force win applied in attack between ${state.attacker.getPlayer().getId()} and ${state.defender.getPlayer().getId()}`,
+    );
     return state;
   }
 
   handleValueComparison(state.attacker, state.defender);
+  console.debug(
+    `Value comparison done in attack between ${state.attacker.getPlayer().getId()} and ${state.defender.getPlayer().getId()}`,
+  );
 
   return state;
 }
@@ -200,6 +206,7 @@ function applyResultToSelf(self: PlayerFightState, result: FightResultType) {
 
   if (result === 'lose' || result === 'explode') {
     playerData.roleCard = null;
+    playerData.hasRoleCard = false;
   }
 
   player.sync();
@@ -209,11 +216,11 @@ function applyStateToSelf(self: PlayerFightState, target: PlayerFightState) {
   const defeatMap: [FightResultType, FightResultType][][] = [
     [
       ['draw', 'draw'],
-      ['lose', 'win'],
+      ['win', 'lose'],
     ],
     [
+      ['lose', 'win'],
       ['explode', 'explode'],
-      ['win', 'lose'],
     ],
   ];
 
@@ -231,13 +238,17 @@ export function performAttack(
 ) {
   let result: FightState;
   try {
-    result = handleAttackLogic(lobby, attacker, defender);
+    result = handleAttackLogic(attacker, defender);
   } catch (error) {
     console.error(error);
     setErrorState(attacker, `Attack failed: ${error}`);
     setErrorState(defender, `Attack failed: ${error}`);
     return;
   }
+
+  console.log(
+    `Attack result: ${result.attacker.getPlayer().getId()} - ${result.attacker.isDefeated()} vs ${result.defender.getPlayer().getId()} - ${result.defender.isDefeated()}`,
+  );
 
   const attackerState = result.attacker;
   const defenderState = result.defender;
