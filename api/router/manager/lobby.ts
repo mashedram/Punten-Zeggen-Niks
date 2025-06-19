@@ -1,5 +1,6 @@
 import { LobbyManager } from '@/api/managers/lobby/LobbyManager';
 import { publicProcedure, router } from '@/api/server';
+import { FirstNames } from '@/constants/FirstNames';
 import z from 'zod';
 
 const lobbyManager = new LobbyManager();
@@ -34,7 +35,7 @@ export const lobbyRouter = router({
         lobby = lobbyManager.createLobby(input.code);
       }
 
-      const firstWord = ['John', 'Jane', 'Alex', 'Chris', 'Dev'];
+      const firstWord = FirstNames;
       const lastWord = ['Developer', 'Tester', 'Admin', 'User', 'Player'];
       const randomName = `${firstWord[Math.floor(Math.random() * firstWord.length)]} ${lastWord[Math.floor(Math.random() * lastWord.length)]}`;
 

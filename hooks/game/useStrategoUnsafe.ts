@@ -1,4 +1,3 @@
-import { useLobby } from '../useLobby';
 import {
   InitalizationFailureReason,
   StategoStateUnsafe,
@@ -6,16 +5,7 @@ import {
 } from './useStratego';
 
 export function useStrategoUnsafe(): StategoStateUnsafe {
-  const lobby = useLobby();
-  const stratego = useStratego(lobby);
-
-  if (lobby.loading) {
-    throw new Error('Lobby is loading');
-  }
-
-  if (!lobby.inLobby) {
-    throw new Error('Not in lobby');
-  }
+  const stratego = useStratego();
 
   if (!stratego.initialized) {
     if (stratego.reason === InitalizationFailureReason.NotInLobby) {
