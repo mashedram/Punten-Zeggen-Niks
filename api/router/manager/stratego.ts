@@ -38,7 +38,9 @@ export const strategoRouter = router({
         .getPlayers()
         .find(p => p.getId() === input.targetId);
       if (!targetPlayer)
-        throw new Error('Target player not found: stratego.revive');
+        throw new Error(
+          `Target player not found ${input.targetId}: stratego.revive`,
+        );
       StrategoGame.revive(lobby, player, targetPlayer, roleCard);
     }),
 

@@ -1,10 +1,9 @@
 import { useTRPC } from '@/api/query';
 import { Picker } from '@react-native-picker/picker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
-import { useLobbyUnsafe } from '@/hooks/useLobbyUnsafe';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
 import { RoleButton } from './RoleButton';
 import { FontAwesome } from '@expo/vector-icons';
@@ -18,20 +17,25 @@ interface RoleCardPickerProps {
  */
 export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
   const trpc = useTRPC();
-  const lobby = useLobbyUnsafe();
   const stratego = useStrategoUnsafe();
 
-  const allAvailablePlayers = stratego.players.filter(
+  const availablePlayers = stratego.players.filter(
     p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
   );
 
-  const [selectedPlayerToRevive, setSelectedPlayerToRevive] = useState<string>(
-    allAvailablePlayers[0]?.id ?? '',
+  const playerTeam = stratego.lobby.teams.find(
+    team => team.id === stratego.self.teamId,
   );
 
-  const availableRoleCards = useQuery(
-    trpc.stratego.getAvailableRoleCards.queryOptions(),
+  const [selectedPlayerToRevive, setSelectedPlayerToRevive] = useState<string>(
+    availablePlayers[0]?.id ?? '',
   );
+
+  useEffect(() => {
+    if (!availablePlayers.find(p => p.id === selectedPlayerToRevive)) {
+      setSelectedPlayerToRevive(availablePlayers[0]?.id ?? '');
+    }
+  }, [availablePlayers, selectedPlayerToRevive]);
 
   const sendReviveMutation = useMutation(
     trpc.stratego.revive.mutationOptions({
@@ -39,22 +43,27 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
         console.error('Error reviving player:', error);
       },
       onSuccess: () => {
-        availableRoleCards.refetch();
-        setSelectedPlayerToRevive('Select player');
+        setSelectedPlayerToRevive('');
       },
     }),
   );
 
-  if (allAvailablePlayers.length === 0) {
+  if (availablePlayers.length === 0) {
     onClose();
     return;
   }
 
+  if (playerTeam === undefined) {
+    console.error('no team found in RoleCardPicker');
+    return;
+  }
+
   const revivePlayer = (targetPlayerId: string, roleCard: RoleCard) => {
-    const players = lobby.get()?.players ?? [];
-    const selectedPlayer = players.find(player => player.id === targetPlayerId);
+    const selectedPlayer = stratego.players.find(
+      player => player.id === targetPlayerId,
+    );
     if (!selectedPlayer) {
-      console.warn('could not find player');
+      console.warn(`could not find player to revive, ${targetPlayerId}`);
       return;
     }
     sendReviveMutation.mutate({
@@ -98,11 +107,9 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
           </Text>
         </View>
         <View style={styles.roleContainer}>
-          {(availableRoleCards.data &&
-            Object.entries(availableRoleCards.data).some(
-              ([card, count]) => card === RoleCards.vlag.id,
-            ) && (
-              <View style={{ alignItems: 'center' }}>
+          {(!playerTeam.hasFlag && (
+            <View style={{ alignItems: 'center' }}>
+              <View style={styles.roleButtonContainer}>
                 <View style={styles.vlagButton}>
                   <RoleButton
                     onPress={() =>
@@ -112,94 +119,157 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                   />
                 </View>
               </View>
-            )) || (
+            </View>
+          )) || (
             <View style={styles.allRoleContainer}>
               <View style={styles.roleRow}>
-                <View style={styles.roleButton}>
-                  <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.maarschalk)
-                    }
-                    roleCard={RoleCards.maarschalk}
-                  />
+                <View style={styles.roleButtonContainer}>
+                  <View style={styles.roleButton}>
+                    <RoleButton
+                      onPress={() =>
+                        revivePlayer(
+                          selectedPlayerToRevive,
+                          RoleCards.maarschalk,
+                        )
+                      }
+                      roleCard={RoleCards.maarschalk}
+                    />
+                  </View>
+                  <Text style={styles.roleButtonText}>
+                    {playerTeam.deck[RoleCards.maarschalk.id] ?? 0}x
+                  </Text>
                 </View>
-                <View style={styles.roleButton}>
-                  <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.generaal)
-                    }
-                    roleCard={RoleCards.generaal}
-                  />
+
+                <View style={styles.roleButtonContainer}>
+                  <View style={styles.roleButton}>
+                    <RoleButton
+                      onPress={() =>
+                        revivePlayer(selectedPlayerToRevive, RoleCards.generaal)
+                      }
+                      roleCard={RoleCards.generaal}
+                    />
+                  </View>
+                  <Text style={styles.roleButtonText}>
+                    {playerTeam.deck[RoleCards.generaal.id] ?? 0}x
+                  </Text>
                 </View>
-                <View style={styles.roleButton}>
-                  <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.kolonel)
-                    }
-                    roleCard={RoleCards.kolonel}
-                  />
-                </View>
-              </View>
-              <View style={styles.roleRow}>
-                <View style={styles.roleButton}>
-                  <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.majoor)
-                    }
-                    roleCard={RoleCards.majoor}
-                  />
-                </View>
-                <View style={styles.roleButton}>
-                  <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.kapitein)
-                    }
-                    roleCard={RoleCards.kapitein}
-                  />
-                </View>
-                <View style={styles.roleButton}>
-                  <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.luitenant)
-                    }
-                    roleCard={RoleCards.luitenant}
-                  />
+
+                <View style={styles.roleButtonContainer}>
+                  <View style={styles.roleButton}>
+                    <RoleButton
+                      onPress={() =>
+                        revivePlayer(selectedPlayerToRevive, RoleCards.kolonel)
+                      }
+                      roleCard={RoleCards.kolonel}
+                    />
+                  </View>
+                  <Text style={styles.roleButtonText}>
+                    {playerTeam.deck[RoleCards.kolonel.id] ?? 0}x
+                  </Text>
                 </View>
               </View>
               <View style={styles.roleRow}>
-                <View style={styles.roleButton}>
-                  <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.sergeant)
-                    }
-                    roleCard={RoleCards.sergeant}
-                  />
+                <View style={styles.roleButtonContainer}>
+                  <View style={styles.roleButton}>
+                    <RoleButton
+                      onPress={() =>
+                        revivePlayer(selectedPlayerToRevive, RoleCards.majoor)
+                      }
+                      roleCard={RoleCards.majoor}
+                    />
+                  </View>
+                  <Text style={styles.roleButtonText}>
+                    {playerTeam.deck[RoleCards.majoor.id] ?? 0}x
+                  </Text>
                 </View>
-                <View style={styles.roleButton}>
-                  <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.mineur)
-                    }
-                    roleCard={RoleCards.mineur}
-                  />
+
+                <View style={styles.roleButtonContainer}>
+                  <View style={styles.roleButton}>
+                    <RoleButton
+                      onPress={() =>
+                        revivePlayer(selectedPlayerToRevive, RoleCards.kapitein)
+                      }
+                      roleCard={RoleCards.kapitein}
+                    />
+                  </View>
+                  <Text style={styles.roleButtonText}>
+                    {playerTeam.deck[RoleCards.kapitein.id] ?? 0}x
+                  </Text>
                 </View>
-                <View style={styles.roleButton}>
-                  <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.spion)
-                    }
-                    roleCard={RoleCards.spion}
-                  />
+
+                <View style={styles.roleButtonContainer}>
+                  <View style={styles.roleButton}>
+                    <RoleButton
+                      onPress={() =>
+                        revivePlayer(
+                          selectedPlayerToRevive,
+                          RoleCards.luitenant,
+                        )
+                      }
+                      roleCard={RoleCards.luitenant}
+                    />
+                  </View>
+                  <Text style={styles.roleButtonText}>
+                    {playerTeam.deck[RoleCards.luitenant.id] ?? 0}x
+                  </Text>
                 </View>
               </View>
               <View style={styles.roleRow}>
-                <View style={styles.roleButton}>
-                  <RoleButton
-                    onPress={() =>
-                      revivePlayer(selectedPlayerToRevive, RoleCards.bom)
-                    }
-                    roleCard={RoleCards.bom}
-                  />
+                <View style={styles.roleButtonContainer}>
+                  <View style={styles.roleButton}>
+                    <RoleButton
+                      onPress={() =>
+                        revivePlayer(selectedPlayerToRevive, RoleCards.sergeant)
+                      }
+                      roleCard={RoleCards.sergeant}
+                    />
+                  </View>
+                  <Text style={styles.roleButtonText}>
+                    {playerTeam.deck[RoleCards.sergeant.id] ?? 0}x
+                  </Text>
+                </View>
+
+                <View style={styles.roleButtonContainer}>
+                  <View style={styles.roleButton}>
+                    <RoleButton
+                      onPress={() =>
+                        revivePlayer(selectedPlayerToRevive, RoleCards.mineur)
+                      }
+                      roleCard={RoleCards.mineur}
+                    />
+                  </View>
+                  <Text style={styles.roleButtonText}>
+                    {playerTeam.deck[RoleCards.mineur.id] ?? 0}x
+                  </Text>
+                </View>
+
+                <View style={styles.roleButtonContainer}>
+                  <View style={styles.roleButton}>
+                    <RoleButton
+                      onPress={() =>
+                        revivePlayer(selectedPlayerToRevive, RoleCards.spion)
+                      }
+                      roleCard={RoleCards.spion}
+                    />
+                  </View>
+                  <Text style={styles.roleButtonText}>
+                    {playerTeam.deck[RoleCards.spion.id] ?? 0}x
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.roleRow}>
+                <View style={styles.roleButtonContainer}>
+                  <View style={styles.roleButton}>
+                    <RoleButton
+                      onPress={() =>
+                        revivePlayer(selectedPlayerToRevive, RoleCards.bom)
+                      }
+                      roleCard={RoleCards.bom}
+                    />
+                  </View>
+                  <Text style={styles.roleButtonText}>
+                    {playerTeam.deck[RoleCards.bom.id] ?? 0}x
+                  </Text>
                 </View>
               </View>
             </View>
@@ -216,7 +286,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
 const styles = StyleSheet.create({
   container: {
     width: 350,
-    height: 485,
+    height: 560,
     backgroundColor: 'white',
     borderWidth: 1,
     borderRadius: 5,
@@ -264,10 +334,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   allRoleContainer: {},
+  roleButtonContainer: {},
   roleButton: {
     height: 85,
     width: 85,
     margin: 2,
+  },
+  roleButtonText: {
+    textAlign: 'center',
+    fontWeight: 700,
   },
   roleRow: {
     display: 'flex',

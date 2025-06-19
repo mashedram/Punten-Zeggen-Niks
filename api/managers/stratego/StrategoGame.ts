@@ -2,7 +2,7 @@ import { GameType } from '@/api/game/GameType';
 import { z } from 'zod';
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { RoleCard } from '@/constants/RoleCards';
+import { RoleCard, RoleCards } from '@/constants/RoleCards';
 import { GameState } from '@/constants/GameState';
 import { createRoleCardDeck } from '@/constants/RoleCardDeck';
 import { console } from 'inspector';
@@ -21,6 +21,7 @@ export const LobbyDataSchemaStratego = z.object({
       id: z.string(),
       name: z.string(),
       deck: z.record(z.string(), z.number()),
+      hasFlag: z.boolean(),
     }),
   ),
   gameState: z.enum(Object.values(GameState) as [string, ...string[]]),
@@ -75,11 +76,13 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
           id: 'red',
           name: 'Rood',
           deck: createRoleCardDeck(),
+          hasFlag: false,
         },
         {
           id: 'blue',
           name: 'Blauw',
           deck: createRoleCardDeck(),
+          hasFlag: false,
         },
       ],
       gameState: String(GameState.playing),
@@ -236,6 +239,8 @@ function checkActiveRoleCards(lobby: Lobby, teamId: string): boolean {
   return players.some(player => getPlayerData(player).roleCard === undefined);
 }
 
+function assignRandomRoleCards(lobby: Lobby, teamId: string) {}
+
 //////////////////////
 /// External utils ///
 //////////////////////
@@ -278,14 +283,18 @@ export function removeRoleCardFromDeck(
   if (!team || !team.deck || !team.deck[cardId]) {
     throw new Error(`Card ${cardId} not found in team ${teamId} deck.`);
   }
-  console.log('removing role from deck');
-  console.log(team.deck[cardId]);
   team.deck[cardId] = team.deck[cardId] - 1;
-  console.log(team.deck[cardId]);
   if (team.deck[cardId] <= 0) {
     delete team.deck[cardId];
   }
-  console.log(lobbyData);
+  console.log(
+    `Removed ${cardId} from deck in team ${teamId}, team has ${team.deck[cardId]} left of role ${cardId}`,
+  );
+  if (cardId === RoleCards.vlag.id && !team.hasFlag) {
+    console.log(`Flag had been given to team ${team.id}`);
+    team.hasFlag = true;
+    assignRandomRoleCards(lobby, teamId);
+  }
   lobbyData.teams = teams;
   lobby.sync();
 }
@@ -317,7 +326,7 @@ export const StrategoGame = {
       throw new Error('Only team leaders can revive players.');
     }
     if (targetData.roleCard) {
-      throw new Error('Target player is already active.');
+      throw new Error(`Target player is already active. ${player.getName()}`);
     }
     if (targetData.teamId !== playerData.teamId) {
       throw new Error('Target player is not on the same team.');
@@ -342,7 +351,7 @@ export const StrategoGame = {
     targetData.hasRoleCard = true;
     removeRoleCardFromDeck(lobby, playerData.teamId, roleCard.id);
     console.log(
-      `Player ${target.getId()} has been revived with role card: ${targetData.roleCard}`,
+      `Player ${target.getId()}, ${target.getName()} has been revived with role card: ${targetData.roleCard}`,
     );
     lobby.sync();
   },
