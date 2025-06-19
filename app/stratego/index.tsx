@@ -204,10 +204,6 @@ export default function Game() {
         <Text>{stratego.self.name}</Text>
       </View>
       {/* Einde test gedeelte gameloop */}
-
-
-      {/* Info button */}
-
       <SpelregelI />
     </SafeAreaView>
   );
