@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { PowerUpPopUp } from './PowerUpPopUp';
 import React from 'react';
@@ -10,6 +10,7 @@ import {
 } from '@/constants/powercard/PowerCardImages';
 import { useMutation } from '@tanstack/react-query';
 import { useTRPC } from '@/api/query';
+import { PowerCardShop } from '../stratego/PowerCardShop';
 
 const PowerupCard = ({
   id,
@@ -37,6 +38,8 @@ export const PowerupBar = () => {
   const [isOpen, setOpen] = useState(false);
   const [popupCardIndex, setPopupCardIndex] = useState<number | null>(null);
 
+  const isFlag = stratego.self.roleCard === 'vlag';
+
   const tRPC = useTRPC();
   const useCardMutation = useMutation(
     tRPC.stratego.usePowerCard.mutationOptions({}),
@@ -53,8 +56,9 @@ export const PowerupBar = () => {
           close={() => setPopupCardIndex(null)}
         />
       )}
-      <View style={styles.container}>
-        <View style={[styles.bar, isOpen ? {} : styles.barClosed]}>
+      {isOpen && isFlag && <PowerCardShop />}
+      <View style={[styles.container, isOpen ? styles.containerOpen : {}]}>
+        <View style={[styles.bar, isOpen && !isFlag ? {} : styles.barClosed]}>
           <Pressable onPress={() => setOpen(!isOpen)} style={styles.header}>
             <Text style={styles.headerText}>Powerups</Text>
           </Pressable>
@@ -82,8 +86,11 @@ const styles = StyleSheet.create({
     height: '30%',
     display: 'flex',
     justifyContent: 'flex-end',
+    zIndex: -50,
   },
-
+  containerOpen: {
+    zIndex: 1000,
+  },
   bar: {
     bottom: 0,
     backgroundColor: 'red',

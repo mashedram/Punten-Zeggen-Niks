@@ -5,5 +5,6 @@ export const PowerCards = {
     name: 'Kamikazi',
     description:
       'Verliest het spel, maar neemt de tegenstander mee in de dood.',
+    cost: 5,
   },
 } satisfies { [K: string]: PowerCard };

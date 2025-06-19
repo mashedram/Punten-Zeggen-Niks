@@ -23,6 +23,7 @@ export const LobbyDataSchemaStratego = z.object({
       name: z.string(),
       deck: z.record(z.string(), z.number()),
       hasFlag: z.boolean(),
+      currency: z.number().default(0),
     }),
   ),
   gameState: z.enum(Object.values(GameState) as [string, ...string[]]),
@@ -79,12 +80,14 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
           id: 'red',
           name: 'Rood',
           deck: createRoleCardDeck(),
+          currency: 0,
           hasFlag: false,
         },
         {
           id: 'blue',
           name: 'Blauw',
           deck: createRoleCardDeck(),
+          currency: 0,
           hasFlag: false,
         },
       ],
@@ -101,7 +104,7 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         hasRoleCard: false,
         roleCard: null,
         activePowercardIndex: null,
-        powercards: ['kamikazi'],
+        powercards: [],
         attackCode: generateAttackCode(),
         lastFightResult: null,
       };
@@ -350,8 +353,9 @@ export const StrategoGame = {
       'defender:',
       getPlayerData(defender).teamId,
     );
-    performAttack(lobby, attacker, defender);
+    performAttack(attacker, defender);
     checkWinConditions(lobby);
+
     lobby.sync();
   },
 

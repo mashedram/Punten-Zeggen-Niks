@@ -1,6 +1,11 @@
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { getPlayerData, PlayerDataStratego } from './StrategoGame';
+import {
+  getLobbyData,
+  getPlayerData,
+  LobbyDataStratego,
+  PlayerDataStratego,
+} from './StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
 import { callHook } from './PowerCardManager';
 
@@ -231,11 +236,49 @@ function applyStateToSelf(self: PlayerFightState, target: PlayerFightState) {
   applyResultToSelf(target, targetState);
 }
 
-export function performAttack(
-  lobby: Lobby,
-  attacker: Player,
-  defender: Player,
+function awardPlayerPoints(
+  lobby: LobbyDataStratego,
+  state: PlayerFightState,
+  points: number,
 ) {
+  if (points <= 0) {
+    return;
+  }
+
+  const playerData = getPlayerData(state.getPlayer());
+  const teams = lobby.teams;
+  const team = teams.find(team => team.id === playerData.teamId);
+  if (!team) {
+    console.warn(`Team not found for player ${state.getPlayer().getId()}`);
+    return;
+  }
+
+  console.debug(
+    `Awarding ${points} points to team ${team.id} for player ${state.getPlayer().getId()}`,
+  );
+  team.currency += points;
+
+  lobby.teams = teams;
+}
+
+function awardFightPoints(lobby: Lobby, state: FightState) {
+  const lobbyData = getLobbyData(lobby);
+  const attackerValue = state.attacker.getRoleCard().value;
+  const defenderValue = state.defender.getRoleCard().value;
+
+  awardPlayerPoints(
+    lobbyData,
+    state.attacker,
+    state.defender.isDefeated() ? attackerValue : 0,
+  );
+  awardPlayerPoints(
+    lobbyData,
+    state.defender,
+    state.attacker.isDefeated() ? defenderValue : 0,
+  );
+}
+
+export function performAttack(attacker: Player, defender: Player) {
   let result: FightState;
   try {
     result = handleAttackLogic(attacker, defender);
@@ -254,4 +297,5 @@ export function performAttack(
   const defenderState = result.defender;
 
   applyStateToSelf(attackerState, defenderState);
+  awardFightPoints(attacker.getLobby(), result);
 }
