@@ -113,7 +113,7 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         hasRoleCard: false,
         roleCard: null,
         activePowercardIndex: null,
-        powercards: ['ruilkaart'],
+        powercards: [],
         attackCode: generateAttackCode(),
         lastFightResult: null,
       };
