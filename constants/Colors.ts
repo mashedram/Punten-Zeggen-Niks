@@ -25,7 +25,7 @@ export const Colors = {
   },
 };
 
-export const TeamColors = {
+export const TeamColors: Record<string, { color: string }> = {
   red: {
     color: 'red',
   },

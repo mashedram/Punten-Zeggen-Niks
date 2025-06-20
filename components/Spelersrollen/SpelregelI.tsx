@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { StyleSheet } from 'react-native';
@@ -86,7 +87,12 @@ export const SpelregelI = () => {
             </View>
             <Pressable
               onPress={() => setShowInfo(false)}
-              style={{ marginTop: 8 }}>
+              style={{
+                marginTop: 8,
+                padding: 8,
+                borderRadius: 8,
+                backgroundColor: '#e0f7fa',
+              }}>
               <Text style={styles.SluitStyling}>Sluiten</Text>
             </Pressable>
           </View>
@@ -153,7 +159,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    bottom: 30,
+    bottom: 15,
   },
 
   PijlContainerStyling: {
@@ -163,7 +169,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     left: 0,
-    bottom: 10,
+    bottom: 30,
     flexDirection: 'row',
     marginTop: 8,
   },
