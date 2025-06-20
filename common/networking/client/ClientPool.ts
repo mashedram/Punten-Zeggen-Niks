@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { Client } from '@/common/networking/client/Client';
-import { CLIENT_MANAGER } from '@/common/networking/client/ClientManager';
+import { CLIENT_MANAGER } from '@/common/networking/Globals';
 
 type EventMap = {
   onClientAdded: [Client];
@@ -18,19 +18,19 @@ export class ClientPool extends EventEmitter<EventMap> {
   constructor() {
     super();
     this._clients = new Set();
-    CLIENT_MANAGER.getEventEmitter().on('onClientConnected', client => {
+    CLIENT_MANAGER.on('onClientConnected', client => {
       if (!this._clients.has(client)) return;
       console.log(`ClientPool: Client connected: ${client.getId()}`);
       this.emit('onClientConnected', client);
     });
 
-    CLIENT_MANAGER.getEventEmitter().on('onClientDisconnected', client => {
+    CLIENT_MANAGER.on('onClientDisconnected', client => {
       if (!this._clients.has(client)) return;
       console.log(`ClientPool: Client disconnected: ${client.getId()}`);
       this.emit('onClientDisconnected', client);
     });
 
-    CLIENT_MANAGER.getEventEmitter().on('onClientRemoved', client => {
+    CLIENT_MANAGER.on('onClientRemoved', client => {
       if (!this._clients.has(client)) return;
       this.removeClient(client);
     });

@@ -81,6 +81,16 @@ export class TrackedInstance<T = never> implements Dereferable<T> {
     return (hash << saltBits) | salt;
   }
 
+  private static shouldDrop(
+    packet: DataPacket<Record<string, unknown>>,
+  ): boolean {
+    if (Object.keys(packet.data).length === 0) {
+      return true; // No data to send
+    }
+
+    return false;
+  }
+
   private broadcast() {
     this._tracker.broadcastById(this._id);
   }
@@ -187,6 +197,13 @@ export class TrackedInstance<T = never> implements Dereferable<T> {
       this.sendTrackPacket(client);
     }
     const packet = this.getDataPacket(client);
+
+    if (TrackedInstance.shouldDrop(packet)) {
+      console.debug(
+        `Packet of ${this.getName()} on client ${client.getId()} dropped`,
+      );
+      return;
+    }
 
     clientData.step = packet.step;
     client.sendEncoded(packet as Packet<never>);

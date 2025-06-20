@@ -6,7 +6,8 @@ import {
 } from '@/common/networking/packet/PacketTransformer';
 import { Lobby } from '@/api/managers/lobby/Lobby';
 import { Player } from '@/api/managers/lobby/Player';
-import { ClientManager } from './ClientManager';
+import { ClientManager } from '@/common/networking/client/ClientManager';
+import { CLIENT_MANAGER } from '@/common/networking/Globals';
 
 // All client data *must* be optional
 type ClientData = {
@@ -55,10 +56,10 @@ export class Client {
     if (this._lastConnected === oldValue) return;
 
     if (this._lastConnected === undefined) {
-      this._owner.getEventEmitter().emit('onClientConnected', this);
+      CLIENT_MANAGER.emit('onClientConnected', this);
       console.log(`Client ${this._id} connected.`);
     } else {
-      this._owner.getEventEmitter().emit('onClientDisconnected', this);
+      CLIENT_MANAGER.emit('onClientDisconnected', this);
       console.log(`Client ${this._id} disconnected event emitted.`);
     }
   }

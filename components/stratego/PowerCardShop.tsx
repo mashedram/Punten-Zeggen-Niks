@@ -1,4 +1,3 @@
-import { PowerCard } from '@/common/stratego/powercard/PowerCard';
 import {
   PowerCardImages,
   PowerCardKeys,

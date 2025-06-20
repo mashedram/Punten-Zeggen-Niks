@@ -12,26 +12,21 @@ interface EventMap {
   onClientRemoved: [client: Client];
 }
 
-export class ClientManager {
+export class ClientManager extends EventEmitter<EventMap> {
   private _clients: Record<string, Client>;
   private _tokenMap: Record<string, Client>;
-  private _eventEmitter: EventEmitter<EventMap>;
 
   constructor() {
+    super();
     this._clients = {};
     this._tokenMap = {};
-    this._eventEmitter = new EventEmitter();
-  }
-
-  public getEventEmitter(): EventEmitter<EventMap> {
-    return this._eventEmitter;
   }
 
   public createClient(): Client {
     const client = new Client(this);
     this._clients[client.getId()] = client;
     this._tokenMap[client.getToken()] = client;
-    this._eventEmitter.emit('onClientCreated', client);
+    this.emit('onClientCreated', client);
     return client;
   }
 
@@ -50,7 +45,7 @@ export class ClientManager {
       return;
     }
 
-    this._eventEmitter.emit('onClientRemoved', client);
+    this.emit('onClientRemoved', client);
 
     delete this._clients[id];
     delete this._tokenMap[client.getToken()];
@@ -113,7 +108,7 @@ export class ClientManager {
       });
 
       ctx.client.setConnected(true);
-      this._eventEmitter.emit('onClientConnected', ctx.client);
+      this.emit('onClientConnected', ctx.client);
 
       for await (const event of listener) {
         const packet: EncodedPacket = event[0];
@@ -124,11 +119,3 @@ export class ClientManager {
     }
   }
 }
-
-const CLIENT_TIMEOUT_MS = 10 * 5 * 1000;
-
-export const CLIENT_MANAGER = new ClientManager();
-
-setInterval(() => {
-  CLIENT_MANAGER.cleanupOldClients(CLIENT_TIMEOUT_MS);
-}, CLIENT_TIMEOUT_MS);

@@ -2,7 +2,7 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "target": "es5",
+    "target": "es2024",
     "module": "esnext",
     "paths": {
       "@/*": ["./*"]

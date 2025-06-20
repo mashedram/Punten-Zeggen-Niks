@@ -1,4 +1,4 @@
-import { CLIENT_MANAGER } from '@/common/networking/client/ClientManager';
+import { CLIENT_MANAGER } from '@/common/networking/Globals';
 import { SERVER_DATA_STORE } from '@/common/networking/Globals';
 import { getDataInstanceDescriptor } from '@/common/networking/tracking/descriptors/DataInstanceDescriptor';
 import { publicProcedure, router } from '@/api/server';

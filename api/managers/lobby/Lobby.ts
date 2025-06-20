@@ -80,6 +80,11 @@ export class Lobby {
     this._clients.on('onClientDisconnected', client => {
       const player = this._players[client.getId()];
       if (player) {
+        if (this._gameState.id == null) {
+          this.removePlayer(player.getId());
+          return;
+        }
+
         player.setConnected(false);
       }
     });
@@ -207,9 +212,14 @@ export class Lobby {
   }
 
   public removePlayer(id: string) {
+    console.debug(
+      `Remove request for player ${id} from lobby ${this.getCode()}`,
+    );
+
     const player = this._players[id];
     if (!player) return;
 
+    console.debug(`Removing player ${id} from lobby ${this.getCode()}`);
     player.getClient().getData().lobby = undefined;
     player.onRemoval();
     this._clients.removeClient(player.getClient());
