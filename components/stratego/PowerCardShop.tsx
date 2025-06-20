@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { PowerCardShopInspect } from './PowerCardShopInspect';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
+import React from 'react';
 
 export const PowerCardShop = () => {
   const stratego = useStrategoUnsafe();

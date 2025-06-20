@@ -5,15 +5,13 @@ import {
 } from '@/hooks/game/useStratego';
 import { useLobby } from '@/hooks/useLobby';
 import { Redirect } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   Text,
   StyleSheet,
   View,
   TouchableOpacity,
-  Animated,
-  Easing,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { GameState } from '@/constants/GameState';
@@ -24,7 +22,6 @@ import { AttackButton } from '@/components/ui/AttackButton';
 import { WinPopUp } from '@/components/ui/WinPopUp';
 import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
-import { defaultDeckSize } from '@/constants/RoleCardDeck';
 import { FeedbackForm } from '@/components/ui/FeedbackForm';
 import { PowerupBar } from '@/components/ui/PowerupBar';
 import GameStatusPopup from '@/components/ui/GameStatusPopup';
@@ -38,17 +35,6 @@ export default function Game() {
   );
 
   const [isLeaderPopupOpen, setLeaderPopupOpen] = useState(false);
-
-  const slideAnim = useRef(new Animated.Value(-1500)).current;
-
-  useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: isLeaderPopupOpen ? -700 : -1500,
-      duration: 300,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: true,
-    }).start();
-  }, [isLeaderPopupOpen, slideAnim]);
 
   if (lobby.loading) {
     return;
@@ -100,26 +86,20 @@ export default function Game() {
     p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
   ).length;
 
-  const teamRedDeck = stratego.lobby.teams.find(
-    team => team.id === 'red',
-  )?.deck;
-  const teamBlueDeck = stratego.lobby.teams.find(
-    team => team.id === 'blue',
-  )?.deck;
-  const teamRedDeckSize = teamRedDeck
-    ? Object.values(teamRedDeck).reduce((sum, value) => sum + value, 0)
-    : defaultDeckSize;
-  const teamBlueDeckSize = teamBlueDeck
-    ? Object.values(teamBlueDeck).reduce((sum, value) => sum + value, 0)
-    : defaultDeckSize;
+  const teamRed = stratego.lobby.teams.find(team => team.id === 'red');
+  const teamBlue = stratego.lobby.teams.find(team => team.id === 'blue');
+
+  if (!teamRed || !teamBlue) {
+    throw new Error(`Can not find team ${teamRed} or ${teamBlue}`);
+  }
 
   return (
     <SafeAreaView style={styles.BackgroundView}>
       <FeedbackForm />
       <View style={styles.CardStackTrackerContainer}>
         <CardCountBar
-          blueCardCount={teamBlueDeckSize}
-          redCardCount={teamRedDeckSize}
+          blueCardCount={teamBlue.score}
+          redCardCount={teamRed.score}
         />
       </View>
 
@@ -156,20 +136,19 @@ export default function Game() {
             card => card.id === stratego.self.roleCard,
           )}
         />
+
+        <View style={styles.playerAttackContainer}>
+          <AttackButton />
+        </View>
       </View>
 
-      <View style={styles.playerAttackContainer}>
-        <AttackButton />
-      </View>
-
-      <Animated.View
+      <View
         style={[
           styles.roleCardPickerContainer,
-          { transform: [{ translateY: slideAnim }] },
-        ]}
-        pointerEvents={isLeaderPopupOpen ? 'auto' : 'none'}>
+          isLeaderPopupOpen ? styles.roleCardPickerOpen : {},
+        ]}>
         <RoleCardPicker onClose={() => setLeaderPopupOpen(false)} />
-      </Animated.View>
+      </View>
 
       <View
         style={{
@@ -213,6 +192,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     marginTop: 40,
+    zIndex: 50,
   },
   CaptainEllipse: {
     position: 'absolute',
@@ -235,12 +215,32 @@ const styles = StyleSheet.create({
     top: 4,
   },
   roleContainer: {
-    marginTop: 90,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  roleCardPickerOpen: {
+    transform: [{ translateY: -1000 }],
   },
   roleCardPickerContainer: {
-    marginTop: 20,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 100,
+    transitionDuration: '0.3s',
   },
   playerAttackContainer: {
     marginTop: 10,

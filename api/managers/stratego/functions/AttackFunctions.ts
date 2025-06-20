@@ -1,13 +1,13 @@
-import { Lobby } from '../lobby/Lobby';
-import { Player } from '../lobby/Player';
+import { Lobby } from '@/api/managers/lobby/Lobby';
+import { Player } from '@/api/managers/lobby/Player';
 import {
   getLobbyData,
   getPlayerData,
   LobbyDataStratego,
   PlayerDataStratego,
-} from './StrategoGame';
+} from '@/api/managers/stratego/StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
-import { callHook } from './PowerCardManager';
+import { callPowerCardHook } from '@/api/managers/stratego/PowerCardManager';
 
 type FightResultType = 'win' | 'lose' | 'draw' | 'explode';
 
@@ -152,7 +152,7 @@ function handleAttackLogic(attacker: Player, defender: Player): FightState {
   const state = buildFightState(attacker, defender);
 
   if (
-    callHook(
+    callPowerCardHook(
       'preAttackHook',
       state.attacker.getPlayer(),
       state.defender.getPlayer(),
@@ -212,6 +212,11 @@ function applyResultToSelf(self: PlayerFightState, result: FightResultType) {
   if (result === 'lose' || result === 'explode') {
     playerData.roleCard = null;
     playerData.hasRoleCard = false;
+    const lobbyData = getLobbyData(self.getPlayer().getLobby());
+    const team = lobbyData.teams.find(team => team.id === playerData.teamId);
+    if (team) {
+      team.score -= 1;
+    }
   }
 
   player.sync();

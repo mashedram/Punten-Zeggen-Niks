@@ -1,6 +1,6 @@
 import { useTRPC } from '@/api/query';
 import { Picker } from '@react-native-picker/picker';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useMutation } from '@tanstack/react-query';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
@@ -19,23 +19,17 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
   const trpc = useTRPC();
   const stratego = useStrategoUnsafe();
 
-  const availablePlayers = stratego.players.filter(
-    p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
-  );
+  const availablePlayers = useMemo(() => {
+    return stratego.players.filter(
+      p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
+    );
+  }, [stratego.players, stratego.self.teamId]);
 
   const playerTeam = stratego.lobby.teams.find(
     team => team.id === stratego.self.teamId,
   );
 
-  const [selectedPlayerToRevive, setSelectedPlayerToRevive] = useState<string>(
-    availablePlayers[0]?.id ?? '',
-  );
-
-  useEffect(() => {
-    if (!availablePlayers.find(p => p.id === selectedPlayerToRevive)) {
-      setSelectedPlayerToRevive(availablePlayers[0]?.id ?? '');
-    }
-  }, [availablePlayers, selectedPlayerToRevive]);
+  const [target, setTarget] = useState<string | null>(null);
 
   const sendReviveMutation = useMutation(
     trpc.stratego.revive.mutationOptions({
@@ -43,7 +37,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
         console.error('Error reviving player:', error);
       },
       onSuccess: () => {
-        setSelectedPlayerToRevive('');
+        setTarget(null);
       },
     }),
   );
@@ -54,10 +48,42 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
         console.error('Error assigning a flag', error);
       },
       onSuccess: () => {
-        setSelectedPlayerToRevive('');
+        setTarget(null);
       },
     }),
   );
+
+  const getTargetId = useCallback(() => {
+    if (target) {
+      return target;
+    }
+    return availablePlayers[0]?.id;
+  }, [target, availablePlayers]);
+
+  const revivePlayer = useCallback(
+    (roleCard: RoleCard) => {
+      const targetId = getTargetId();
+      if (!targetId) {
+        console.warn(`could not find player to revive, ${targetId}`);
+        return;
+      }
+      sendReviveMutation.mutate({
+        targetId,
+        roleCard: roleCard.id,
+      });
+    },
+    [getTargetId, sendReviveMutation],
+  );
+
+  const assignFlag = useCallback(() => {
+    const targetId = getTargetId();
+
+    if (!targetId) {
+      console.warn(`could not find player to assign flag, ${targetId}`);
+      return;
+    }
+    sendAssignFlagMutation.mutate(targetId);
+  }, [getTargetId, sendAssignFlagMutation]);
 
   if (availablePlayers.length === 0) {
     onClose();
@@ -69,31 +95,6 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
     return;
   }
 
-  const revivePlayer = (targetPlayerId: string, roleCard: RoleCard) => {
-    const selectedPlayer = stratego.players.find(
-      player => player.id === targetPlayerId,
-    );
-    if (!selectedPlayer) {
-      console.warn(`could not find player to revive, ${targetPlayerId}`);
-      return;
-    }
-    sendReviveMutation.mutate({
-      targetId: targetPlayerId,
-      roleCard: roleCard.id,
-    });
-  };
-
-  const assignFlag = (targetPlayerId: string) => {
-    const selectedPlayer = stratego.players.find(
-      player => player.id === targetPlayerId,
-    );
-    if (!selectedPlayer) {
-      console.warn(`could not find player to assign flag, ${targetPlayerId}`);
-      return;
-    }
-    sendAssignFlagMutation.mutate(selectedPlayer.id);
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -103,24 +104,19 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
         <View style={styles.playerContainer}>
           <Picker
             style={styles.playerPicker}
-            selectedValue={selectedPlayerToRevive}
+            selectedValue={target}
             onValueChange={(itemValue, itemIndex) => {
-              setSelectedPlayerToRevive(itemValue);
+              setTarget(itemValue);
             }}>
-            {stratego.players
-              .filter(
-                p =>
-                  p.hasRoleCard === false && p.teamId === stratego.self.teamId,
-              )
-              .map(player => {
-                return (
-                  <Picker.Item
-                    key={player.id}
-                    label={player.name}
-                    value={player.id}
-                  />
-                );
-              })}
+            {availablePlayers.map(player => {
+              return (
+                <Picker.Item
+                  key={player.id}
+                  label={player.name}
+                  value={player.id}
+                />
+              );
+            })}
           </Picker>
         </View>
         <View style={styles.title}>
@@ -134,7 +130,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
               <View style={styles.roleButtonContainer}>
                 <View style={styles.vlagButton}>
                   <RoleButton
-                    onPress={() => assignFlag(selectedPlayerToRevive)}
+                    onPress={() => assignFlag()}
                     roleCard={RoleCards.vlag}
                   />
                 </View>
@@ -146,12 +142,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                 <View style={styles.roleButtonContainer}>
                   <View style={styles.roleButton}>
                     <RoleButton
-                      onPress={() =>
-                        revivePlayer(
-                          selectedPlayerToRevive,
-                          RoleCards.maarschalk,
-                        )
-                      }
+                      onPress={() => revivePlayer(RoleCards.maarschalk)}
                       roleCard={RoleCards.maarschalk}
                     />
                   </View>
@@ -163,9 +154,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                 <View style={styles.roleButtonContainer}>
                   <View style={styles.roleButton}>
                     <RoleButton
-                      onPress={() =>
-                        revivePlayer(selectedPlayerToRevive, RoleCards.generaal)
-                      }
+                      onPress={() => revivePlayer(RoleCards.generaal)}
                       roleCard={RoleCards.generaal}
                     />
                   </View>
@@ -177,9 +166,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                 <View style={styles.roleButtonContainer}>
                   <View style={styles.roleButton}>
                     <RoleButton
-                      onPress={() =>
-                        revivePlayer(selectedPlayerToRevive, RoleCards.kolonel)
-                      }
+                      onPress={() => revivePlayer(RoleCards.kolonel)}
                       roleCard={RoleCards.kolonel}
                     />
                   </View>
@@ -192,9 +179,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                 <View style={styles.roleButtonContainer}>
                   <View style={styles.roleButton}>
                     <RoleButton
-                      onPress={() =>
-                        revivePlayer(selectedPlayerToRevive, RoleCards.majoor)
-                      }
+                      onPress={() => revivePlayer(RoleCards.majoor)}
                       roleCard={RoleCards.majoor}
                     />
                   </View>
@@ -206,9 +191,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                 <View style={styles.roleButtonContainer}>
                   <View style={styles.roleButton}>
                     <RoleButton
-                      onPress={() =>
-                        revivePlayer(selectedPlayerToRevive, RoleCards.kapitein)
-                      }
+                      onPress={() => revivePlayer(RoleCards.kapitein)}
                       roleCard={RoleCards.kapitein}
                     />
                   </View>
@@ -220,12 +203,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                 <View style={styles.roleButtonContainer}>
                   <View style={styles.roleButton}>
                     <RoleButton
-                      onPress={() =>
-                        revivePlayer(
-                          selectedPlayerToRevive,
-                          RoleCards.luitenant,
-                        )
-                      }
+                      onPress={() => revivePlayer(RoleCards.luitenant)}
                       roleCard={RoleCards.luitenant}
                     />
                   </View>
@@ -238,9 +216,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                 <View style={styles.roleButtonContainer}>
                   <View style={styles.roleButton}>
                     <RoleButton
-                      onPress={() =>
-                        revivePlayer(selectedPlayerToRevive, RoleCards.sergeant)
-                      }
+                      onPress={() => revivePlayer(RoleCards.sergeant)}
                       roleCard={RoleCards.sergeant}
                     />
                   </View>
@@ -252,9 +228,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                 <View style={styles.roleButtonContainer}>
                   <View style={styles.roleButton}>
                     <RoleButton
-                      onPress={() =>
-                        revivePlayer(selectedPlayerToRevive, RoleCards.mineur)
-                      }
+                      onPress={() => revivePlayer(RoleCards.mineur)}
                       roleCard={RoleCards.mineur}
                     />
                   </View>
@@ -266,9 +240,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                 <View style={styles.roleButtonContainer}>
                   <View style={styles.roleButton}>
                     <RoleButton
-                      onPress={() =>
-                        revivePlayer(selectedPlayerToRevive, RoleCards.spion)
-                      }
+                      onPress={() => revivePlayer(RoleCards.spion)}
                       roleCard={RoleCards.spion}
                     />
                   </View>
@@ -281,9 +253,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
                 <View style={styles.roleButtonContainer}>
                   <View style={styles.roleButton}>
                     <RoleButton
-                      onPress={() =>
-                        revivePlayer(selectedPlayerToRevive, RoleCards.bom)
-                      }
+                      onPress={() => revivePlayer(RoleCards.bom)}
                       roleCard={RoleCards.bom}
                     />
                   </View>
@@ -312,8 +282,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute',
-    top: 200,
   },
   content: {
     height: '100%',

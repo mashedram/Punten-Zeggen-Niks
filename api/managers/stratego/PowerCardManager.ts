@@ -105,7 +105,7 @@ function buildHookCaller(
 /**
  * @returns True if the hook cancels the current function
  */
-export function callHook(
+export function callPowerCardHook(
   hookId: keyof PowerCardHooksType,
   self: Player,
   target: Player | null,
