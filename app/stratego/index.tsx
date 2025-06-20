@@ -141,17 +141,19 @@ export default function Game() {
       )}
 
       <View style={styles.roleContainer}>
-        <PlayerRole
-          teamId={stratego.self.teamId}
-          attackCode={stratego.self.attackCode}
-          roleCard={AllRoleCards.find(
-            card => card.id === stratego.self.roleCard,
-          )}
-        />
-      </View>
+        <View style={styles.roleBox}>
+          <PlayerRole
+            teamId={stratego.self.teamId}
+            attackCode={stratego.self.attackCode}
+            roleCard={AllRoleCards.find(
+              card => card.id === stratego.self.roleCard,
+            )}
+          />
+        </View>
 
-      <View style={styles.playerAttackContainer}>
-        <AttackButton />
+        <View style={styles.playerAttackContainer}>
+          <AttackButton />
+        </View>
       </View>
 
       <Animated.View
@@ -224,8 +226,18 @@ const styles = StyleSheet.create({
     top: 4,
   },
   roleContainer: {
-    marginTop: 90,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+  roleBox: {},
   roleCardPickerContainer: {
     marginTop: 20,
     alignItems: 'center',
