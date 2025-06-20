@@ -12,6 +12,7 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { GameState } from '@/constants/GameState';
@@ -94,7 +95,9 @@ export default function Game() {
   }
 
   return (
-    <SafeAreaView style={styles.BackgroundView}>
+    <KeyboardAvoidingView
+      ehavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={styles.BackgroundView}>
       <FeedbackForm />
       <View style={styles.CardStackTrackerContainer}>
         <CardCountBar
@@ -175,7 +178,7 @@ export default function Game() {
 
       <PowerupBar />
       <SpelregelI />
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
