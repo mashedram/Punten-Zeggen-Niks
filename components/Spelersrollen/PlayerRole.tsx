@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Image, Animated, TouchableOpacity } from 'react-native';
 import { View } from 'react-native';
 import { Text } from 'react-native';
@@ -16,28 +16,6 @@ interface Rolecardprops {
 export const PlayerRole = ({ teamId, attackCode, roleCard }: Rolecardprops) => {
   const image = roleCard ? CardImages[roleCard.id?.toLowerCase()] : undefined;
   const [showQRcode, setShowQRcode] = useState(false);
-  const flipAnim = useRef(new Animated.Value(0)).current;
-
-  const handleFlipImg = () => {
-    const toValue = showQRcode ? 0 : 1;
-    Animated.timing(flipAnim, {
-      toValue: 0.5,
-      duration: 250,
-      useNativeDriver: true,
-    }).start(() => {
-      setShowQRcode(prev => !prev);
-      Animated.timing(flipAnim, {
-        toValue,
-        duration: 250,
-        useNativeDriver: true,
-      }).start();
-    });
-  };
-
-  const rotateY = flipAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '180deg'],
-  });
 
   if (roleCard === undefined) {
     return (
@@ -66,26 +44,20 @@ export const PlayerRole = ({ teamId, attackCode, roleCard }: Rolecardprops) => {
         {
           borderColor:
             teamId === 'red' ? TeamColors.red.color : TeamColors.blue.color,
-          transform: [{ rotateY }],
         },
       ]}>
       <TouchableOpacity
-        style={styles.button}
-        onPress={handleFlipImg}
+        style={[styles.button]}
+        onPress={() => setShowQRcode(!showQRcode)}
         activeOpacity={0.8}>
-        {showQRcode ? (
-          <View
-            style={[
-              styles.qrCodeContainer,
-              { transform: [{ rotateY: '180deg' }] },
-            ]}>
-            <QRCode value={`${attackCode}`} size={160} />
-          </View>
-        ) : (
-          <View style={styles.imageContainer}>
-            <Image source={image} style={styles.image} resizeMode="center" />
-          </View>
-        )}
+        <View
+          style={[styles.qrCodeContainer, showQRcode ? styles.flipButton : {}]}>
+          <QRCode value={`${attackCode}`} size={160} />
+        </View>
+        <View
+          style={[styles.imageContainer, showQRcode ? {} : styles.flipButton]}>
+          <Image source={image} style={styles.image} resizeMode="center" />
+        </View>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -102,16 +74,26 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     height: '100%',
+    transitionDuration: '0.3s',
+  },
+  flipButton: {
+    transform: [{ rotateY: '180deg' }],
   },
   qrCodeContainer: {
+    position: 'absolute',
     width: '100%',
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    backfaceVisibility: 'hidden',
+    transitionDuration: '0.3s',
   },
   imageContainer: {
+    position: 'absolute',
     width: '100%',
     height: '100%',
+    backfaceVisibility: 'hidden',
+    transitionDuration: '0.3s',
   },
   image: {
     borderRadius: 20,
