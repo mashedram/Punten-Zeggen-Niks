@@ -33,13 +33,14 @@ export const FeedbackForm = () => {
         onPress={() => setIsOpen(true)}
         style={{
           position: 'absolute',
-          bottom: 20,
-          left: 20,
+          aspectRatio: 1,
+          top: 90,
+          right: 20,
           backgroundColor: 'lightgray',
-          padding: 10,
-          borderRadius: 5,
+          padding: 13,
+          borderRadius: 30,
         }}>
-        <Text>Open Feedback Form</Text>
+        <Text>F</Text>
       </Pressable>
     );
   }

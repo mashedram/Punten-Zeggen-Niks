@@ -7,7 +7,6 @@ import { useLobby } from '@/hooks/useLobby';
 import { Redirect } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  SafeAreaView,
   Text,
   StyleSheet,
   View,
@@ -143,7 +142,7 @@ export default function Game() {
         </TouchableOpacity>
       )}
 
-      <View style={styles.roleContainer}>
+      <View style={styles.roleContainer} pointerEvents="box-none">
         <PlayerRole
           teamId={stratego.self.teamId}
           attackCode={stratego.self.attackCode}
