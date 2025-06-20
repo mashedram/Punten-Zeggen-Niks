@@ -1,16 +1,29 @@
 import { ImageSourcePropType } from 'react-native';
 
+import SpionImage from '@/assets/images/Spion.png';
+import MajoorImage from '@/assets/images/Majoor.png';
+import LuitenantImage from '@/assets/images/Luitenant.png';
+import KapiteinImage from '@/assets/images/Kapitein.png';
+import KolonelImage from '@/assets/images/Kolonel.png';
+import MineurImage from '@/assets/images/Mineur.png';
+import VlagImage from '@/assets/images/Vlag.png';
+import GeneraalImage from '@/assets/images/Generaal.png';
+import VerkennerImage from '@/assets/images/Verkenner.png';
+import SergeantImage from '@/assets/images/Sergeant.png';
+import BomImage from '@/assets/images/Bom.png';
+import MaarschalkImage from '@/assets/images/Maarschalk.png';
+
 export const CardImages: Record<string, ImageSourcePropType> = {
-  spion: require('@/assets/images/Spion.png'),
-  majoor: require('@/assets/images/Majoor.png'),
-  luitenant: require('@/assets/images/Luitenant.png'),
-  kapitein: require('@/assets/images/Kapitein.png'),
-  kolonel: require('@/assets/images/Kolonel.png'),
-  mineur: require('@/assets/images/Mineur.png'),
-  vlag: require('@/assets/images/Vlag.png'),
-  generaal: require('@/assets/images/Generaal.png'),
-  verkenner: require('@/assets/images/Verkenner.png'),
-  sergeant: require('@/assets/images/Sergeant.png'),
-  bom: require('@/assets/images/Bom.png'),
-  maarschalk: require('@/assets/images/Maarschalk.png'),
+  spion: SpionImage,
+  majoor: MajoorImage,
+  luitenant: LuitenantImage,
+  kapitein: KapiteinImage,
+  kolonel: KolonelImage,
+  mineur: MineurImage,
+  vlag: VlagImage,
+  generaal: GeneraalImage,
+  verkenner: VerkennerImage,
+  sergeant: SergeantImage,
+  bom: BomImage,
+  maarschalk: MaarschalkImage,
 };

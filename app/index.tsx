@@ -13,6 +13,8 @@ import {
   StatusBar,
 } from 'react-native';
 
+import LogoImage from '@/assets/images/Socket.png';
+
 export default function HomePage() {
   const lobby = useLobby();
 
@@ -32,10 +34,7 @@ export default function HomePage() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.mainContent}>
-        <Image
-          source={require('../assets/images/Socket.png')}
-          style={styles.profileImage}
-        />
+        <Image source={LogoImage} style={styles.profileImage} />
       </View>
       <View style={styles.bottomCard}>
         <JoinButton />

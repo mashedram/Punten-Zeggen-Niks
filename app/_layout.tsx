@@ -23,6 +23,8 @@ import { LobbyProvider } from '@/hooks/useLobby';
 import { ClientProvider } from '@/hooks/networking/useClient';
 import SuperJSON from 'superjson';
 
+import SpaceMonoFont from '@/assets/fonts/SpaceMono-Regular.ttf';
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync().catch(e => console.warn(e));
 
@@ -37,9 +39,7 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    // Require does work in the browser on react.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: SpaceMonoFont,
   });
 
   useEffect(() => {

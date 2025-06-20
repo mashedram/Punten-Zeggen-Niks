@@ -17,6 +17,9 @@ import { StyleSheet } from 'react-native';
 import { QrButton } from '@/components/lobby_host/QrButton';
 import { StrategoGameId } from '@/api/managers/stratego/StrategoGame';
 
+import CrownImage from '@/assets/images/CrownImage.png';
+import StrategoImage from '@/assets/images/stratego.png';
+
 export default function LobbyPage() {
   const lobby = useLobby();
   const router = useRouter();
@@ -56,10 +59,7 @@ export default function LobbyPage() {
       </View>
 
       <View style={stylesheet.StrategoContainer}>
-        <Image
-          source={require('@/assets/images/stratego.png')}
-          style={stylesheet.StrategoImage}
-        />
+        <Image source={StrategoImage} style={stylesheet.StrategoImage} />
       </View>
 
       <View style={stylesheet.SpelerlijstContainer}>
@@ -84,13 +84,13 @@ export default function LobbyPage() {
                     {player.isAdmin && (
                       <ImageBackground
                         style={stylesheet.CrownImage}
-                        source={require('@/assets/images/CrownImage.png')}
+                        source={CrownImage}
                       />
                     )}
                     {player.isLeader && (
                       <ImageBackground
                         style={stylesheet.LeaderImage}
-                        source={require('@/assets/images/CrownImage.png')}
+                        source={CrownImage}
                       />
                     )}
                   </View>

@@ -43,6 +43,7 @@ const PowerCardHooks: Record<PowerCardKeys, Partial<PowerCardHooksType>> = {
       },
     ],
   },
+  ruilkaart: {},
 };
 
 function getPowerCardHook(

@@ -7,4 +7,9 @@ export const PowerCards = {
       'Verliest het spel, maar neemt de tegenstander mee in de dood.',
     cost: 5,
   },
+  ruilkaart: {
+    name: 'Ruilkaart',
+    description: 'Ruil van plaats met een andere speler.',
+    cost: 3,
+  },
 } satisfies { [K: string]: PowerCard };

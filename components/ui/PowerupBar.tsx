@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { PowerUpPopUp } from './PowerUpPopUp';
 import React from 'react';
@@ -11,6 +11,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { useTRPC } from '@/api/query';
 import { PowerCardShop } from '../stratego/PowerCardShop';
+import { PowerCardPopups } from '@/constants/powercard/PowerCardPopups';
 
 const PowerupCard = ({
   id,
@@ -37,22 +38,43 @@ export const PowerupBar = () => {
   const stratego = useStrategoUnsafe();
   const [isOpen, setOpen] = useState(false);
   const [popupCardIndex, setPopupCardIndex] = useState<number | null>(null);
+  const [cardMenuPopUp, setCardMenuPopUp] = useState<React.ReactNode>(null);
 
   const isFlag = stratego.self.roleCard === 'vlag';
 
   const tRPC = useTRPC();
+
   const useCardMutation = useMutation(
     tRPC.stratego.usePowerCard.mutationOptions({}),
   );
 
+  const useCard = useCallback(
+    (index: number) => {
+      const id = stratego.self.powercards[index] as PowerCardKeys;
+      const PopupComponent = PowerCardPopups[id];
+      console.log(PopupComponent);
+      if (PopupComponent) {
+        setCardMenuPopUp(
+          <Suspense>
+            <PopupComponent />
+          </Suspense>,
+        );
+      } else {
+        useCardMutation.mutate({ index });
+      }
+    },
+    [stratego.self.powercards, useCardMutation],
+  );
+
   return (
     <>
+      {cardMenuPopUp}
       {popupCardIndex !== null && (
         <PowerUpPopUp
           index={popupCardIndex}
           cardId={stratego.self.powercards[popupCardIndex] as PowerCardKeys}
           inUse={popupCardIndex === stratego.self.activePowercardIndex}
-          use={index => useCardMutation.mutateAsync({ index })}
+          use={useCard}
           close={() => setPopupCardIndex(null)}
         />
       )}

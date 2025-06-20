@@ -1,12 +1,11 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 
+import NeutraalImage from '@/assets/images/Neutraal.png';
+
 export const GelijkPopUp = ({ onClose }: { onClose: () => void }) => {
   return (
     <View style={styles.PopUpBox}>
-      <Image
-        source={require('@/assets/images/Neutraal.png')}
-        style={styles.NeutraalImage}
-      />
+      <Image source={NeutraalImage} style={styles.NeutraalImage} />
       <TouchableOpacity style={styles.DeleteButton} onPress={onClose}>
         <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}>
           X
