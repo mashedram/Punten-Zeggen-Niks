@@ -225,6 +225,7 @@ export class Lobby {
 
     if (Object.keys(this._players).length === 0) {
       this.manager.deleteLobby(this.getCode());
+      console.debug(`Deleted empty lobby ${this.getCode()}`);
       return;
     }
 
