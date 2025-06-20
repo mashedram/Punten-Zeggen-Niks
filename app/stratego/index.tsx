@@ -24,7 +24,6 @@ import { AttackButton } from '@/components/ui/AttackButton';
 import { WinPopUp } from '@/components/ui/WinPopUp';
 import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
-import { defaultDeckSize } from '@/constants/RoleCardDeck';
 import { FeedbackForm } from '@/components/ui/FeedbackForm';
 import GameStatusPopup from '@/components/ui/GameStatusPopup';
 import { SpelregelI } from '@/components/Spelersrollen/SpelregelI';
@@ -99,26 +98,20 @@ export default function Game() {
     p => p.hasRoleCard === false && p.teamId === stratego.self.teamId,
   ).length;
 
-  const teamRedDeck = stratego.lobby.teams.find(
-    team => team.id === 'red',
-  )?.deck;
-  const teamBlueDeck = stratego.lobby.teams.find(
-    team => team.id === 'blue',
-  )?.deck;
-  const teamRedDeckSize = teamRedDeck
-    ? Object.values(teamRedDeck).reduce((sum, value) => sum + value, 0)
-    : defaultDeckSize;
-  const teamBlueDeckSize = teamBlueDeck
-    ? Object.values(teamBlueDeck).reduce((sum, value) => sum + value, 0)
-    : defaultDeckSize;
+  const teamRed = stratego.lobby.teams.find(team => team.id === 'red');
+  const teamBlue = stratego.lobby.teams.find(team => team.id === 'blue');
+
+  if (!teamRed || !teamBlue) {
+    throw new Error(`Can not find team ${teamRed} or ${teamBlue}`);
+  }
 
   return (
     <SafeAreaView style={styles.BackgroundView}>
       <FeedbackForm />
       <View style={styles.CardStackTrackerContainer}>
         <CardCountBar
-          blueCardCount={teamBlueDeckSize}
-          redCardCount={teamRedDeckSize}
+          blueCardCount={teamBlue.score}
+          redCardCount={teamRed.score}
         />
       </View>
 
@@ -190,7 +183,6 @@ export default function Game() {
           GameStateEnum={GameState}
         />
       </View>
-
       <SpelregelI />
     </SafeAreaView>
   );

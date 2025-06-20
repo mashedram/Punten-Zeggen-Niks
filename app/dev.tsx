@@ -1,10 +1,9 @@
 import { useTRPC } from '@/api/query';
-import { useClient } from '@/hooks/networking/useClient';
 import { useLobby } from '@/hooks/useLobby';
 import { useMutation } from '@tanstack/react-query';
 import { Redirect } from 'expo-router';
 import { useEffect } from 'react';
-import { Button, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 
 export default function DevPage() {
   const lobby = useLobby();

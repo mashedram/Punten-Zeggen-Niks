@@ -14,7 +14,6 @@ export const CreateButton = () => {
       onPress={() => {
         if (lobby.loading) return;
         if (lobby.inLobby) return;
-        // @ts-ignore
 
         router.navigate('/lobby/create');
       }}>
@@ -36,7 +35,6 @@ const styles = StyleSheet.create({
 
   createText: {
     color: '#665858',
-    // marginTop: 16,
     fontWeight: '700',
     fontSize: 16,
   },
