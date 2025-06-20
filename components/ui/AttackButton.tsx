@@ -27,11 +27,9 @@ export const AttackButton = () => {
     card => card.id === stratego.self.roleCard,
   );
   const currentTeamColor =
-    TeamColors[stratego.self.teamId as keyof typeof TeamColors]?.color ||
-    '#000';
-  // stratego.self.teamId === 'red'
-  //   ? TeamColors.red.color
-  //   : TeamColors.blue.color;
+    stratego.self.teamId === 'red'
+      ? TeamColors.red.color
+      : TeamColors.blue.color;
 
   return (
     <View style={styles.container}>
