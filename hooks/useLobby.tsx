@@ -17,7 +17,7 @@ export type LobbyStateUnsafe = {
   get: () => LobbyDataExtended | undefined;
   setLeader: (target: string, state: boolean) => void;
   leave: () => void;
-  setGame: (gameId: string) => void;
+  setGame: (gameId: string | null) => void;
 };
 
 export type LobbyState =
@@ -136,7 +136,7 @@ export function LobbyProvider({ children }: { children?: React.ReactNode }) {
   ]);
 
   const setGameCallback = useCallback(
-    (gameId: string) => {
+    (gameId: string | null) => {
       if (client.isLoading) return;
       if (lobbyData.isLoading) return;
       if (lobbyData.data === undefined) return;
