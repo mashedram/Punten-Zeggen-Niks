@@ -35,6 +35,11 @@ export const AttackButton = () => {
     <View style={styles.container}>
       <View
         style={[styles.attackCodeContainer, { borderColor: currentTeamColor }]}>
+        <Text>You are team:</Text>
+        <Text
+          style={{ fontWeight: 'bold', fontSize: 20, color: currentTeamColor }}>
+          {stratego.self.teamId.toUpperCase()}
+        </Text>
         <Text>Your attack code:</Text>
         <Text style={styles.attackCodeText}>{stratego.self.attackCode}</Text>
         <Text style={[{ fontSize: 12 }]}>
@@ -87,7 +92,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 80,
+    height: 120,
     borderRadius: 5,
     borderWidth: 3,
   },
