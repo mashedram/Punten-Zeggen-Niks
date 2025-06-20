@@ -69,6 +69,20 @@ export class Lobby {
       },
       this._tracker,
     );
+
+    this._clients.on('onClientConnected', client => {
+      const player = this._players[client.getId()];
+      if (player) {
+        player.setConnected(true);
+      }
+    });
+
+    this._clients.on('onClientDisconnected', client => {
+      const player = this._players[client.getId()];
+      if (player) {
+        player.setConnected(false);
+      }
+    });
   }
 
   // Player control methods

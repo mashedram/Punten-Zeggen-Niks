@@ -13,6 +13,7 @@ import {
   getPlayersWithoutRoleCards,
 } from './functions/RoleCardFunctions';
 import { checkWinConditions } from './functions/GameLogicFunctions';
+import { callPowerCardHook } from './PowerCardManager';
 
 export const StrategoGameId = 'stratego';
 
@@ -28,6 +29,7 @@ export const LobbyDataSchemaStratego = z.object({
       name: z.string(),
       deck: z.record(z.string(), z.number()),
       hasFlag: z.boolean(),
+      currency: z.number().default(0),
       score: z.number(),
     }),
   ),
@@ -49,9 +51,11 @@ export const PlayerDataSchemaStratego = z.object({
   name: z.string(),
   teamId: z.string(),
   roleCard: z.string().nullable(),
+  hasRoleCard: z.boolean(),
   attackCode: z.string(),
   isTeamLeader: z.boolean(),
-  hasRoleCard: z.boolean(),
+  activePowercardIndex: z.number().nullable(),
+  powercards: z.array(z.string()),
   lastFightResult: z
     .discriminatedUnion('type', [
       z.object({
@@ -83,6 +87,7 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
           id: 'red',
           name: 'Rood',
           deck: createRoleCardDeck(),
+          currency: 0,
           hasFlag: false,
           score: defaultDeckSize,
         },
@@ -90,6 +95,7 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
           id: 'blue',
           name: 'Blauw',
           deck: createRoleCardDeck(),
+          currency: 0,
           hasFlag: false,
           score: defaultDeckSize,
         },
@@ -106,6 +112,8 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         isTeamLeader: false,
         hasRoleCard: false,
         roleCard: null,
+        activePowercardIndex: null,
+        powercards: ['ruilkaart'],
         attackCode: generateAttackCode(),
         lastFightResult: null,
       };
@@ -166,7 +174,17 @@ function assignTeamLeader(lobby: Lobby, teamId: string) {
     playerScores.push({ player, score });
   }
   playerScores.sort((a, b) => b.score - a.score);
-  const playerData = getPlayerData(playerScores[0].player);
+
+  const bestTeamLeader = playerScores[0];
+
+  if (!bestTeamLeader) {
+    console.warn(
+      `No team leader found for team ${teamId}, defaulting to first player.`,
+    );
+    return;
+  }
+
+  const playerData = getPlayerData(bestTeamLeader.player);
   playerData.isTeamLeader = true;
 }
 
@@ -238,8 +256,9 @@ export function getPlayerFromAttackCode(
 
 export const StrategoGame = {
   attack(lobby: Lobby, attacker: Player, defender: Player) {
-    performAttack(lobby, attacker, defender);
+    performAttack(attacker, defender);
     checkWinConditions(lobby);
+
     lobby.sync();
   },
 
@@ -263,5 +282,28 @@ export const StrategoGame = {
     const players = getPlayersWithoutRoleCards(lobby, player);
     lobby.sync();
     return players;
+  },
+
+  usePowerCard: (player: Player, index: number) => {
+    const data = getPlayerData(player);
+    if (index < 0 || index >= data.powercards.length) {
+      throw new Error(`Invalid power card index: ${index}`);
+    }
+
+    if (
+      callPowerCardHook('useHook', player, null, {
+        defeat: () => {
+          data.lastFightResult = {
+            type: 'error',
+            index: index,
+            error: 'Power card cannot attack',
+          };
+        },
+      })
+    ) {
+      return;
+    }
+
+    data.activePowercardIndex = index;
   },
 };

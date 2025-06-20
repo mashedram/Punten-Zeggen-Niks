@@ -13,9 +13,11 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { StyleSheet } from 'react-native';
-import { QrButton } from '@/components/lobby_host/QrButton';
 import { StrategoGameId } from '@/api/managers/stratego/StrategoGame';
 import { FontAwesome } from '@expo/vector-icons';
+
+import CrownImage from '@/assets/images/CrownImage.png';
+import StrategoImage from '@/assets/images/stratego.png';
 
 export default function LobbyPage() {
   const lobby = useLobby();
@@ -64,10 +66,7 @@ export default function LobbyPage() {
 
       <View style={stylesheet.StrategoContainer}>
         <View style={stylesheet.StrategoBox}>
-          <Image
-            source={require('@/assets/images/stratego.png')}
-            style={stylesheet.StrategoImage}
-          />
+          <Image source={StrategoImage} style={stylesheet.StrategoImage} />
         </View>
       </View>
 
@@ -96,7 +95,7 @@ export default function LobbyPage() {
                   {player.isAdmin && (
                     <ImageBackground
                       style={stylesheet.CrownImage}
-                      source={require('@/assets/images/CrownImage.png')}
+                      source={CrownImage}
                     />
                   )}
                   {player.isLeader && (

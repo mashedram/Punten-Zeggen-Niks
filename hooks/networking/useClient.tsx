@@ -3,7 +3,10 @@ import {
   getDataInstanceDescriptor,
   DataInstanceDescriptor,
 } from '@/common/networking/tracking/descriptors/DataInstanceDescriptor';
-import { Deref } from '@/common/networking/tracking/tracker/TrackedInstanceReference';
+import {
+  Deref,
+  TrackedInstanceReference,
+} from '@/common/networking/tracking/tracker/TrackedInstanceReference';
 import { useTRPC } from '@/api/query';
 import { useMutation } from '@tanstack/react-query';
 import { useSubscription } from '@trpc/tanstack-react-query';
@@ -28,6 +31,7 @@ type ClientContextType =
       getInstance: <T>(
         descriptor: DataInstanceDescriptor<T>,
       ) => ClientTrackedInstance<T> | undefined;
+      refetch: (ref: TrackedInstanceReference<never>) => void;
       getStore: () => ClientDataStore;
     }
   | {

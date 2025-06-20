@@ -1,12 +1,11 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 
+import RoodDuimpjeImage from '@/assets/images/Rood-duimpje.png';
+
 export const VerlorenPopUp = ({ onClose }: { onClose: () => void }) => {
   return (
     <View style={styles.PopUpBox}>
-      <Image
-        source={require('@/assets/images/Rood-duimpje.png')}
-        style={styles.RoodDuimpjeImage}
-      />
+      <Image source={RoodDuimpjeImage} style={styles.RoodDuimpjeImage} />
       <TouchableOpacity style={styles.DeleteButton} onPress={onClose}>
         <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}>
           X

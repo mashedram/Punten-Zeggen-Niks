@@ -30,6 +30,7 @@ export type PlayerData = {
   id: string;
   name: string;
   isAdmin: boolean;
+  isConnected: boolean;
   gameData: TrackedInstanceReference<PlayerDataStratego> | undefined;
   isLeader: boolean;
 };

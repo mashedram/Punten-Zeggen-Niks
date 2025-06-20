@@ -36,6 +36,7 @@ export class Player {
         id,
         name,
         gameData: undefined,
+        isConnected: client.isConnected(),
         isAdmin: false,
         isLeader: false,
       },
@@ -64,6 +65,12 @@ export class Player {
   public setLeader(value: boolean) {
     this._data.modify(data => {
       data.set('isLeader', value);
+    });
+  }
+
+  public setConnected(value: boolean) {
+    this._data.modify(data => {
+      data.set('isConnected', value);
     });
   }
 

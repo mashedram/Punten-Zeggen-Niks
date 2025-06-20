@@ -13,12 +13,12 @@ export class DataTracker {
     this._trackedInstances = {};
     this._clients = clients;
     // There is a real difference here between a lambda and a method reference
-    this._clients
-      .getEventEmitter()
-      .on('onClientConnected', client => this.registerClient(client));
-    this._clients
-      .getEventEmitter()
-      .on('onClientRemoved', client => this.unregisterClient(client));
+    this._clients.on('onClientConnected', client =>
+      this.registerClient(client),
+    );
+    this._clients.on('onClientRemoved', client =>
+      this.unregisterClient(client),
+    );
   }
 
   public getName(): string {

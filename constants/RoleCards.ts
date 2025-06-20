@@ -3,8 +3,7 @@ export type RoleCard = {
   name: string;
   value: number;
   canAttack: boolean;
-  beats: RoleCard[];
-  overwrites?: string[];
+  forceWins?: string[];
 };
 
 const vlag: RoleCard = {
@@ -12,7 +11,6 @@ const vlag: RoleCard = {
   name: 'Vlag',
   value: 0,
   canAttack: false,
-  beats: [],
 };
 
 const maarschalk: RoleCard = {
@@ -20,7 +18,6 @@ const maarschalk: RoleCard = {
   name: 'Maarschalk',
   value: 10,
   canAttack: true,
-  beats: [],
 };
 
 const generaal: RoleCard = {
@@ -28,7 +25,6 @@ const generaal: RoleCard = {
   name: 'Generaal',
   value: 9,
   canAttack: true,
-  beats: [],
 };
 
 const kolonel: RoleCard = {
@@ -36,7 +32,6 @@ const kolonel: RoleCard = {
   name: 'Kolonel',
   value: 8,
   canAttack: true,
-  beats: [],
 };
 
 const majoor: RoleCard = {
@@ -44,7 +39,6 @@ const majoor: RoleCard = {
   name: 'Majoor',
   value: 7,
   canAttack: true,
-  beats: [],
 };
 
 const kapitein: RoleCard = {
@@ -52,7 +46,6 @@ const kapitein: RoleCard = {
   name: 'Kapitein',
   value: 6,
   canAttack: true,
-  beats: [],
 };
 
 const luitenant: RoleCard = {
@@ -60,7 +53,6 @@ const luitenant: RoleCard = {
   name: 'Luitenant',
   value: 5,
   canAttack: true,
-  beats: [],
 };
 
 const sergeant: RoleCard = {
@@ -68,7 +60,6 @@ const sergeant: RoleCard = {
   name: 'Sergeant',
   value: 4,
   canAttack: true,
-  beats: [],
 };
 
 const mineur: RoleCard = {
@@ -76,7 +67,7 @@ const mineur: RoleCard = {
   name: 'Mineur',
   value: 3,
   canAttack: true,
-  beats: [],
+  forceWins: ['bom'],
 };
 
 const spion: RoleCard = {
@@ -84,62 +75,15 @@ const spion: RoleCard = {
   name: 'Spion',
   value: 2,
   canAttack: true,
-  beats: [],
+  forceWins: ['maarschalk'],
 };
 
 const bom: RoleCard = {
   id: 'bom',
   name: 'Bom',
-  value: 1,
+  value: 11,
   canAttack: false,
-  beats: [],
 };
-
-maarschalk.beats = [
-  generaal,
-  kolonel,
-  majoor,
-  kapitein,
-  luitenant,
-  sergeant,
-  mineur,
-  spion,
-];
-
-generaal.beats = [
-  kolonel,
-  majoor,
-  kapitein,
-  luitenant,
-  sergeant,
-  mineur,
-  spion,
-];
-
-kolonel.beats = [majoor, kapitein, luitenant, sergeant, mineur, spion];
-
-majoor.beats = [kapitein, luitenant, sergeant, mineur, spion];
-
-kapitein.beats = [luitenant, sergeant, mineur, spion];
-
-luitenant.beats = [sergeant, mineur, spion];
-
-sergeant.beats = [mineur, spion];
-
-mineur.beats = [spion, bom];
-
-spion.beats = [maarschalk];
-
-bom.beats = [
-  maarschalk,
-  generaal,
-  kolonel,
-  majoor,
-  kapitein,
-  luitenant,
-  sergeant,
-  spion,
-];
 
 export const RoleCards: Record<string, RoleCard> = {
   vlag,

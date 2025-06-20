@@ -6,6 +6,7 @@ import {
 } from '@/common/networking/packet/PacketTransformer';
 import { Lobby } from '@/api/managers/lobby/Lobby';
 import { Player } from '@/api/managers/lobby/Player';
+import { ClientManager } from './ClientManager';
 
 // All client data *must* be optional
 type ClientData = {
@@ -24,13 +25,16 @@ export class Client {
   private _emitter: EventEmitter<EventMap>;
   private _transformer: PacketTransformer;
   private _lastConnected: number | undefined;
+  private _owner: ClientManager;
   private _data: ClientData;
 
-  constructor(id: string = crypto.randomUUID()) {
+  constructor(owner: ClientManager, id: string = crypto.randomUUID()) {
     this._id = id;
     this._emitter = new EventEmitter();
     this._transformer = new PacketTransformer();
     this._token = crypto.randomUUID();
+    this._lastConnected = Date.now();
+    this._owner = owner;
     this._data = {};
   }
 
@@ -39,7 +43,24 @@ export class Client {
   }
 
   public setConnected(connected: boolean): void {
+    const oldValue = this._lastConnected;
+    console.log(
+      `Client ${this._id} is now ${connected ? 'connected' : 'disconnected'}.`,
+    );
     this._lastConnected = connected ? undefined : Date.now();
+
+    console.log(
+      `Client ${this._id} last connected time updated from ${oldValue} to ${this._lastConnected}.`,
+    );
+    if (this._lastConnected === oldValue) return;
+
+    if (this._lastConnected === undefined) {
+      this._owner.getEventEmitter().emit('onClientConnected', this);
+      console.log(`Client ${this._id} connected.`);
+    } else {
+      this._owner.getEventEmitter().emit('onClientDisconnected', this);
+      console.log(`Client ${this._id} disconnected event emitted.`);
+    }
   }
 
   public isConnected(): boolean {

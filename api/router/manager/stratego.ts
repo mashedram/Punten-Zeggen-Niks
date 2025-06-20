@@ -6,6 +6,8 @@ import {
   StrategoGame,
 } from '@/api/managers/stratego/StrategoGame';
 import { publicProcedure, router } from '@/api/server';
+import { PowerCardKeys } from '@/constants/powercard/PowerCardImages';
+import { PowerCards } from '@/constants/powercard/PowerCards';
 import { RoleCards } from '@/constants/RoleCards';
 import { z } from 'zod';
 
@@ -14,13 +16,63 @@ export const strategoRouter = router({
     .input(z.object({ attackCode: z.string() }))
     .mutation(({ ctx, input }) => {
       const client = ctx.client;
-      if (!client) throw new Error('Client not found');
 
       const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
       if (!lobby) throw new Error('Lobby not found');
       const defender = getPlayerFromAttackCode(lobby, input.attackCode);
       if (!defender) throw new Error('Invalid attack code');
       StrategoGame.attack(lobby, player, defender);
+    }),
+
+  usePowerCard: publicProcedure
+    .input(z.object({ index: z.number() }))
+    .mutation(({ ctx, input }) => {
+      const client = ctx.client;
+      const [, player] = lobbyManager.getClientLobbyAndPlayer(client);
+      if (!player) throw new Error('Player not found');
+      StrategoGame.usePowerCard(player, input.index);
+    }),
+  buyCardMutation: publicProcedure
+    .input(
+      z.object({
+        targetId: z.string(),
+        cardId: z.string(),
+      }),
+    )
+    .mutation(({ ctx, input }) => {
+      const client = ctx.client;
+      const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
+      if (!lobby) {
+        throw new Error('Lobby not found');
+      }
+
+      const targetPlayer = lobby
+        .getPlayers()
+        .find(p => p.getId() === input.targetId);
+      if (!targetPlayer) {
+        throw new Error(
+          `Target player not found ${input.targetId}: stratego.buyCard`,
+        );
+      }
+
+      const playerData = getPlayerData(player);
+      const targetData = getPlayerData(targetPlayer);
+
+      if (playerData.roleCard !== 'vlag') {
+        throw new Error('Only players with a flag can buy cards.');
+      }
+
+      if (targetData.powercards.length >= 3) {
+        throw new Error('Target player already has 3 power cards.');
+      }
+
+      if (!Object.keys(PowerCards).includes(input.cardId)) {
+        throw new Error(`Power card ${input.cardId} does not exist.`);
+      }
+
+      const cards = targetData.powercards;
+      cards.push(input.cardId as PowerCardKeys);
+      targetData.powercards = cards;
     }),
 
   revive: publicProcedure
@@ -32,7 +84,6 @@ export const strategoRouter = router({
     )
     .mutation(({ ctx, input }) => {
       const client = ctx.client;
-      if (!client) throw new Error('Client not found');
       const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
       if (!lobby) throw new Error('Lobby not found');
 
@@ -44,17 +95,18 @@ export const strategoRouter = router({
         .getPlayers()
         .find(p => p.getId() === input.targetId);
       const playerData = getPlayerData(player);
+      if (!playerData.isTeamLeader) {
+        throw new Error('Only team leaders can revive players.');
+      }
 
       if (!targetPlayer)
         throw new Error(`Target player not found ${input}: stratego.revive`);
       const targetData = getPlayerData(targetPlayer);
-
-      if (!playerData.isTeamLeader)
-        throw new Error('Only team leaders can revive players.');
-      if (targetData.roleCard)
+      if (targetData.roleCard) {
         throw new Error(
           `Target player is already active. ${targetPlayer.getName()}`,
         );
+      }
       if (targetData.teamId !== playerData.teamId)
         throw new Error('Target player is not on the same team.');
       if (
@@ -78,8 +130,6 @@ export const strategoRouter = router({
 
   assignFlag: publicProcedure.input(z.string()).mutation(({ ctx, input }) => {
     const client = ctx.client;
-    if (!client) throw new Error('Client not found');
-
     const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
     if (!lobby) throw new Error('Lobby not found');
 
@@ -105,7 +155,6 @@ export const strategoRouter = router({
     .output(z.record(z.string(), z.number()))
     .query(({ ctx }) => {
       const client = ctx.client;
-      if (!client) throw new Error('Client not found');
       const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
       if (!lobby) throw new Error('Lobby not found');
 
@@ -116,7 +165,6 @@ export const strategoRouter = router({
     .output(z.array(z.string()))
     .query(({ ctx }) => {
       const client = ctx.client;
-      if (!client) throw new Error('Client not found');
       const [lobby, player] = lobbyManager.getClientLobbyAndPlayer(client);
       if (!lobby) throw new Error('Lobby not found');
 

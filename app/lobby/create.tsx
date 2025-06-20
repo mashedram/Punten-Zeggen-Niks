@@ -9,7 +9,7 @@
 
 import { useLobby } from '@/hooks/useLobby'; // Lobby hook voor game-join functionaliteit
 import { Redirect, useRouter } from 'expo-router'; // Navigatie hook van Expo Router
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -30,12 +30,26 @@ export default function EnterPinScreen() {
   /** Navigatie initialiseren via Expo Router */
   const router = useRouter();
 
-  /**
-   * State voor de ingevoerde code (PIN)
-   * @type {[string, React.Dispatch<React.SetStateAction<string>>]}
-   */
-
   const [name, setName] = useState('');
+
+  const createLobby = useCallback(async () => {
+    if (!name.trim()) {
+      Alert.alert('Fout', 'Voer een naam in om verder te gaan.');
+    } else {
+      if (lobby.loading) {
+        console.error(
+          'Lobby is al bezig met laden. Probeer het later opnieuw.',
+        );
+        return;
+      }
+      if (lobby.inLobby) {
+        console.error('Je zit al in een lobby. Probeer het later opnieuw.');
+        return;
+      }
+      await lobby.create(name.trim()); // Join het spel met de ingevoerde code
+      router.push('/lobby'); // Navigeer naar de lobby-pagina
+    }
+  }, [lobby, name, router]);
 
   if (lobby.loading) {
     return <Text>Loading...</Text>;
@@ -55,6 +69,7 @@ export default function EnterPinScreen() {
           <TextInput
             value={name}
             onChangeText={setName}
+            onSubmitEditing={createLobby}
             style={styles.TextInput}
             placeholder="Vul je naam in"
             placeholderTextColor="#888"
