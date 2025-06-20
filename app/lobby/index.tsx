@@ -1,4 +1,3 @@
-import { SettingsButton } from '@/components/lobby_host/SettingsButton';
 import { useLobby } from '@/hooks/useLobby';
 import { ExternalPathString, Redirect, useRouter } from 'expo-router';
 import React from 'react';
@@ -11,11 +10,12 @@ import {
   Platform,
   StatusBar,
   ScrollView,
-  Pressable,
+  SafeAreaView,
 } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { QrButton } from '@/components/lobby_host/QrButton';
 import { StrategoGameId } from '@/api/managers/stratego/StrategoGame';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function LobbyPage() {
   const lobby = useLobby();
@@ -45,30 +45,44 @@ export default function LobbyPage() {
   const canStart = activeLobby.self.isAdmin;
 
   return (
-    <View style={stylesheet.BackgroundContainer}>
+    <SafeAreaView style={stylesheet.BackgroundContainer}>
       <View style={stylesheet.CodeContainer}>
         <View style={stylesheet.CodeBox}>
-          <View style={stylesheet.QrButton}>
-            <QrButton />
-          </View>
+          <TouchableOpacity
+            style={stylesheet.QrButton}
+            onPress={() => router.navigate('/qrcode')}>
+            <Image
+              source={{
+                uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1024px-QR_code_for_mobile_English_Wikipedia.svg.png',
+              }}
+              style={stylesheet.QrButtonImage}
+            />
+          </TouchableOpacity>
           <Text style={stylesheet.Cijfercode}>{lobby.get()?.code}</Text>
         </View>
       </View>
 
       <View style={stylesheet.StrategoContainer}>
-        <Image
-          source={require('@/assets/images/stratego.png')}
-          style={stylesheet.StrategoImage}
-        />
+        <View style={stylesheet.StrategoBox}>
+          <Image
+            source={require('@/assets/images/stratego.png')}
+            style={stylesheet.StrategoImage}
+          />
+        </View>
       </View>
 
       <View style={stylesheet.SpelerlijstContainer}>
+        <View style={stylesheet.settingsAndPlayers}>
+          <Text style={stylesheet.title}>
+            Spelers: {activeLobby.players.length}
+          </Text>
+        </View>
+
         <ScrollView
           style={stylesheet.list}
           contentContainerStyle={stylesheet.listContentContainer}>
           <View style={stylesheet.NaamBox}>
             {activeLobby.players.map(player => {
-              console.log(player.name);
               return (
                 <View style={[stylesheet.SpelerNaamEntity]}>
                   <Text
@@ -86,24 +100,15 @@ export default function LobbyPage() {
                     />
                   )}
                   {player.isLeader && (
-                    <ImageBackground
-                      style={stylesheet.LeaderImage}
-                      source={require('@/assets/images/CrownImage.png')}
-                    />
+                    <Text style={stylesheet.LeaderImage}>
+                      <FontAwesome name={'flag'} size={20} />
+                    </Text>
                   )}
                 </View>
               );
             })}
           </View>
         </ScrollView>
-
-        <View style={stylesheet.check} />
-        <View style={stylesheet.settingsAndPlayers}>
-          <SettingsButton />
-          <Text style={stylesheet.title}>
-            Spelers: {activeLobby.players.length}
-          </Text>
-        </View>
       </View>
 
       <View style={stylesheet.bottomCard}>
@@ -129,7 +134,7 @@ export default function LobbyPage() {
           <Text style={stylesheet.PlayText}>Terug</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -142,17 +147,21 @@ const stylesheet = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    flex: 0,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 2,
-    margin: -1.2,
+  },
+
+  bottomContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
 
   bottomCard: {
     width: '100%',
     height: '20%',
-    position: 'absolute',
     display: 'flex',
+    alignSelf: 'flex-end',
     flexDirection: 'column',
     backgroundColor: 'white',
     paddingVertical: 24,
@@ -160,46 +169,54 @@ const stylesheet = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     alignItems: 'center',
-    marginTop: 595,
   },
 
   CodeContainer: {
-    position: 'absolute',
     width: '100%',
-    height: '130%',
-    marginTop: 50,
+    height: '8%',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    left: 0,
-    marginBottom: 680,
   },
 
   CodeBox: {
-    position: 'relative',
-    flexShrink: 0,
-    height: '5%',
+    height: '100%',
     width: '98%',
     backgroundColor: 'rgba(71, 72, 73, 1)',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
+    justifyContent: 'center',
+    paddingHorizontal: 5,
     borderRadius: 8,
-    margin: '1%',
+    marginTop: 5,
   },
 
   Cijfercode: {
-    position: 'relative',
-    marginRight: 125,
     flexShrink: 0,
     textAlign: 'left',
     color: 'rgba(255, 255, 255, 1)',
     fontFamily: 'Inter',
     fontSize: 36,
     fontWeight: 400,
+  },
+
+  QrButton: {
+    height: '80%',
+    aspectRatio: 1,
+
+    position: 'absolute',
+    left: '1%',
+
+    backgroundColor: 'white',
+    borderRadius: 8,
+  },
+
+  QrButtonImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
 
   PlayButtonContainer: {
@@ -293,26 +310,23 @@ const stylesheet = StyleSheet.create({
     margin: 20,
   },
   LeaderImage: {
-    position: 'absolute',
     alignSelf: 'flex-end',
     width: 20,
     height: 20,
     color: 'rgb(255, 255, 255)',
+    fontWeight: 'bold',
     margin: 20,
   },
 
   SpelerlijstContainer: {
-    position: 'relative',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     flexShrink: 0,
-    height: '43%',
+    height: '45%',
     width: '90%',
     paddingTop: 18,
     paddingBottom: 0,
-    marginTop: 20,
-    marginBottom: -40,
     backgroundColor: 'rgba(255, 255, 255, 1)',
     shadowColor: 'rgba(0, 0, 0, 0.25)',
     shadowOffset: {
@@ -326,9 +340,7 @@ const stylesheet = StyleSheet.create({
     borderRadius: 8,
   },
   list: {
-    position: 'absolute',
-    flexShrink: 0,
-    height: '90%',
+    height: '95%',
     width: '100%',
   },
   listContentContainer: {
@@ -376,10 +388,6 @@ const stylesheet = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    paddingHorizontal: 20,
-    marginBottom: 35,
-    marginRight: 50,
-    marginTop: -240,
   },
   title: {
     textAlign: 'center',
@@ -387,16 +395,22 @@ const stylesheet = StyleSheet.create({
     fontFamily: 'Inter',
     fontSize: 20,
     fontWeight: '400',
-    marginLeft: 10,
   },
   StrategoContainer: {
+    width: '100%',
+    height: '20%',
     display: 'flex',
-    position: 'absolute',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  StrategoBox: {
+    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    width: '38%',
-    height: '22%',
+    aspectRatio: 1,
+    height: '100%',
     borderStyle: 'solid',
     backgroundColor: 'rgba(255, 255, 255, 1)',
     shadowColor: 'rgba(0, 0, 0, 0.25)',
@@ -408,19 +422,15 @@ const stylesheet = StyleSheet.create({
     borderWidth: 4,
     borderColor: 'rgba(0, 0, 0, 1)',
     borderRadius: 36,
-    marginBottom: 420,
   },
   StrategoImage: {
     position: 'relative',
     flexGrow: 1,
-    width: '88%',
-    height: '890%',
+    width: '100%',
+    height: 'auto',
     marginTop: 20,
     marginBottom: 20,
     resizeMode: 'contain',
     borderRadius: 300,
-  },
-  QrButton: {
-    marginRight: 10,
   },
 });

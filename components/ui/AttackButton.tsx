@@ -27,14 +27,21 @@ export const AttackButton = () => {
     card => card.id === stratego.self.roleCard,
   );
   const currentTeamColor =
-    stratego.self.teamId === 'red'
-      ? TeamColors.red.color
-      : TeamColors.blue.color;
+    TeamColors[stratego.self.teamId as keyof typeof TeamColors]?.color ||
+    '#000';
+  // stratego.self.teamId === 'red'
+  //   ? TeamColors.red.color
+  //   : TeamColors.blue.color;
 
   return (
     <View style={styles.container}>
       <View
         style={[styles.attackCodeContainer, { borderColor: currentTeamColor }]}>
+        <Text>You are team:</Text>
+        <Text
+          style={{ fontWeight: 'bold', fontSize: 20, color: currentTeamColor }}>
+          {stratego.self.teamId.toUpperCase()}
+        </Text>
         <Text>Your attack code:</Text>
         <Text style={styles.attackCodeText}>{stratego.self.attackCode}</Text>
         <Text style={[{ fontSize: 12 }]}>
@@ -87,7 +94,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 80,
+    height: 120,
     borderRadius: 5,
     borderWidth: 3,
   },
