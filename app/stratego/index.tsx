@@ -13,6 +13,7 @@ import {
   View,
   TouchableOpacity,
   KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { GameState } from '@/constants/GameState';
@@ -96,7 +97,7 @@ export default function Game() {
 
   return (
     <KeyboardAvoidingView
-      ehavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.BackgroundView}>
       <FeedbackForm />
       <View style={styles.CardStackTrackerContainer}>
@@ -184,6 +185,9 @@ export default function Game() {
 
 const styles = StyleSheet.create({
   BackgroundView: {
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
     backgroundColor: 'rgba(92, 163, 194, 1)',
     alignItems: 'center',
     flex: 1,
@@ -208,17 +212,17 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     color: 'rgba(0, 0, 0, 1)',
     fontFamily: 'Inter',
-    fontSize: 60,
+    fontSize: 45,
     fontWeight: '700',
   },
   CaptainText: {
     position: 'absolute',
     color: 'rgba(255, 255, 255, 1)',
     fontFamily: 'Inter',
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
-    left: 8,
-    top: 4,
+    left: 5,
+    top: 3,
   },
   roleContainer: {
     position: 'absolute',
