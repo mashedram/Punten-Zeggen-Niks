@@ -1,18 +1,9 @@
-import { PowerCard } from '@/common/stratego/powercard/PowerCard';
 import {
   PowerCardImages,
   PowerCardKeys,
 } from '@/constants/powercard/PowerCardImages';
 import { PowerCards } from '@/constants/powercard/PowerCards';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ImageSourcePropType,
-  Pressable,
-  Button,
-} from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 
 interface PowerUpPopUpProps {
   index: number;

@@ -5,11 +5,11 @@ export const PowerCards = {
     name: 'Kamikazi',
     description:
       'Verliest het spel, maar neemt de tegenstander mee in de dood.',
-    cost: 5,
+    cost: 15,
   },
   ruilkaart: {
     name: 'Ruilkaart',
     description: 'Ruil van plaats met een andere speler.',
-    cost: 3,
+    cost: 300,
   },
 } satisfies { [K: string]: PowerCard };

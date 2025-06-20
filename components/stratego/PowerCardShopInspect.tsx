@@ -1,5 +1,4 @@
 import { useTRPC } from '@/api/query';
-import { PowerCard } from '@/common/stratego/powercard/PowerCard';
 import { PowerCardKeys } from '@/constants/powercard/PowerCardImages';
 import { PowerCards } from '@/constants/powercard/PowerCards';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';

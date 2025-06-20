@@ -26,8 +26,6 @@ import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
 import { defaultDeckSize } from '@/constants/RoleCardDeck';
 import { FeedbackForm } from '@/components/ui/FeedbackForm';
-import { PowerUpList } from '@/constants/PowerUpList';
-import { PowerUpPopUp } from '@/components/ui/PowerUpPopUp';
 import { PowerupBar } from '@/components/ui/PowerupBar';
 
 export default function Game() {
