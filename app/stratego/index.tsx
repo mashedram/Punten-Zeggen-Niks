@@ -103,6 +103,17 @@ export default function Game() {
         />
       </View>
 
+      <View
+        style={[
+          styles.roleCardPickerContainer,
+          isLeaderPopupOpen && stratego.self.isTeamLeader
+            ? styles.roleCardPickerOpen
+            : {},
+        ]}
+        pointerEvents="box-none">
+        <RoleCardPicker onClose={() => setLeaderPopupOpen(false)} />
+      </View>
+
       {stratego.self.isTeamLeader && (
         <TouchableOpacity
           style={styles.CaptainIconContainer}
@@ -140,14 +151,6 @@ export default function Game() {
         <View style={styles.playerAttackContainer}>
           <AttackButton />
         </View>
-      </View>
-
-      <View
-        style={[
-          styles.roleCardPickerContainer,
-          isLeaderPopupOpen ? styles.roleCardPickerOpen : {},
-        ]}>
-        <RoleCardPicker onClose={() => setLeaderPopupOpen(false)} />
       </View>
 
       <View
@@ -227,7 +230,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   roleCardPickerOpen: {
-    transform: [{ translateY: -1000 }],
+    transform: [{ translateY: 0 }],
   },
   roleCardPickerContainer: {
     position: 'absolute',
@@ -241,6 +244,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     transitionDuration: '0.3s',
+    transform: [{ translateY: -1000 }],
+
+    zIndex: 1000,
   },
   playerAttackContainer: {
     marginTop: 10,

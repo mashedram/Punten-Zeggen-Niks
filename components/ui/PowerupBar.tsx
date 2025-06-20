@@ -79,7 +79,7 @@ export const PowerupBar = () => {
         />
       )}
       {isOpen && isFlag && <PowerCardShop />}
-      <View style={[styles.container, isOpen ? styles.containerOpen : {}]}>
+      <View style={[styles.container]} pointerEvents="box-none">
         <View style={[styles.bar, isOpen && !isFlag ? {} : styles.barClosed]}>
           <Pressable onPress={() => setOpen(!isOpen)} style={styles.header}>
             <Text style={styles.headerText}>Powerups</Text>
@@ -108,10 +108,6 @@ const styles = StyleSheet.create({
     height: '30%',
     display: 'flex',
     justifyContent: 'flex-end',
-    zIndex: -50,
-  },
-  containerOpen: {
-    zIndex: 1000,
   },
   bar: {
     bottom: 0,
