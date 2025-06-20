@@ -70,9 +70,24 @@ export const strategoRouter = router({
         throw new Error(`Power card ${input.cardId} does not exist.`);
       }
 
+      const lobbyData = getLobbyData(lobby);
+      const teams = lobbyData.teams;
+      const team = teams.find(team => team.id === playerData.teamId);
+
+      if (!team) {
+        throw new Error('Team not found.');
+      }
+
+      const cardCost = PowerCards[input.cardId as PowerCardKeys].cost;
+      if (team.currency < cardCost) {
+        throw new Error('Not enough currency to buy power card.');
+      }
+
       const cards = targetData.powercards;
       cards.push(input.cardId as PowerCardKeys);
       targetData.powercards = cards;
+      team.currency -= cardCost;
+      lobbyData.teams = teams;
     }),
 
   revive: publicProcedure

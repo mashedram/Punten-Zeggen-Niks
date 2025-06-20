@@ -18,12 +18,12 @@ export class Player {
   private _lobby: Lobby;
 
   constructor(
-    id: string,
     name: string,
     client: Client,
     tracker: DataTracker,
     lobby: Lobby,
   ) {
+    const id = client.getId();
     this._client = client;
     this._lobby = lobby;
 

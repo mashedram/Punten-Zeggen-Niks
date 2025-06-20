@@ -37,7 +37,11 @@ export const PowerCardShopInspect = ({
 
   const tRPC = useTRPC();
   const buyCardMutation = useMutation(
-    tRPC.stratego.buyCardMutation.mutationOptions({}),
+    tRPC.stratego.buyCardMutation.mutationOptions({
+      onSuccess: () => {
+        onClose();
+      },
+    }),
   );
 
   return (

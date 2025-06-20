@@ -182,19 +182,14 @@ export class Lobby {
     }
 
     this._clients.addClient(client);
-    const player = new Player(
-      client.getId(),
-      name,
-      client,
-      this._tracker,
-      this,
-    );
+    const player = new Player(name, client, this._tracker, this);
     if (Object.keys(this._players).length === 0) {
       player.setAdmin(true);
     }
     this._players[player.getId()] = player;
-    this._data.data.players.push(player.getInstanceReference());
-    this._data.sync('players');
+    const playerData = this._data.data.players;
+    playerData.push(player.getInstanceReference());
+    this._data.data.players = playerData;
     client.getData().lobby = { lobby: this, player };
 
     const activeGame = this.getGameType();
