@@ -27,6 +27,11 @@ export const lobbyRouter = router({
   joinDevLobby: publicProcedure
     .input(z.object({ code: z.string() }))
     .mutation(({ ctx, input }) => {
+      if (!Bun.env.EXPO_PUBLIC_DEV_LOBBY_CODE) {
+        console.error('Dev lobby code is not set');
+        return;
+      }
+
       if (Bun.env.EXPO_PUBLIC_DEV_LOBBY_CODE !== input.code) {
         throw new Error('Invalid dev lobby code');
       }

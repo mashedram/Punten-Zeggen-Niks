@@ -1,46 +1,61 @@
-import { QrCode } from '@/components/QrCode';
-import { Link } from 'expo-router';
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
+import { useMemo } from 'react';
+import {
+  Dimensions,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 
 const { width, height } = Dimensions.get('window');
 
-export default function Qrcodev2() {
+export const LobbyQrCodeOverlay = ({
+  code,
+  close,
+}: {
+  code: string;
+  close: () => void;
+}) => {
+  const remoteUrl = useMemo(() => {
+    const baseUrl = process.env.EXPO_PUBLIC_SERVER_URL;
+    if (!baseUrl) {
+      throw new Error('EXPO_PUBLIC_SERVER_URL is not defined');
+    }
+
+    return `${baseUrl}/lobby/join?code=${code}`;
+  }, [code]);
+
   return (
     <View style={styles.container}>
-      <View style={styles.background} />
-
       <Text style={styles.title}>QR CODE</Text>
 
       <View style={styles.card}>
-        <QrCode code={'test'} size={Math.min(width * 0.8, 300)} />
+        <QRCode value={remoteUrl} size={Math.min(width * 0.8, 300)} />
       </View>
 
-      <Link href="/lobby">
+      <Pressable onPress={close}>
         <View style={styles.scanTextBox}>
           <Text style={styles.scanText}>Terug naar lobby</Text>
         </View>
-      </Link>
+      </Pressable>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: '#5CA3C2',
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    margin: -2.2,
-  },
-  background: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#5CA3C2',
+    zIndex: 1000,
   },
   title: {
     color: 'white',
-    fontSize: width > 400 ? 32 : 24,
+    fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 20,
     textShadowColor: 'rgba(0, 0, 0, 0.25)',
