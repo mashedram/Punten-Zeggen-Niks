@@ -4,6 +4,7 @@ export type RoleCard = {
   value: number;
   canAttack: boolean;
   forceWins?: string[];
+  explodes?: boolean;
 };
 
 const vlag: RoleCard = {
@@ -83,6 +84,7 @@ const bom: RoleCard = {
   name: 'Bom',
   value: 11,
   canAttack: false,
+  explodes: true,
 };
 
 export const RoleCards: Record<string, RoleCard> = {

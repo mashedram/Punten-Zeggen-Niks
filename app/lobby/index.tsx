@@ -1,5 +1,5 @@
 import { useLobby } from '@/hooks/useLobby';
-import { ExternalPathString, Redirect, useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   View,
