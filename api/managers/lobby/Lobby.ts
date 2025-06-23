@@ -114,6 +114,7 @@ export class Lobby {
     this._gameState = {
       id: null,
     };
+    this._data.data.game = undefined;
   }
 
   public setGame(gameId: string) {

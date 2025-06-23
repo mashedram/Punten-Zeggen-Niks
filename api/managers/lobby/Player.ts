@@ -86,6 +86,7 @@ export class Player {
     if (!this._gameData) return;
 
     tracker.stopTracking(this._gameData.getId());
+    this._data.data.gameData = undefined;
     this._gameData = undefined;
   }
 
