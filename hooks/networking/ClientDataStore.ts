@@ -31,7 +31,6 @@ export class ClientDataStore implements DataStore {
   }
 
   public clear() {
-    // TO-DO: Make this check based around the identify packet, where the server tells the client what it should currently be tracking
     this._instances = {};
   }
 

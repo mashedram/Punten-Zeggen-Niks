@@ -69,6 +69,14 @@ export class ClientTrackedInstance<T> implements Dereferable<T> {
       );
       return LoadingSymbol;
     }
-    return this._descriptor.deref(this._data.raw(), store);
+    try {
+      return this._descriptor.deref(this._data.raw(), store);
+    } catch (error) {
+      console.error(
+        `Error dereferencing ${this._descriptor.name} with id ${this._id}`,
+        error,
+      );
+      return LoadingSymbol;
+    }
   }
 }
