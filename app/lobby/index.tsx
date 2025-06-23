@@ -1,6 +1,6 @@
 import { useLobby } from '@/hooks/useLobby';
 import { ExternalPathString, Redirect, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -18,10 +18,12 @@ import { FontAwesome } from '@expo/vector-icons';
 
 import CrownImage from '@/assets/images/CrownImage.png';
 import StrategoImage from '@/assets/images/stratego.png';
+import { LobbyQrCodeOverlay } from '@/components/ui/LobbyQrCodeOverlay';
 
 export default function LobbyPage() {
   const lobby = useLobby();
   const router = useRouter();
+  const [qrCodeVisible, setQrCodeVisible] = useState(false);
 
   if (lobby.loading) {
     return <Text>Loading...</Text>;
@@ -32,27 +34,30 @@ export default function LobbyPage() {
   }
 
   const activeLobby = lobby.get();
-  console.debug('activeLobby', activeLobby);
 
   if (!activeLobby) {
     return <Redirect href="/" />;
   }
 
   if (activeLobby.game) {
-    return (
-      <Redirect href={`/${activeLobby.game.gameId}` as ExternalPathString} />
-    );
+    return <Redirect href={`/${activeLobby.game.gameId}`} />;
   }
 
   const canStart = activeLobby.self.isAdmin;
 
   return (
     <SafeAreaView style={stylesheet.BackgroundContainer}>
+      {qrCodeVisible && (
+        <LobbyQrCodeOverlay
+          code={activeLobby.code}
+          close={() => setQrCodeVisible(false)}
+        />
+      )}
       <View style={stylesheet.CodeContainer}>
         <View style={stylesheet.CodeBox}>
           <TouchableOpacity
             style={stylesheet.QrButton}
-            onPress={() => router.navigate('/qrcode')}>
+            onPress={() => setQrCodeVisible(true)}>
             <Image
               source={{
                 uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1024px-QR_code_for_mobile_English_Wikipedia.svg.png',

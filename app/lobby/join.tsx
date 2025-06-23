@@ -9,7 +9,7 @@
 
 import CodeInput from '@/components/CodeInput'; // Aangepaste inputcomponent voor PIN-code
 import { useLobby } from '@/hooks/useLobby'; // Lobby hook voor game-join functionaliteit
-import { Redirect, useRouter } from 'expo-router'; // Navigatie hook van Expo Router
+import { Redirect, useLocalSearchParams, useRouter } from 'expo-router'; // Navigatie hook van Expo Router
 import React, { useState } from 'react';
 import {
   View,
@@ -25,6 +25,7 @@ import {
 } from 'react-native';
 
 export default function EnterPinScreen() {
+  const { code: forceCode } = useLocalSearchParams<{ code: string }>();
   /** Lobby functionaliteit ophalen */
   const lobby = useLobby();
 
@@ -55,7 +56,10 @@ export default function EnterPinScreen() {
         <View style={styles.joinContainer}>
           {/* Invoerveld voor de PIN-code */}
           <CodeInput
-            code={code}
+            code={forceCode || code} // Gebruik de geforceerde code of de huidige state
+            maxLength={6} // Maximaal 6 cijfers voor de PIN-code
+            autoFocus={!forceCode} // Focus automatisch op het invoerveld als er geen geforceerde code is
+            keyboardType="numeric" // Numeriek toetsenbord voor PIN-code
             onChange={code => setCode(code as string)}
             style={styles.CodeInput}
             placeholder="Vul game PIN in"

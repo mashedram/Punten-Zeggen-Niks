@@ -6,7 +6,7 @@ import {
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -52,15 +52,15 @@ export default function RootLayout() {
    * Use the 'EXPO_PUBLIC_SERVER_ADDRESS' environment variable to set the remote server address
    * Source: https://docs.expo.dev/guides/environment-variables/
    */
-  const remote_server_address = process.env.EXPO_PUBLIC_SERVER_ADDRESS;
+  const websocketServerUrl = process.env.EXPO_PUBLIC_WEBSOCKET_URL;
 
-  if (!remote_server_address)
-    throw new Error('EXPO_PUBLIC_SERVER_ADDRESS is not defined');
+  if (!websocketServerUrl)
+    throw new Error('EXPO_PUBLIC_WEBSOCKET_URL is not defined');
 
-  const [tRPCClient] = useState(() => {
+  const tRPCClient = useMemo(() => {
     // Networking init
     const wsClient = createWSClient({
-      url: remote_server_address,
+      url: websocketServerUrl,
       connectionParams: () => {
         const token = sessionStorage.getItem('player_token') ?? undefined;
         return {
@@ -82,7 +82,7 @@ export default function RootLayout() {
         }),
       ],
     });
-  });
+  }, [websocketServerUrl]);
 
   if (!loaded) {
     return null;
