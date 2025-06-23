@@ -123,6 +123,23 @@ function handleForceWin(
   return false;
 }
 
+function handleExplodingCard(
+  attacker: PlayerFightState,
+  defender: PlayerFightState,
+): boolean {
+  if (!(attacker.getRoleCard().explodes || defender.getRoleCard().explodes)) {
+    return false;
+  }
+
+  attacker.defeat();
+  defender.defeat();
+
+  console.log(
+    `Both players ${attacker.getPlayer().getId()} and ${defender.getPlayer().getId()} explode.`,
+  );
+  return true;
+}
+
 function handleValueComparison(
   attacker: PlayerFightState,
   defender: PlayerFightState,
@@ -177,6 +194,13 @@ function handleAttackLogic(attacker: Player, defender: Player): FightState {
     return state;
   }
 
+  if (handleExplodingCard(state.attacker, state.defender)) {
+    console.debug(
+      `Exploding card applied in attack between ${state.attacker.getPlayer().getId()} and ${state.defender.getPlayer().getId()}`,
+    );
+    return state;
+  }
+
   handleValueComparison(state.attacker, state.defender);
   console.debug(
     `Value comparison done in attack between ${state.attacker.getPlayer().getId()} and ${state.defender.getPlayer().getId()}`,
@@ -203,6 +227,7 @@ function toIndex(state: boolean): number {
 function applyResultToSelf(self: PlayerFightState, result: FightResultType) {
   const player = self.getPlayer();
   const playerData = getPlayerData(player);
+
   playerData.lastFightResult = {
     type: 'success',
     index: self.getIndex(),
