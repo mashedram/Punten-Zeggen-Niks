@@ -19,6 +19,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import CrownImage from '@/assets/images/CrownImage.png';
 import StrategoImage from '@/assets/images/stratego.png';
 import { LobbyQrCodeOverlay } from '@/components/ui/LobbyQrCodeOverlay';
+import { GameRuleOverlay } from '@/components/ui/GameRuleOverlay';
 
 export default function LobbyPage() {
   const lobby = useLobby();
@@ -138,6 +139,8 @@ export default function LobbyPage() {
           <Text style={stylesheet.PlayText}>Terug</Text>
         </TouchableOpacity>
       </View>
+
+      <GameRuleOverlay />
     </SafeAreaView>
   );
 }
