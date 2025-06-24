@@ -13,6 +13,7 @@ import { RoleCards } from '@/constants/RoleCards';
 import Svg, { Circle } from 'react-native-svg';
 import { defaultDeckSize } from '@/constants/RoleCardDeck';
 import CardCountBar from './CardCountBar';
+import { PowerCards } from '@/constants/powercard/PowerCards';
 
 export const GameRuleOverlay = () => {
   const [isOpen, setOpen] = useState(true);
@@ -52,7 +53,8 @@ export const GameRuleOverlay = () => {
                     } else {
                       setPage(page - 1);
                     }
-                  }}>
+                  }}
+                  disabled={page <= 0}>
                   <Text style={styles.navigationText}>vorrige</Text>
                 </TouchableOpacity>
               </View>
@@ -69,7 +71,8 @@ export const GameRuleOverlay = () => {
                     } else {
                       setPage(page + 1);
                     }
-                  }}>
+                  }}
+                  disabled={page >= maxPages}>
                   <Text style={styles.navigationText}>volgende</Text>
                 </TouchableOpacity>
               </View>
@@ -295,14 +298,6 @@ const roleListImgSize = 48;
 const rulePages = [
   <View style={styles.pageContent}>
     <View style={styles.pageTitelContainer}>
-      <Text style={styles.pageTitleText}>Title</Text>
-    </View>
-    <ScrollView style={styles.pageContentContainer}>
-      <Text style={styles.pageContentText}>content</Text>
-    </ScrollView>
-  </View>,
-  <View style={styles.pageContent}>
-    <View style={styles.pageTitelContainer}>
       <Text style={styles.pageTitleText}>Welkom</Text>
     </View>
     <ScrollView style={styles.pageContentContainer}>
@@ -313,8 +308,8 @@ const rulePages = [
           dat je gaat spelen.
         </Text>
         <Text style={styles.pageContentText}>
-          Dit is een digitale versie van Levend stratego, zodadelijk wordt de
-          lobby in 2 teams verdeelt.
+          Dit is een digitale versie van Levend stratego, zo dadelijk wordt de
+          lobby in 2 teams verdeeld.
         </Text>
         <View
           style={{
@@ -346,13 +341,15 @@ const rulePages = [
         </Text>
         <Text style={styles.pageContentText}>
           In de lobby is deze te zien naast je naam en tijdens het spel is dit
-          te zien boven aan je scherm.
+          te zien bovenaan je scherm.
         </Text>
         <Text style={styles.pageContentText}>
           Als er: <FontAwesome5 name="crown" size={20} /> , naast je naam staat
-          in de lobby ben je de host van de huidige lobby. Als jij de lobby host
-          bent kan je door op de naam van de speler te drukken die persoon de
-          teamleider rol geven.
+          in de lobby dan ben je de host van de huidige lobby. Als jij de lobby
+          host bent kan je door op de naam van de speler te drukken van een
+          speler. Deze speler krijgt dan de prioriteit om een teamleider te
+          zijn. Je kan er meer dan 2 kiezen. Het spel kiest dan welke van de
+          geselecteerde spelers een teamleider wordt.
         </Text>
       </View>
     </ScrollView>
@@ -368,14 +365,14 @@ const rulePages = [
         kan de lobby host het spel beginnen door op de 'start' knop te drukken.
       </Text>
       <Text style={styles.pageContentText}>
-        Zodra het spel is begonnen moeten bijde teams een speler aanweizen die
-        de vlag rol krijgt. De teamleiders kunnen dit doen door op het{' '}
-        <FontAwesome5 name="medal" size={20} /> icon te drukken. Er wordt nu een
-        menu geopend waarin de teamleider een speler kan kiezen en die de vlag
-        geven door op de vlag rol te drukken.
+        Zodra het spel is begonnen moeten beide teamleiders een speler aanwijzen
+        die de rol: Vlag krijgt. De teamleiders kunnen dit doen door op het{' '}
+        <FontAwesome5 name="medal" size={20} /> icoon te drukken. Er wordt dan
+        een menu geopend waarin de teamleider een speler kan kiezen en die de
+        vlag krijgt, dit kan door op de vlag knop te drukken binnen dit menu.
       </Text>
       <Text style={styles.pageContentText}>
-        Als er binnen een team een vlag is aangewezen kan de rest van het team
+        Als er binnen een team een vlag is aangewezen, kan de rest van het team
         een rol ontvangen. Als iedereen een rol heeft ontvangen kan het spel
         beginnen.
       </Text>
@@ -389,61 +386,14 @@ const rulePages = [
       <Text style={styles.pageContentText}>
         Dit is een lijst van alle rollen
       </Text>
-      <RoleItemList
-        roleCard={RoleCards.vlag}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
-      <RoleItemList
-        roleCard={RoleCards.maarschalk}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
-      <RoleItemList
-        roleCard={RoleCards.generaal}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
-      <RoleItemList
-        roleCard={RoleCards.kolonel}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
-      <RoleItemList
-        roleCard={RoleCards.majoor}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
-      <RoleItemList
-        roleCard={RoleCards.kapitein}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
-      <RoleItemList
-        roleCard={RoleCards.luitenant}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
-      <RoleItemList
-        roleCard={RoleCards.sergeant}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
-      <RoleItemList
-        roleCard={RoleCards.mineur}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
-      <RoleItemList
-        roleCard={RoleCards.spion}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
-      <RoleItemList
-        roleCard={RoleCards.bom}
-        size={roleListImgSize}
-        textStyle={styles.pageContentText}
-      />
+      {Object.values(RoleCards).map((roleCard, idx) => (
+        <RoleItemList
+          key={roleCard.id ?? idx}
+          roleCard={roleCard}
+          size={roleListImgSize}
+          textStyle={styles.pageContentText}
+        />
+      ))}
     </ScrollView>
   </View>,
   <View style={styles.pageContent}>
@@ -457,16 +407,16 @@ const rulePages = [
       </Text>
       <Text style={styles.pageContentText}>
         Je valt een speler aan door deze persoon aan te tikken. De persoon die
-        iemand aan tikt is de aanvaller en de persoon die is aangetikt is de
-        verdediger
+        iemand aan heeft getikt is de aanvaller en de persoon die aangetikt is,
+        is de verdediger.
       </Text>
       <Text style={styles.pageContentText}>
         De aanvaller scant de qr-code van de verdediger of voert de aanvalscode
-        van de verdediger in en drukt op de knop 'aanvallen'
+        van de verdediger in en drukt op de knop 'aanvallen'.
       </Text>
       <Text style={styles.pageContentText}>
         Je kan op je rol afbeelding drukken om de qr-code te weergeven die de
-        aanvaller moet scannen
+        aanvaller moet scannen.
       </Text>
       <Text style={styles.pageContentText}>
         De speler met een hogere rol in de lijst wint het gevecht, met een
@@ -484,15 +434,15 @@ const rulePages = [
     </View>
     <ScrollView style={styles.pageContentContainer}>
       <Text style={styles.pageContentText}>
-        Als de bom wordt aangevallen explodeert de bom. De aanvallende speler en
-        de speler met de bom verliezen beide hun rol.
+        Als de bom wordt aangevallen, explodeert de bom. De aanvallende speler
+        en de speler met de bom verliezen beide hun rol.
       </Text>
       <Text style={styles.pageContentText}>
-        Als de bom wordt aangevallen door een mineur verliest de bom.
+        Als de bom wordt aangevallen door een mineur, verliest de bom.
       </Text>
       <Text style={styles.pageContentText}>
-        Als de maarschalk wordt aangevallen door een spion verliest de
-        maarschalk.{' '}
+        Als de maarschalk wordt aangevallen door een spion, verliest de
+        maarschalk.
       </Text>
     </ScrollView>
   </View>,
@@ -502,7 +452,7 @@ const rulePages = [
     </View>
     <ScrollView style={styles.pageContentContainer}>
       <Text style={styles.pageContentText}>
-        Als een speler een rol verliest moet deze speler terug naar de
+        Als een speler een rol verliest, moet deze speler terug naar de
         teamleider om een nieuwe rol te ontvangen.
       </Text>
       <Text style={styles.pageContentText}>
@@ -510,8 +460,9 @@ const rulePages = [
         teamleider icoon te drukken: <FontAwesome5 name="medal" size={20} />.
       </Text>
       <Text style={styles.pageContentText}>
-        De teamleider kan dan een speler kiezen uit de lijst en deze een rol te
-        geven door op de rol te drukken die de teamleider wilt aanweizen.
+        De teamleider kan dan een speler kiezen uit de lijst van spelers en deze
+        een rol geven door op de rol te drukken die de teamleider wilt
+        aanwijzen.
       </Text>
       <Text style={styles.pageContentText}>
         Je kan als teamleider zien hoeveel spelers er een nieuwe rol nodig
@@ -532,11 +483,11 @@ const rulePages = [
         <FontAwesome5 name="medal" size={40} style={styles.CaptainIcon} />
       </View>
       <Text style={styles.pageContentText}>
-        In dit voorbeeld zijn er 3 spelers die een rol nog moeten ontvangen
+        In dit voorbeeld zijn er 3 spelers die een rol nog moeten ontvangen.
       </Text>
       <Text style={styles.pageContentText}>
-        De nummers onder de rollen geeft aan hoeveel kaarten er nog over zijn
-        van die rol. Als het op 0 staat kan je die rol niet meer uitdelen.
+        De nummers onder de rollen geven aan hoeveel kaarten er nog over zijn
+        van die rol. Als het op 0 staat, kan je die rol niet meer uitdelen.
       </Text>
     </ScrollView>
   </View>,
@@ -547,11 +498,11 @@ const rulePages = [
     <ScrollView style={styles.pageContentContainer}>
       <Text style={styles.pageContentText}>
         Elk team begint met een deck van {defaultDeckSize} rollen. Als een team
-        een rolkaart verliest wordt het uit het deck gehaald en kan deze niet
+        een rolkaart verliest, wordt het uit het deck gehaald en kan deze niet
         meer worden gebruikt in het spel.
       </Text>
       <Text style={styles.pageContentText}>
-        Boven aan het scherm kan je zien hoeveel kaarten bijde teams nog in hun
+        Bovenaan het scherm kan je zien hoeveel kaarten beide teams nog in hun
         deck hebben zitten.
       </Text>
       <CardCountBar blueCardCount={43} redCardCount={23} />
@@ -561,7 +512,7 @@ const rulePages = [
       </Text>
       <Text style={styles.pageContentText}>
         Als er geen kaarten meer in het deck zitten kunnen spelers geen rollen
-        meer ontvangen en doen niet meer mee met het spel.
+        meer ontvangen en doen deze spelers niet meer mee met het spel.
       </Text>
       <Text style={styles.pageContentText}>
         Het spel is pas afgelopen als de vlag is aangevallen.
@@ -574,15 +525,60 @@ const rulePages = [
     </View>
     <ScrollView style={styles.pageContentContainer}>
       <Text style={styles.pageContentText}>
-        Als vlag heb je een extra taak. Voor elke rol die jou team verslaat
-        krijg je die rol zijn waarde in punten. Als er een bom wordt verslagen
-        krijg je 1 punt en als een maarschalk wordt verslagen krijg je 10
-        punten.
+        Als vlag heb je een extra taak, voor elke rol die je team verslaat krijg
+        je die rol zijn waarde, in punten. Als er een bom wordt verslagen krijg
+        je 1 punt en als een maarschalk wordt verslagen krijg je 10 punten. Je
+        kan in het overzicht van rollen zien hoeveel een rol waard is.
       </Text>
       <Text style={styles.pageContentText}>
         Deze punten kun je spenderen in de Power-up shop. Deze power-ups kan je
         dan geven aan spelers in je team.
       </Text>
+    </ScrollView>
+  </View>,
+  <View style={styles.pageContent}>
+    <View style={styles.pageTitelContainer}>
+      <Text style={styles.pageTitleText}>Power-ups</Text>
+    </View>
+    <ScrollView style={styles.pageContentContainer}>
+      <Text style={styles.pageContentText}>
+        Als je niet de vlag bent kan je onderaan je scherm het power-up menu
+        openen. In dit menu kan je zien hoeveel power-ups je hebt en kun je ze
+        activeren.
+      </Text>
+      <Text style={styles.pageContentText}>
+        Power-ups die te maken hebben met aanvallen of verdedigen moeten worden
+        geactiveerd voordat je het gevecht begint.
+      </Text>
+      <Text style={styles.pageContentText}>
+        De volgende power-ups zitten in het spel:
+      </Text>
+      <View
+        style={{
+          width: '100%',
+          marginTop: 5,
+          borderBottomWidth: 1,
+          borderTopWidth: 1,
+          borderColor: 'gray',
+        }}>
+        {Object.values(PowerCards).map((card, idx: number) => (
+          <View key={idx} style={{ flexDirection: 'row' }}>
+            <View style={{ display: 'flex', width: '30%' }}>
+              <Text style={[styles.pageContentText, { fontWeight: 'bold' }]}>
+                {(card as { name: string }).name}:
+              </Text>
+              <Text style={[styles.pageContentText, { marginTop: 2 }]}>
+                prijs: {(card as { cost: number }).cost}
+              </Text>
+            </View>
+            <View style={{ display: 'flex', marginLeft: 5, width: '70%' }}>
+              <Text style={styles.pageContentText}>
+                {(card as { description: string }).description}
+              </Text>
+            </View>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   </View>,
 ];
