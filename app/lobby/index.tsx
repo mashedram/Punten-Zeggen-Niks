@@ -5,7 +5,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ImageBackground,
   Image,
   Platform,
   StatusBar,
@@ -14,11 +13,11 @@ import {
 } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { StrategoGameId } from '@/api/managers/stratego/StrategoGame';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 
-import CrownImage from '@/assets/images/CrownImage.png';
 import StrategoImage from '@/assets/images/stratego.png';
 import { LobbyQrCodeOverlay } from '@/components/ui/LobbyQrCodeOverlay';
+import { GameRuleOverlay } from '@/components/ui/GameRuleOverlay';
 
 export default function LobbyPage() {
   const lobby = useLobby();
@@ -98,14 +97,13 @@ export default function LobbyPage() {
                     {player.name}
                   </Text>
                   {player.isAdmin && (
-                    <ImageBackground
-                      style={stylesheet.CrownImage}
-                      source={CrownImage}
-                    />
+                    <Text style={stylesheet.CrownImage}>
+                      <FontAwesome5 name="crown" size={20} />
+                    </Text>
                   )}
                   {player.isLeader && (
                     <Text style={stylesheet.LeaderImage}>
-                      <FontAwesome name={'flag'} size={20} />
+                      <FontAwesome5 name="medal" size={20} />
                     </Text>
                   )}
                 </View>
@@ -138,6 +136,8 @@ export default function LobbyPage() {
           <Text style={stylesheet.PlayText}>Terug</Text>
         </TouchableOpacity>
       </View>
+
+      <GameRuleOverlay />
     </SafeAreaView>
   );
 }
@@ -308,15 +308,11 @@ const stylesheet = StyleSheet.create({
   CrownImage: {
     position: 'absolute',
     alignSelf: 'flex-start',
-    width: 20,
-    height: 20,
     color: 'rgb(255, 255, 255)',
     margin: 20,
   },
   LeaderImage: {
     alignSelf: 'flex-end',
-    width: 20,
-    height: 20,
     color: 'rgb(255, 255, 255)',
     fontWeight: 'bold',
     margin: 20,

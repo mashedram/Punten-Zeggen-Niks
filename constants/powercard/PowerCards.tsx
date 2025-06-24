@@ -2,14 +2,14 @@ import { PowerCard } from '@/common/stratego/powercard/PowerCard';
 
 export const PowerCards = {
   kamikazi: {
-    name: 'Kamikazi',
+    name: 'Kamikaze',
     description:
-      'Verliest het spel, maar neemt de tegenstander mee in de dood.',
+      'Je rol heeft nu de zelfde regels als een Bom. Jij en je tegenstander exploderen maar een Mineur kan niet je ontmantelen.',
     cost: 15,
   },
   ruilkaart: {
     name: 'Ruilkaart',
-    description: 'Ruil van plaats met een andere speler.',
+    description: 'Ruil je huidige rol met de rol van iemand binnen je team.',
     cost: 300,
   },
 } satisfies { [K: string]: PowerCard };

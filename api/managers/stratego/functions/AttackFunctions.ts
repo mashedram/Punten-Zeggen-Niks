@@ -6,7 +6,7 @@ import {
   LobbyDataStratego,
   PlayerDataStratego,
 } from '@/api/managers/stratego/StrategoGame';
-import { RoleCard, RoleCards } from '@/constants/RoleCards';
+import { RoleCard, RoleCardKeys, RoleCards } from '@/constants/RoleCards';
 import { callPowerCardHook } from '@/api/managers/stratego/PowerCardManager';
 import { GameState } from '@/constants/GameState';
 import { StatisticsContainer } from '../../statistics/StatisticsContainer';
@@ -67,7 +67,7 @@ function buildPlayerFightState(
     throw new Error(`Player ${player.getName()} has no role card.`);
   }
 
-  const roleCard = RoleCards[data.roleCard];
+  const roleCard = RoleCards[data.roleCard as RoleCardKeys];
   if (!roleCard) {
     console.warn(`Player ${player.getName()} has no role card.`);
     throw new Error(`Player ${player.getName()} has no role card.`);
@@ -301,8 +301,11 @@ function awardPlayerPoints(
 
 function awardFightPoints(lobby: Lobby, state: FightState) {
   const lobbyData = getLobbyData(lobby);
-  const attackerValue = state.attacker.getRoleCard().value;
-  const defenderValue = state.defender.getRoleCard().value;
+  const attackerValue = state.attacker.getRoleCard().points;
+  const defenderValue = state.defender.getRoleCard().points;
+  console.log(
+    `attacker points: ${attackerValue}, defender points: ${defenderValue}`,
+  );
 
   awardPlayerPoints(
     lobbyData,

@@ -4,6 +4,7 @@ export type RoleCard = {
   value: number;
   canAttack: boolean;
   forceWins?: string[];
+  points: number;
   explodes?: boolean;
 };
 
@@ -12,6 +13,7 @@ const vlag: RoleCard = {
   name: 'Vlag',
   value: 0,
   canAttack: false,
+  points: 0,
 };
 
 const maarschalk: RoleCard = {
@@ -19,6 +21,7 @@ const maarschalk: RoleCard = {
   name: 'Maarschalk',
   value: 10,
   canAttack: true,
+  points: 10,
 };
 
 const generaal: RoleCard = {
@@ -26,6 +29,7 @@ const generaal: RoleCard = {
   name: 'Generaal',
   value: 9,
   canAttack: true,
+  points: 9,
 };
 
 const kolonel: RoleCard = {
@@ -33,6 +37,7 @@ const kolonel: RoleCard = {
   name: 'Kolonel',
   value: 8,
   canAttack: true,
+  points: 8,
 };
 
 const majoor: RoleCard = {
@@ -40,6 +45,7 @@ const majoor: RoleCard = {
   name: 'Majoor',
   value: 7,
   canAttack: true,
+  points: 7,
 };
 
 const kapitein: RoleCard = {
@@ -47,6 +53,7 @@ const kapitein: RoleCard = {
   name: 'Kapitein',
   value: 6,
   canAttack: true,
+  points: 6,
 };
 
 const luitenant: RoleCard = {
@@ -54,6 +61,7 @@ const luitenant: RoleCard = {
   name: 'Luitenant',
   value: 5,
   canAttack: true,
+  points: 5,
 };
 
 const sergeant: RoleCard = {
@@ -61,6 +69,7 @@ const sergeant: RoleCard = {
   name: 'Sergeant',
   value: 4,
   canAttack: true,
+  points: 4,
 };
 
 const mineur: RoleCard = {
@@ -69,6 +78,7 @@ const mineur: RoleCard = {
   value: 3,
   canAttack: true,
   forceWins: ['bom'],
+  points: 3,
 };
 
 const spion: RoleCard = {
@@ -77,6 +87,7 @@ const spion: RoleCard = {
   value: 2,
   canAttack: true,
   forceWins: ['maarschalk'],
+  points: 2,
 };
 
 const bom: RoleCard = {
@@ -84,10 +95,11 @@ const bom: RoleCard = {
   name: 'Bom',
   value: 11,
   canAttack: false,
+  points: 1,
   explodes: true,
 };
 
-export const RoleCards: Record<string, RoleCard> = {
+export const RoleCards = {
   vlag,
   maarschalk,
   generaal,
@@ -99,6 +111,8 @@ export const RoleCards: Record<string, RoleCard> = {
   mineur,
   spion,
   bom,
-};
+} satisfies Record<string, RoleCard>;
+
+export type RoleCardKeys = keyof typeof RoleCards;
 
 export const AllRoleCards: RoleCard[] = Object.values(RoleCards);
