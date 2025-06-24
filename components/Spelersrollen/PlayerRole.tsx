@@ -51,11 +51,11 @@ export const PlayerRole = ({ teamId, attackCode, roleCard }: Rolecardprops) => {
         onPress={() => setShowQRcode(!showQRcode)}
         activeOpacity={0.8}>
         <View
-          style={[styles.qrCodeContainer, showQRcode ? styles.flipButton : {}]}>
+          style={[styles.qrCodeContainer, showQRcode ? {} : styles.flipButton]}>
           <QRCode value={`${attackCode}`} size={160} />
         </View>
         <View
-          style={[styles.imageContainer, showQRcode ? {} : styles.flipButton]}>
+          style={[styles.imageContainer, showQRcode ? styles.flipButton : {}]}>
           <Image source={image} style={styles.image} resizeMode="center" />
         </View>
       </TouchableOpacity>

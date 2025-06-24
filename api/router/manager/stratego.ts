@@ -185,4 +185,13 @@ export const strategoRouter = router({
 
       return StrategoGame.getPlayersWithoutRoleCards(lobby, player);
     }),
+
+  getStatistics: publicProcedure.query(({ ctx }) => {
+    const client = ctx.client;
+    const [lobby] = lobbyManager.getClientLobbyAndPlayer(client);
+
+    if (!lobby) throw new Error('Lobby not found');
+
+    return lobby.getStatistics().getReport();
+  }),
 });

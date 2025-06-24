@@ -16,6 +16,7 @@ import {
   LobbyDataGameInstanceDescriptor,
   PlayerDataGameInstanceDescriptor,
 } from '@/common/networking/tracking/descriptors/StrategoInstanceDescriptors';
+import { StatisticsContainer } from '../statistics/StatisticsContainer';
 
 type GameState<P extends PlayerGameData, L extends LobbyGameData> =
   | {
@@ -51,9 +52,13 @@ export class Lobby {
     id: null,
   };
 
+  private _statistics: StatisticsContainer;
+
   constructor(manager: LobbyManager, code?: string) {
     this.manager = manager;
     this.code = code ?? generateRandomCode(LOBBY_CONSTANTS.LOBBY_CODE_LENGTH);
+
+    this._statistics = new StatisticsContainer(this);
 
     this._clients = new ClientPool();
     this._tracker = SERVER_DATA_STORE.createDataTracker(
@@ -96,6 +101,10 @@ export class Lobby {
     return this.code;
   }
 
+  public getStatistics(): StatisticsContainer {
+    return this._statistics;
+  }
+
   public getGameType(): GameType<PlayerGameData, LobbyGameData> | undefined {
     return this._gameState.id ? this._gameState.type : undefined;
   }
@@ -122,9 +131,12 @@ export class Lobby {
     if (!type) {
       throw new Error('Game not found');
     }
+
     if (this._gameState.id) {
       this.clearGame();
     }
+    this.getStatistics().clear();
+
     const lobbyGameData = SERVER_DATA_STORE.startTracking(
       LobbyDataGameInstanceDescriptor,
       type.createLobbyData(),
