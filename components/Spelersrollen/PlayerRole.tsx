@@ -28,9 +28,9 @@ export const PlayerRole = ({ teamId, attackCode, roleCard }: Rolecardprops) => {
           },
         ]}>
         <View style={styles.textContainer}>
-          <Text style={styles.text}>You have no role card assigned</Text>
+          <Text style={styles.text}>Je hebt geen rol</Text>
           <Text style={styles.text}>
-            Go to your team leader to get a role assigned
+            Ga naar je teamleider om er een te krijgen
           </Text>
         </View>
       </View>

@@ -40,14 +40,14 @@ export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
         <View style={styles.container}>
           {!permission?.granted ? (
             <View style={styles.cameraPermission}>
-              <Text>Camera permission is required.</Text>
+              <Text>Camera toestemming is vereist.</Text>
               <TouchableOpacity
                 style={[
                   styles.permissionButtonContainer,
                   { backgroundColor: currentTeamColor },
                 ]}
                 onPress={requestPermission}>
-                <Text style={styles.buttonText}>Grant Permission</Text>
+                <Text style={styles.buttonText}>Toestemming geven</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -55,7 +55,7 @@ export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
                   { backgroundColor: currentTeamColor },
                 ]}
                 onPress={() => setScannerVisible(false)}>
-                <Text style={styles.buttonText}>Close</Text>
+                <Text style={styles.buttonText}>Sluiten</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -74,7 +74,7 @@ export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
                     { backgroundColor: currentTeamColor },
                   ]}
                   onPress={() => setScannerVisible(false)}>
-                  <Text style={styles.buttonText}>Close</Text>
+                  <Text style={styles.buttonText}>Sluiten</Text>
                 </TouchableOpacity>
               </View>
             </CameraView>

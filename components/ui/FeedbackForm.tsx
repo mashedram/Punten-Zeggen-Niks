@@ -48,18 +48,18 @@ export const FeedbackForm = () => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Button title="Close" onPress={() => setIsOpen(false)} />
+        <Button title="Sluiten" onPress={() => setIsOpen(false)} />
         <Picker onValueChange={setFeedbackType} selectedValue={feedbackType}>
-          <Picker.Item label="Select feedback type" value="" />
+          <Picker.Item label="Selecteer feedback type" value="" />
           <Picker.Item label="Bug Report" value="bug_report" />
-          <Picker.Item label="Feature Request" value="feature_request" />
-          <Picker.Item label="Other" value="other" />
+          <Picker.Item label="Aanpassingen" value="feature_request" />
+          <Picker.Item label="Overig" value="other" />
         </Picker>
         <Picker onValueChange={setAbout} selectedValue={about}>
-          <Picker.Item label="About" value="" />
-          <Picker.Item label="Game Mechanics" value="game_mechanics" />
+          <Picker.Item label="Selecteer onderwerp" value="" />
+          <Picker.Item label="Spelverloop" value="game_mechanics" />
           <Picker.Item label="User Interface" value="user_interface" />
-          <Picker.Item label="Other" value="other_feedback" />
+          <Picker.Item label="Overig" value="other_feedback" />
         </Picker>
         <TextInput
           style={styles.textInput}
@@ -68,11 +68,11 @@ export const FeedbackForm = () => {
           value={feedbackText}></TextInput>
 
         <Button
-          title="Submit Feedback"
+          title="Verstuur Feedback"
           onPress={() => {
             if (submitFeedbackMutation.isPending) return;
             if (!feedbackType || !about || !feedbackText) {
-              alert('Please fill in all fields.');
+              alert('Vul alle velden in.');
               return;
             }
             submitFeedbackMutation.mutate({

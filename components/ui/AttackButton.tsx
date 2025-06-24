@@ -35,21 +35,21 @@ export const AttackButton = () => {
     <View style={styles.container}>
       <View
         style={[styles.attackCodeContainer, { borderColor: currentTeamColor }]}>
-        <Text>You are team:</Text>
+        <Text>Je zit in team:</Text>
         <Text
           style={{ fontWeight: 'bold', fontSize: 20, color: currentTeamColor }}>
           {stratego.self.teamId.toUpperCase()}
         </Text>
-        <Text>Your attack code:</Text>
+        <Text>Je aanvals code:</Text>
         <Text style={styles.attackCodeText}>{stratego.self.attackCode}</Text>
-        <Text style={[{ fontSize: 12 }]}>
-          Tap the role card to show QR code
+        <Text style={[{ fontSize: 12, textAlign: 'center' }]}>
+          Druk op de rol kaart om de QR-code te laten zien.
         </Text>
       </View>
 
       <View style={styles.codeInputContainer}>
         <TextInput
-          placeholder="Enter enemy attack code here"
+          placeholder="Vul hier de aanvalscode in"
           onChangeText={text => setEnemyAttackCode(text)}
           value={enemyAttackCode}
           style={[styles.codeInput, { borderColor: currentTeamColor }]}
@@ -67,7 +67,7 @@ export const AttackButton = () => {
             });
           }
         }}>
-        <Text style={styles.buttonText}>Attack</Text>
+        <Text style={styles.buttonText}>aanvallen</Text>
       </TouchableOpacity>
       <View style={styles.qrContainer}>
         <AttackQrCode
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 120,
+    height: 140,
     borderRadius: 5,
     borderWidth: 3,
   },
