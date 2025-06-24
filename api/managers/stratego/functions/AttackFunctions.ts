@@ -340,20 +340,6 @@ function checkWinConditions(
     );
     return [winner!, criticalDefeatedPlayer];
   }
-  console.debug('No critical player defeated, checking for empty deck.');
-
-  const lobbyData = getLobbyData(self.getPlayer().getLobby());
-
-  const emptyTeamDeck = lobbyData.teams.find(team => team.deck.length <= 0);
-
-  if (emptyTeamDeck) {
-    console.log(`Team ${emptyTeamDeck.id} has no more role cards left.`);
-    const winner = [self, target].find(
-      value => getPlayerData(value.getPlayer()).teamId !== emptyTeamDeck.id,
-    );
-    const loser = [self, target].find(value => value !== winner);
-    return [winner!, loser!];
-  }
 
   return null;
 }
