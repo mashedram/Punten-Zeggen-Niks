@@ -345,11 +345,11 @@ const rulePages = [
         </Text>
         <Text style={styles.pageContentText}>
           Als er: <FontAwesome5 name="crown" size={20} /> , naast je naam staat
-          in de lobby dan ben je de host van de huidige lobby. Als jij de lobby
-          host bent kan je door op de naam van de speler te drukken van een
-          speler. Deze speler krijgt dan de prioriteit om een teamleider te
-          zijn. Je kan er meer dan 2 kiezen. Het spel kiest dan welke van de
-          geselecteerde spelers een teamleider wordt.
+          in de lobby dan ben je de host. Als jij de host bent kan je door op de
+          naam van de speler te drukken van een speler. Deze speler krijgt dan
+          de prioriteit om een teamleider te zijn. Je kan er meer dan 2 kiezen,
+          maar dan kiest het spel er nog steeds twee. Het spel kiest dan welke
+          van de geselecteerde spelers een teamleider wordt.
         </Text>
       </View>
     </ScrollView>
@@ -362,7 +362,7 @@ const rulePages = [
       <Text style={styles.pageContentText}>
         Als alle spelers die mee willen doen in de lobby zijn gekomen door
         middel van het invoeren van de lobby code of het scannen van de qr-code
-        kan de lobby host het spel beginnen door op de 'start' knop te drukken.
+        kan de host het spel beginnen door op de 'start' knop te drukken.
       </Text>
       <Text style={styles.pageContentText}>
         Zodra het spel is begonnen moeten beide teamleiders een speler aanwijzen
