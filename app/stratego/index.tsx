@@ -27,6 +27,7 @@ import { FeedbackForm } from '@/components/ui/FeedbackForm';
 import { PowerupBar } from '@/components/ui/PowerupBar';
 import GameStatusPopup from '@/components/ui/GameStatusPopup';
 import { SpelregelI } from '@/components/Spelersrollen/SpelregelI';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 export default function Game() {
   const lobby = useLobby();
@@ -138,7 +139,7 @@ export default function Game() {
               <Text style={styles.CaptainText}>{availablePlayers}</Text>
             </View>
           )}
-          <Text style={styles.CaptainIcon}>🎖</Text>
+          <FontAwesome5 name="medal" size={40} style={styles.CaptainIcon} />
         </TouchableOpacity>
       )}
 
@@ -213,6 +214,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     fontSize: 45,
     fontWeight: '700',
+    zIndex: -1,
   },
   CaptainText: {
     position: 'absolute',
