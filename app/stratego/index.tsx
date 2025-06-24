@@ -23,6 +23,7 @@ import { AttackButton } from '@/components/ui/AttackButton';
 import { WinPopUp } from '@/components/ui/WinPopUp';
 import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
+import { ExplodePopUp } from '@/components/ui/ExplodePopUp';
 import { FeedbackForm } from '@/components/ui/FeedbackForm';
 import { PowerupBar } from '@/components/ui/PowerupBar';
 import GameStatusPopup from '@/components/ui/GameStatusPopup';
@@ -55,6 +56,8 @@ export default function Game() {
     return;
   }
 
+  console.debug(stratego);
+
   const lastFightResult = stratego.self.lastFightResult;
   let fightPopUp = null;
   if (
@@ -77,7 +80,7 @@ export default function Game() {
       );
     } else if (lastFightResult.state === 'explode') {
       fightPopUp = (
-        <VerlorenPopUp
+        <ExplodePopUp
           onClose={() => setLastFightPopup(lastFightResult.index)}
         />
       );

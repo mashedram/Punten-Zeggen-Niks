@@ -5,6 +5,7 @@ export type RoleCard = {
   canAttack: boolean;
   forceWins?: string[];
   points: number;
+  explodes?: boolean;
 };
 
 const vlag: RoleCard = {
@@ -95,6 +96,7 @@ const bom: RoleCard = {
   value: 11,
   canAttack: false,
   points: 1,
+  explodes: true,
 };
 
 export const RoleCards = {

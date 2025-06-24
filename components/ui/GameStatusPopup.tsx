@@ -1,6 +1,5 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useLobbyUnsafe } from '@/hooks/useLobbyUnsafe';
 
 interface GameStatusPopupProps {
@@ -16,7 +15,6 @@ const GameStatusPopup: React.FC<GameStatusPopupProps> = ({
   teamId,
   GameStateEnum,
 }) => {
-  const navigation = useNavigation<any>();
   const lobby = useLobbyUnsafe();
   const isPlaying = gameState === GameStateEnum.playing;
   const isWinner = gameState === teamId && !isPlaying;
@@ -24,7 +22,6 @@ const GameStatusPopup: React.FC<GameStatusPopupProps> = ({
 
   const handleButtonPress = () => {
     lobby.setGame(null);
-    navigation.navigate('@/index');
   };
 
   return (
