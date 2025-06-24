@@ -8,6 +8,8 @@ import {
 } from '@/api/managers/stratego/StrategoGame';
 import { RoleCard, RoleCards } from '@/constants/RoleCards';
 import { callPowerCardHook } from '@/api/managers/stratego/PowerCardManager';
+import { GameState } from '@/constants/GameState';
+import { StatisticsContainer } from '../../statistics/StatisticsContainer';
 
 type FightResultType = 'win' | 'lose' | 'draw' | 'explode';
 
@@ -242,6 +244,12 @@ function applyResultToSelf(self: PlayerFightState, result: FightResultType) {
     if (team) {
       team.score -= 1;
     }
+
+    StatisticsContainer.increment('TotalDeaths', player);
+  }
+
+  if (result === 'win' || result === 'explode') {
+    StatisticsContainer.increment('TotalKills', player);
   }
 
   player.sync();
@@ -308,6 +316,69 @@ function awardFightPoints(lobby: Lobby, state: FightState) {
   );
 }
 
+function checkWinConditions(
+  self: PlayerFightState,
+  target: PlayerFightState,
+): [winner: PlayerFightState, loser: PlayerFightState] | null {
+  console.debug(
+    `Checking win conditions for ${self.getPlayer().getId()} vs ${target.getPlayer().getId()}`,
+  );
+  const criticalDefeatedPlayer = [self, target].find(
+    value => value.getRoleCard().id === 'vlag' && value.isDefeated(),
+  );
+
+  console.debug(
+    `Checked card of self (${self.getRoleCard().id}) and target (${target.getRoleCard().id})`,
+  );
+
+  if (criticalDefeatedPlayer) {
+    console.log(
+      `Critical player defeated: ${criticalDefeatedPlayer.getPlayer().getId()}`,
+    );
+    const winner = [self, target].find(
+      value => value !== criticalDefeatedPlayer,
+    );
+    return [winner!, criticalDefeatedPlayer];
+  }
+  console.debug('No critical player defeated, checking for empty deck.');
+
+  const lobbyData = getLobbyData(self.getPlayer().getLobby());
+
+  const emptyTeamDeck = lobbyData.teams.find(team => team.deck.length <= 0);
+
+  if (emptyTeamDeck) {
+    console.log(`Team ${emptyTeamDeck.id} has no more role cards left.`);
+    const winner = [self, target].find(
+      value => getPlayerData(value.getPlayer()).teamId !== emptyTeamDeck.id,
+    );
+    const loser = [self, target].find(value => value !== winner);
+    return [winner!, loser!];
+  }
+
+  return null;
+}
+
+function endGame(winner: PlayerFightState, loser: PlayerFightState) {
+  const lobby = winner.getPlayer().getLobby();
+  const lobbyData = getLobbyData(lobby);
+
+  const winStateMap: Record<string, GameState> = {
+    red: GameState.red_wins,
+    blue: GameState.blue_wins,
+  };
+
+  const winState =
+    winStateMap[getPlayerData(winner.getPlayer()).teamId] ?? GameState.draw;
+  lobbyData.gameState = winState;
+  console.log(
+    `Game ended. Team ${getPlayerData(winner.getPlayer()).teamId} has won.`,
+  );
+
+  lobby.getStatistics().buildReport();
+
+  lobby.sync();
+}
+
 export function performAttack(attacker: Player, defender: Player) {
   let result: FightState;
   try {
@@ -325,6 +396,12 @@ export function performAttack(attacker: Player, defender: Player) {
 
   const attackerState = result.attacker;
   const defenderState = result.defender;
+
+  const winCondition = checkWinConditions(attackerState, defenderState);
+  if (winCondition !== null) {
+    endGame(winCondition[0], winCondition[1]);
+    return;
+  }
 
   applyStateToSelf(attackerState, defenderState);
   awardFightPoints(attacker.getLobby(), result);

@@ -12,7 +12,6 @@ import {
   getAvailableRoleCards,
   getPlayersWithoutRoleCards,
 } from './functions/RoleCardFunctions';
-import { checkWinConditions } from './functions/GameLogicFunctions';
 import { callPowerCardHook } from './PowerCardManager';
 
 export const StrategoGameId = 'stratego';
@@ -257,7 +256,6 @@ export function getPlayerFromAttackCode(
 export const StrategoGame = {
   attack(lobby: Lobby, attacker: Player, defender: Player) {
     performAttack(attacker, defender);
-    checkWinConditions(lobby);
 
     lobby.sync();
   },
