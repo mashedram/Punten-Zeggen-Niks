@@ -56,8 +56,6 @@ export default function Game() {
     return;
   }
 
-  console.debug(stratego);
-
   const lastFightResult = stratego.self.lastFightResult;
   let fightPopUp = null;
   if (

@@ -8,16 +8,70 @@ interface AttackQrCodeProps {
   onQrScan: (qrAttackCode: string) => void;
 }
 
+const AttackScanner = ({
+  onScan,
+  currentTeamColor,
+  onExit,
+}: {
+  onScan: (data: { data: string }) => void;
+  currentTeamColor: string;
+  onExit: () => void;
+}) => {
+  const [permission, requestPermission] = useCameraPermissions();
+
+  if (!permission?.granted) {
+    return (
+      <View style={styles.cameraPermission}>
+        <Text>Camera toestemming is vereist.</Text>
+        <TouchableOpacity
+          style={[
+            styles.permissionButtonContainer,
+            { backgroundColor: currentTeamColor },
+          ]}
+          onPress={requestPermission}>
+          <Text style={styles.buttonText}>Toestemming geven</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.permissionButtonContainer,
+            { backgroundColor: currentTeamColor },
+          ]}
+          onPress={() => onExit()}>
+          <Text style={styles.buttonText}>Sluiten</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <CameraView
+      style={styles.cameraView}
+      barcodeScannerSettings={{
+        barcodeTypes: ['qr'],
+      }}
+      onBarcodeScanned={onScan}
+      autofocus="on">
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={[
+            styles.permissionButtonContainer,
+            { backgroundColor: currentTeamColor },
+          ]}
+          onPress={() => onExit()}>
+          <Text style={styles.buttonText}>Sluiten</Text>
+        </TouchableOpacity>
+      </View>
+    </CameraView>
+  );
+};
+
 export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
   const stratego = useStrategoUnsafe();
 
   const [scannerVisible, setScannerVisible] = useState(false);
-  const [cameraKey, setCameraKey] = useState(0);
-  const [permission, requestPermission] = useCameraPermissions();
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     setScannerVisible(false);
-    setCameraKey(prev => prev + 1);
     onQrScan(data);
   };
 
@@ -38,47 +92,11 @@ export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
       </TouchableOpacity>
       <Modal visible={scannerVisible} animationType="slide">
         <View style={styles.container}>
-          {!permission?.granted ? (
-            <View style={styles.cameraPermission}>
-              <Text>Camera toestemming is vereist.</Text>
-              <TouchableOpacity
-                style={[
-                  styles.permissionButtonContainer,
-                  { backgroundColor: currentTeamColor },
-                ]}
-                onPress={requestPermission}>
-                <Text style={styles.buttonText}>Toestemming geven</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.permissionButtonContainer,
-                  { backgroundColor: currentTeamColor },
-                ]}
-                onPress={() => setScannerVisible(false)}>
-                <Text style={styles.buttonText}>Sluiten</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <CameraView
-              key={cameraKey}
-              style={styles.cameraView}
-              barcodeScannerSettings={{
-                barcodeTypes: ['qr'],
-              }}
-              onBarcodeScanned={handleBarCodeScanned}
-              autofocus="on">
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                  style={[
-                    styles.permissionButtonContainer,
-                    { backgroundColor: currentTeamColor },
-                  ]}
-                  onPress={() => setScannerVisible(false)}>
-                  <Text style={styles.buttonText}>Sluiten</Text>
-                </TouchableOpacity>
-              </View>
-            </CameraView>
-          )}
+          <AttackScanner
+            onScan={handleBarCodeScanned}
+            currentTeamColor={currentTeamColor}
+            onExit={() => setScannerVisible(false)}
+          />
         </View>
       </Modal>
     </>
