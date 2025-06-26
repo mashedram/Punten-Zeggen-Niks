@@ -100,7 +100,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.title}>
-          <Text style={styles.titleText}>Select a player to revive</Text>
+          <Text style={styles.titleText}>Selecteer een speler</Text>
         </View>
         <View style={styles.playerContainer}>
           <Picker
@@ -121,9 +121,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
           </Picker>
         </View>
         <View style={styles.title}>
-          <Text style={styles.titleText}>
-            Tap the role you want to give the player
-          </Text>
+          <Text style={styles.titleText}>Kies een rol</Text>
         </View>
         <View style={styles.roleContainer}>
           {(!playerTeam.hasFlag && (

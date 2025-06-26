@@ -11,9 +11,15 @@ interface Rolecardprops {
   teamId: string;
   attackCode: string;
   roleCard: RoleCard | undefined;
+  isTeamLeader: boolean;
 }
 
-export const PlayerRole = ({ teamId, attackCode, roleCard }: Rolecardprops) => {
+export const PlayerRole = ({
+  teamId,
+  attackCode,
+  roleCard,
+  isTeamLeader,
+}: Rolecardprops) => {
   const image = roleCard ? CardImages[roleCard.id?.toLowerCase()] : undefined;
   const [showQRcode, setShowQRcode] = useState(false);
 
@@ -29,8 +35,10 @@ export const PlayerRole = ({ teamId, attackCode, roleCard }: Rolecardprops) => {
         ]}>
         <View style={styles.textContainer}>
           <Text style={styles.text}>Je hebt geen rol</Text>
-          <Text style={styles.text}>
-            Ga naar je teamleider om er een te krijgen
+          <Text style={[styles.text, { marginTop: 10 }]}>
+            {(isTeamLeader && (
+              <>Geef jezelf een rol door op de medaille knop te drukken</>
+            )) || <>Ga naar je teamleider om er een te krijgen</>}
           </Text>
         </View>
       </View>

@@ -128,6 +128,7 @@ export default function Game() {
             roleCard={AllRoleCards.find(
               card => card.id === stratego.self.roleCard,
             )}
+            isTeamLeader={stratego.self.isTeamLeader}
           />
 
           <AttackButton />
