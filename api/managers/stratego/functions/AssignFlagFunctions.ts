@@ -1,4 +1,4 @@
-import { RoleCard, RoleCards } from '@/constants/RoleCards';
+import { RoleCard, RoleCardKeys, RoleCards } from '@/constants/RoleCards';
 import { Lobby } from '../../lobby/Lobby';
 import { Player } from '../../lobby/Player';
 import { getPlayerData, getLobbyData } from '../StrategoGame';
@@ -48,5 +48,5 @@ function getRandomRoleCard(lobby: Lobby, teamId: string): RoleCard {
   const randomCardId =
     availableCardIds[Math.floor(Math.random() * availableCardIds.length)];
 
-  return RoleCards[randomCardId];
+  return RoleCards[randomCardId as RoleCardKeys];
 }

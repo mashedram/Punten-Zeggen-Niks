@@ -130,7 +130,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
               <View style={styles.roleButtonContainer}>
                 <View style={styles.vlagButton}>
                   <RoleButton
-                    onPress={() => assignFlag()}
+                    onPress={() => revivePlayer(RoleCards.vlag)}
                     roleCard={RoleCards.vlag}
                   />
                 </View>
