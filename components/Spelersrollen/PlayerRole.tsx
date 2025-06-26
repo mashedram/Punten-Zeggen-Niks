@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Image, Animated, TouchableOpacity } from 'react-native';
+import { StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { View } from 'react-native';
 import { Text } from 'react-native';
 import { RoleCard } from '@/constants/RoleCards';
@@ -46,7 +46,7 @@ export const PlayerRole = ({
   }
 
   return (
-    <Animated.View
+    <View
       style={[
         styles.container,
         {
@@ -60,14 +60,14 @@ export const PlayerRole = ({
         activeOpacity={0.8}>
         <View
           style={[styles.qrCodeContainer, showQRcode ? {} : styles.flipButton]}>
-          <QRCode value={`${attackCode}`} size={160} />
+          <QRCode value={`${attackCode}`} size={600} />
         </View>
         <View
           style={[styles.imageContainer, showQRcode ? styles.flipButton : {}]}>
-          <Image source={image} style={styles.image} resizeMode="center" />
+          <Image source={image} style={styles.image} resizeMode="contain" />
         </View>
       </TouchableOpacity>
-    </Animated.View>
+    </View>
   );
 };
 
@@ -76,21 +76,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     borderWidth: 4,
-    width: 200,
-    height: 200,
+    height: '50%',
+    aspectRatio: 1,
   },
   button: {
     width: '100%',
     height: '100%',
     transitionDuration: '0.3s',
+
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   flipButton: {
     transform: [{ rotateY: '180deg' }],
   },
   qrCodeContainer: {
     position: 'absolute',
-    width: '100%',
-    height: '100%',
+    width: '90%',
+    height: '90%',
     justifyContent: 'center',
     alignItems: 'center',
     backfaceVisibility: 'hidden',
@@ -98,8 +102,8 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     position: 'absolute',
-    width: '100%',
-    height: '100%',
+    width: '90%',
+    height: '90%',
     backfaceVisibility: 'hidden',
     transitionDuration: '0.3s',
   },
