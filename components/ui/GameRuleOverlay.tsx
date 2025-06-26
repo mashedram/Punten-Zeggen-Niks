@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Modal,
 } from 'react-native';
 import { RoleItemList } from './RoleItemList';
 import { RoleCards } from '@/constants/RoleCards';
@@ -26,7 +27,7 @@ export const GameRuleOverlayContent = ({
   const maxPages = rulePages.length - 1;
 
   return (
-    <View style={styles.container}>
+    <Modal style={styles.container}>
       <View style={styles.primaryContainer}>
         <View style={styles.titleContainer}>
           <View style={styles.innerTitleContainer}>
@@ -88,7 +89,7 @@ export const GameRuleOverlayContent = ({
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </Modal>
   );
 };
 
@@ -115,7 +116,6 @@ const styles = StyleSheet.create({
   primaryContainer: {
     width: '100%',
     height: '90%',
-    maxWidth: 650,
   },
   titleContainer: {
     width: '100%',
@@ -277,7 +277,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 30,
     paddingTop: 6,
-    maxWidth: 650,
   },
   button: {
     position: 'relative',

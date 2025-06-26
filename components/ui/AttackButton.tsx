@@ -51,6 +51,8 @@ export const AttackButton = () => {
         <TextInput
           placeholder="Vul hier de aanvalscode in"
           onChangeText={text => setEnemyAttackCode(text)}
+          autoComplete="off"
+          autoCorrect={false}
           value={enemyAttackCode}
           style={[styles.codeInput, { borderColor: currentTeamColor }]}
         />
@@ -84,7 +86,8 @@ export const AttackButton = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: 200,
+    width: '100%',
+    marginTop: 10,
   },
   attackCodeContainer: {
     backgroundColor: 'white',
@@ -92,9 +95,9 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 140,
     borderRadius: 5,
     borderWidth: 3,
+    padding: 5,
   },
   attackCodeText: {
     fontWeight: 700,

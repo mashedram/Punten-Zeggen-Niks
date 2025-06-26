@@ -10,11 +10,9 @@ import {
   Text,
   StyleSheet,
   View,
-  TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
 import { GameState } from '@/constants/GameState';
 import { CardCountBar } from '@/components/ui/CardCountBar';
 import { RoleCardPicker } from '@/components/ui/RoleCardPicker';
@@ -24,11 +22,10 @@ import { WinPopUp } from '@/components/ui/WinPopUp';
 import { VerlorenPopUp } from '@/components/ui/VerlorenPopUp';
 import { GelijkPopUp } from '@/components/ui/GelijkPopUp';
 import { ExplodePopUp } from '@/components/ui/ExplodePopUp';
-import { FeedbackForm } from '@/components/ui/FeedbackForm';
 import { PowerupBar } from '@/components/ui/PowerupBar';
 import GameStatusPopup from '@/components/ui/GameStatusPopup';
-import { SpelregelI } from '@/components/Spelersrollen/SpelregelI';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { MainMenu } from '@/components/stratego/MainMenu';
+import { CaptainButton } from '@/components/stratego/CaptainButton';
 
 export default function Game() {
   const lobby = useLobby();
@@ -100,7 +97,6 @@ export default function Game() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.BackgroundView}>
-      <FeedbackForm />
       <View style={styles.CardStackTrackerContainer}>
         <CardCountBar
           blueCardCount={teamBlue.score}
@@ -120,40 +116,26 @@ export default function Game() {
       </View>
 
       {stratego.self.isTeamLeader && (
-        <TouchableOpacity
-          style={styles.CaptainIconContainer}
+        <CaptainButton
+          count={availablePlayers}
           onPress={() => {
             if (availablePlayers > 0 || isLeaderPopupOpen) {
               setLeaderPopupOpen(!isLeaderPopupOpen);
             }
-          }}>
-          {availablePlayers > 0 && (
-            <View>
-              <Svg
-                style={styles.CaptainEllipse}
-                width={20}
-                height={20}
-                viewBox="0 0 20 20"
-                fill="none">
-                <Circle cx={10} cy={10} r={10} fill="#FF2424" />
-              </Svg>
-              <Text style={styles.CaptainText}>{availablePlayers}</Text>
-            </View>
-          )}
-          <FontAwesome5 name="medal" size={40} style={styles.CaptainIcon} />
-        </TouchableOpacity>
+          }}
+        />
       )}
 
-      <View style={styles.roleContainer} pointerEvents="box-none">
-        <PlayerRole
-          teamId={stratego.self.teamId}
-          attackCode={stratego.self.attackCode}
-          roleCard={AllRoleCards.find(
-            card => card.id === stratego.self.roleCard,
-          )}
-        />
+      <View style={styles.roleOuter} pointerEvents="box-none">
+        <View style={styles.roleContainer}>
+          <PlayerRole
+            teamId={stratego.self.teamId}
+            attackCode={stratego.self.attackCode}
+            roleCard={AllRoleCards.find(
+              card => card.id === stratego.self.roleCard,
+            )}
+          />
 
-        <View style={styles.playerAttackContainer}>
           <AttackButton />
         </View>
       </View>
@@ -179,7 +161,7 @@ export default function Game() {
       {/* Einde test gedeelte gameloop */}
 
       <PowerupBar />
-      <SpelregelI />
+      <MainMenu />
     </KeyboardAvoidingView>
   );
 }
@@ -199,43 +181,16 @@ const styles = StyleSheet.create({
     top: 0,
     marginTop: 5,
   },
-  CaptainIconContainer: {
-    position: 'absolute',
-    top: 0,
-    marginTop: 40,
-  },
-  CaptainEllipse: {
-    position: 'absolute',
-    borderRadius: 10,
-  },
-  CaptainIcon: {
-    textAlign: 'left',
-    color: 'rgba(0, 0, 0, 1)',
-    fontFamily: 'Inter',
-    fontSize: 45,
-    fontWeight: '700',
-    zIndex: -1,
-  },
-  CaptainText: {
-    position: 'absolute',
-    color: 'rgba(255, 255, 255, 1)',
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: '700',
-    left: 5,
-    top: 3,
-  },
-  roleContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    display: 'flex',
+  roleOuter: {
+    ...StyleSheet.absoluteFillObject,
 
+    display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  roleContainer: {
+    height: '72%',
   },
   roleCardPickerOpen: {
     transform: [{ translateY: 0 }],
