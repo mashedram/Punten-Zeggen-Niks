@@ -1,9 +1,19 @@
-import { PowerCardKeys } from '@/constants/powercard/PowerCardImages';
 import { Player } from '../lobby/Player';
 import { getPlayerData, PlayerDataStratego } from './StrategoGame';
+import { PowerCard } from '@/common/stratego/powercard/PowerCard';
+import {
+  PowerCardKeys,
+  PowerCardKeysType,
+  PowerCards,
+} from '@/constants/powercard/PowerCards';
+import {
+  RoleCardKeys,
+  RoleCardKeysType,
+  RoleCards,
+} from '@/constants/RoleCards';
 
 type HookContext = {
-  cardId: PowerCardKeys;
+  cardId: PowerCardKeysType;
   self: Player;
   target: Player | null;
 };
@@ -29,7 +39,7 @@ type PowerCardHooksType = {
   useHook: PowerCardHook;
 };
 
-const PowerCardHooks: Record<PowerCardKeys, Partial<PowerCardHooksType>> = {
+const PowerCardHooks: Record<PowerCardKeysType, Partial<PowerCardHooksType>> = {
   kamikazi: {
     preAttackHook: [
       100,
@@ -43,11 +53,104 @@ const PowerCardHooks: Record<PowerCardKeys, Partial<PowerCardHooksType>> = {
       },
     ],
   },
-  ruilkaart: {},
+  bomvest: {
+    preAttackHook: [
+      200,
+      (ctx: HookContext, handlers: HookHandlers) => {
+        if (!ctx.target) return HookResult.IGNORE;
+        const targetData = getPlayerData(ctx.target);
+        const enemyPowerCard = getPlayerPowerCard(targetData);
+
+        const isTargetBomb = targetData.roleCard === RoleCardKeys.bom;
+        const isTargetExplosivePowerup =
+          enemyPowerCard?.id === PowerCardKeys.kamikazi;
+        console.log(
+          `Target is bomb: ${isTargetBomb}, Target has explosive powerup: ${isTargetExplosivePowerup}`,
+          enemyPowerCard,
+        );
+        if (!isTargetBomb && !isTargetExplosivePowerup) {
+          return HookResult.IGNORE;
+        }
+
+        handlers.defeat(ctx.target);
+        return HookResult.CONSUMED;
+      },
+    ],
+  },
+  strongarm: {
+    preAttackHook: [
+      100,
+      (ctx: HookContext, handlers: HookHandlers) => {
+        if (!ctx.target) return HookResult.IGNORE;
+        const selfData = getPlayerData(ctx.self);
+        const targetData = getPlayerData(ctx.target);
+
+        if (targetData.roleCard === null) {
+          console.warn('Target has no role card, ignoring strongarm hook.');
+          return HookResult.IGNORE;
+        }
+
+        if (selfData.roleCard !== targetData.roleCard) {
+          return HookResult.IGNORE;
+        }
+
+        const targetHasPowerCard =
+          getPlayerPowerCard(targetData)?.id === PowerCardKeys.strongarm;
+
+        const selfValue =
+          RoleCards[selfData.roleCard as RoleCardKeysType].value;
+        const targetValue =
+          RoleCards[targetData.roleCard as RoleCardKeysType].value;
+
+        if (selfValue !== targetValue) {
+          return HookResult.IGNORE; // Only consume if values are equal
+        }
+
+        if (targetHasPowerCard) {
+          // We can confirm the target has a strongarm power card
+          const cards = targetData.powercards;
+          cards.splice(targetData.activePowercardIndex!, 1); // Remove the active power card
+          targetData.powercards = cards; // Update the power cards array
+          targetData.activePowercardIndex = null; // Clear active power card index
+          console.debug('Strongarm power card consumed, removing from target.');
+          return HookResult.CONSUMED;
+        }
+
+        handlers.defeat(ctx.target);
+
+        return HookResult.CONSUMED;
+      },
+    ],
+  },
 };
 
+function getPlayerPowerCard(
+  player: PlayerDataStratego,
+): ({ id: string } & PowerCard) | null {
+  if (player.activePowercardIndex === null || player.powercards.length === 0) {
+    return null;
+  }
+
+  const powerCardId = player.powercards[player.activePowercardIndex];
+  if (!powerCardId) {
+    return null;
+  }
+
+  const powerCard = PowerCards[powerCardId as PowerCardKeysType];
+
+  if (!powerCard) {
+    console.error(`Power card ${powerCardId} does not exist.`);
+    return null;
+  }
+
+  return {
+    ...powerCard,
+    id: powerCardId,
+  };
+}
+
 function getPowerCardHook(
-  cardId: PowerCardKeys | null,
+  cardId: PowerCardKeysType | null,
   hookId: keyof PowerCardHooksType,
   handlers: HookHandlers,
   contextBuilder: () => HookContext,
@@ -89,10 +192,14 @@ function buildHookCaller(
 
   return () => {
     const result = hook();
+
     if (result === HookResult.CONSUMED) {
       if (data != null) {
+        console.log('Power card hook consumed, removing active power card.');
         if (data.activePowercardIndex != null) {
-          data.powercards.splice(data.activePowercardIndex, 1); // Remove the active power card
+          const cards = data.powercards;
+          cards.splice(data.activePowercardIndex, 1); // Remove the active power card
+          data.powercards = cards; // Update the power cards array
         }
         data.activePowercardIndex = null; // Clear active power card index
       }
@@ -123,25 +230,27 @@ export function callPowerCardHook(
 
   const selfCardId =
     selfData.activePowercardIndex != null
-      ? (selfData.powercards[selfData.activePowercardIndex] as PowerCardKeys)
+      ? (selfData.powercards[
+          selfData.activePowercardIndex
+        ] as PowerCardKeysType)
       : null;
   const targetCardId =
     targetData?.activePowercardIndex != null
       ? (targetData.powercards[
           targetData.activePowercardIndex
-        ] as PowerCardKeys)
+        ] as PowerCardKeysType)
       : null;
 
   console.debug(`Self card ID: ${selfCardId}, Target card ID: ${targetCardId}`);
 
   const selfHook = getPowerCardHook(selfCardId, hookId, handlers, () => ({
-    cardId: selfCardId as PowerCardKeys,
+    cardId: selfCardId as PowerCardKeysType,
     self,
     target,
   }));
 
   const targetHook = getPowerCardHook(targetCardId, hookId, handlers, () => ({
-    cardId: targetCardId as PowerCardKeys,
+    cardId: targetCardId as PowerCardKeysType,
     self,
     target,
   }));

@@ -6,13 +6,7 @@ import {
 import { useLobby } from '@/hooks/useLobby';
 import { Redirect } from 'expo-router';
 import React, { useState } from 'react';
-import {
-  Text,
-  StyleSheet,
-  View,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
 import { GameState } from '@/constants/GameState';
 import { CardCountBar } from '@/components/ui/CardCountBar';
 import { RoleCardPicker } from '@/components/ui/RoleCardPicker';

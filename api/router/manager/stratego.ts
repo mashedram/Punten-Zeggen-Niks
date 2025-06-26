@@ -6,9 +6,9 @@ import {
   StrategoGame,
 } from '@/api/managers/stratego/StrategoGame';
 import { publicProcedure, router } from '@/api/server';
-import { PowerCardKeys } from '@/constants/powercard/PowerCardImages';
+import { PowerCardKeysType } from '@/constants/powercard/PowerCards';
 import { PowerCards } from '@/constants/powercard/PowerCards';
-import { RoleCards } from '@/constants/RoleCards';
+import { RoleCardKeysType, RoleCards } from '@/constants/RoleCards';
 import { z } from 'zod';
 
 export const strategoRouter = router({
@@ -78,13 +78,13 @@ export const strategoRouter = router({
         throw new Error('Team not found.');
       }
 
-      const cardCost = PowerCards[input.cardId as PowerCardKeys].cost;
+      const cardCost = PowerCards[input.cardId as PowerCardKeysType].cost;
       if (team.currency < cardCost) {
         throw new Error('Not enough currency to buy power card.');
       }
 
       const cards = targetData.powercards;
-      cards.push(input.cardId as PowerCardKeys);
+      cards.push(input.cardId as PowerCardKeysType);
       targetData.powercards = cards;
       team.currency -= cardCost;
       lobbyData.teams = teams;
@@ -103,7 +103,7 @@ export const strategoRouter = router({
       if (!lobby) throw new Error('Lobby not found');
 
       const lobbyData = getLobbyData(lobby);
-      const roleCard = RoleCards[input.roleCard];
+      const roleCard = RoleCards[input.roleCard as RoleCardKeysType];
       if (!roleCard) throw new Error('Invalid role card');
 
       const targetPlayer = lobby

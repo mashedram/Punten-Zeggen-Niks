@@ -1,8 +1,8 @@
+import { PowerCardImages } from '@/constants/powercard/PowerCardImages';
 import {
-  PowerCardImages,
-  PowerCardKeys,
-} from '@/constants/powercard/PowerCardImages';
-import { PowerCards } from '@/constants/powercard/PowerCards';
+  PowerCardKeysType,
+  PowerCards,
+} from '@/constants/powercard/PowerCards';
 import { useMemo, useState } from 'react';
 import {
   Image,
@@ -18,7 +18,7 @@ import React from 'react';
 
 export const PowerCardShop = () => {
   const stratego = useStrategoUnsafe();
-  const [focusedId, setFocusedId] = useState<PowerCardKeys | null>(null);
+  const [focusedId, setFocusedId] = useState<PowerCardKeysType | null>(null);
 
   const teamCurrency = useMemo(() => {
     return (
@@ -45,13 +45,13 @@ export const PowerCardShop = () => {
             style={styles.cardContainer}
             contentContainerStyle={styles.cardContainerInner}>
             {Object.entries(PowerCards).map(([key, card]) => {
-              const image = PowerCardImages[key as PowerCardKeys];
+              const image = PowerCardImages[key as PowerCardKeysType];
 
               return (
                 <Pressable
                   style={styles.card}
                   key={key}
-                  onPress={() => setFocusedId(key as PowerCardKeys)}>
+                  onPress={() => setFocusedId(key as PowerCardKeysType)}>
                   <Image style={styles.cardImage} source={image} />
                   <Text style={styles.cardName}>{card.name}</Text>
                   <Text>cost: {card.cost}</Text>

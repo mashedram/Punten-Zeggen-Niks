@@ -3,11 +3,11 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { PowerUpPopUp } from './PowerUpPopUp';
 import React from 'react';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
-import { PowerCards } from '@/constants/powercard/PowerCards';
 import {
-  PowerCardImages,
-  PowerCardKeys,
-} from '@/constants/powercard/PowerCardImages';
+  PowerCardKeysType,
+  PowerCards,
+} from '@/constants/powercard/PowerCards';
+import { PowerCardImages } from '@/constants/powercard/PowerCardImages';
 import { useMutation } from '@tanstack/react-query';
 import { useTRPC } from '@/api/query';
 import { PowerCardShop } from '../stratego/PowerCardShop';
@@ -17,7 +17,7 @@ const PowerupCard = ({
   id,
   onPress,
 }: {
-  id: PowerCardKeys;
+  id: PowerCardKeysType;
   onPress: () => void;
 }) => {
   const card = PowerCards[id];
@@ -50,7 +50,7 @@ export const PowerupBar = () => {
 
   const useCard = useCallback(
     (index: number) => {
-      const id = stratego.self.powercards[index] as PowerCardKeys;
+      const id = stratego.self.powercards[index] as PowerCardKeysType;
       const PopupComponent = PowerCardPopups[id];
       console.log(PopupComponent);
       if (PopupComponent) {
@@ -72,7 +72,7 @@ export const PowerupBar = () => {
       {popupCardIndex !== null && (
         <PowerUpPopUp
           index={popupCardIndex}
-          cardId={stratego.self.powercards[popupCardIndex] as PowerCardKeys}
+          cardId={stratego.self.powercards[popupCardIndex] as PowerCardKeysType}
           inUse={popupCardIndex === stratego.self.activePowercardIndex}
           use={useCard}
           close={() => setPopupCardIndex(null)}
@@ -88,7 +88,7 @@ export const PowerupBar = () => {
             {stratego.self.powercards.map((card, index) => (
               <PowerupCard
                 key={index}
-                id={card as PowerCardKeys}
+                id={card as PowerCardKeysType}
                 onPress={() => setPopupCardIndex(index)}
               />
             ))}

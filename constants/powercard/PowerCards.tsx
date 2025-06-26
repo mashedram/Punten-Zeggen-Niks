@@ -5,11 +5,23 @@ export const PowerCards = {
     name: 'Kamikaze',
     description:
       'Je rol heeft nu de zelfde regels als een Bom. Jij en je tegenstander exploderen maar een Mineur kan niet je ontmantelen.',
+    cost: 20,
+  },
+  bomvest: {
+    name: 'Bomvest',
+    description: 'Bescherm jezelf tegen 1 bom',
+    cost: 50,
+  },
+  strongarm: {
+    name: 'Goed getraind',
+    description:
+      'Als je tegen een speler met dezelfde kaart als jijzelf speelt, dan wint jij het gevegt!',
     cost: 15,
   },
-  ruilkaart: {
-    name: 'Ruilkaart',
-    description: 'Ruil je huidige rol met de rol van iemand binnen je team.',
-    cost: 300,
-  },
 } satisfies { [K: string]: PowerCard };
+
+export type PowerCardKeysType = keyof typeof PowerCards;
+
+export const PowerCardKeys = Object.fromEntries(
+  Object.keys(PowerCards).map(value => [value, value]),
+) as Record<PowerCardKeysType, PowerCardKeysType>;

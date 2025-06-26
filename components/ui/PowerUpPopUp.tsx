@@ -1,13 +1,13 @@
 import {
   PowerCardImages,
-  PowerCardKeys,
+  PowerCardKeysType,
 } from '@/constants/powercard/PowerCardImages';
 import { PowerCards } from '@/constants/powercard/PowerCards';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 
 interface PowerUpPopUpProps {
   index: number;
-  cardId: PowerCardKeys;
+  cardId: PowerCardKeysType;
   inUse: boolean;
   use: (index: number) => void;
   close: () => void;

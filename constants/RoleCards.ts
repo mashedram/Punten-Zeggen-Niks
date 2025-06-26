@@ -113,6 +113,10 @@ export const RoleCards = {
   bom,
 } satisfies Record<string, RoleCard>;
 
-export type RoleCardKeys = keyof typeof RoleCards;
+export type RoleCardKeysType = keyof typeof RoleCards;
+
+export const RoleCardKeys = Object.fromEntries(
+  Object.keys(RoleCards).map(value => [value, value]),
+) as Record<RoleCardKeysType, RoleCardKeysType>;
 
 export const AllRoleCards: RoleCard[] = Object.values(RoleCards);

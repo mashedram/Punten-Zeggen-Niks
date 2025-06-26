@@ -1,12 +1,12 @@
 import { ImageSourcePropType } from 'react-native';
-import { PowerCards } from './PowerCards';
+import { PowerCardKeysType } from './PowerCards';
 
-import kamikaziImage from '@/assets/images/Vergrootglas.jpg';
-import ruilkaartImage from '@/assets/images/SpionP.jpg';
-
-export type PowerCardKeys = keyof typeof PowerCards;
+import kamikaziImage from '@/assets/images/powercards/kamikaze.png';
+import bomvestImage from '@/assets/images/powercards/bomvest.png';
+import strongarmImage from '@/assets/images/powercards/strongarm.png';
 
 export const PowerCardImages = {
   kamikazi: kamikaziImage,
-  ruilkaart: ruilkaartImage,
-} satisfies Record<PowerCardKeys, ImageSourcePropType>;
+  bomvest: bomvestImage,
+  strongarm: strongarmImage,
+} satisfies Record<PowerCardKeysType, ImageSourcePropType>;

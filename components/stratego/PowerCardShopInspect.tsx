@@ -1,5 +1,5 @@
 import { useTRPC } from '@/api/query';
-import { PowerCardKeys } from '@/constants/powercard/PowerCardImages';
+import { PowerCardKeysType } from '@/constants/powercard/PowerCards';
 import { PowerCards } from '@/constants/powercard/PowerCards';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
 import { Picker } from '@react-native-picker/picker';
@@ -12,7 +12,7 @@ export const PowerCardShopInspect = ({
   teamCurrency,
   onClose,
 }: {
-  cardId: PowerCardKeys;
+  cardId: PowerCardKeysType;
   teamCurrency: number;
   onClose: () => void;
 }) => {
@@ -30,10 +30,11 @@ export const PowerCardShopInspect = ({
     );
   }, [stratego.players, stratego.self.id, stratego.self.teamId]);
 
-  const hasAssignablePlayers = assignablePlayers.length > 0;
-  const hasEnoughCurrency = teamCurrency >= card.cost;
-  const buyButtonDisabled =
-    !hasAssignablePlayers || !hasEnoughCurrency || !target;
+  const buyButtonDisabled = useMemo(() => {
+    const hasAssignablePlayers = assignablePlayers.length > 0;
+    const hasEnoughCurrency = teamCurrency >= card.cost;
+    return !(hasEnoughCurrency && hasAssignablePlayers);
+  }, [assignablePlayers.length, card.cost, teamCurrency]);
 
   const tRPC = useTRPC();
   const buyCardMutation = useMutation(
@@ -50,7 +51,7 @@ export const PowerCardShopInspect = ({
         <Text style={styles.cardName}>{card.name}</Text>
         <Text style={styles.cardDescription}>{card.description}</Text>
         <Text
-          style={[styles.cardCost, hasEnoughCurrency ? {} : { color: 'red' }]}>
+          style={[styles.cardCost, buyButtonDisabled ? { color: 'red' } : {}]}>
           Cost: {card.cost} points
         </Text>
         <Picker

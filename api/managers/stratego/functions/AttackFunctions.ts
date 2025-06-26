@@ -6,7 +6,7 @@ import {
   LobbyDataStratego,
   PlayerDataStratego,
 } from '@/api/managers/stratego/StrategoGame';
-import { RoleCard, RoleCardKeys, RoleCards } from '@/constants/RoleCards';
+import { RoleCard, RoleCardKeysType, RoleCards } from '@/constants/RoleCards';
 import { callPowerCardHook } from '@/api/managers/stratego/PowerCardManager';
 import { GameState } from '@/constants/GameState';
 import { StatisticsContainer } from '../../statistics/StatisticsContainer';
@@ -67,7 +67,7 @@ function buildPlayerFightState(
     throw new Error(`Player ${player.getName()} has no role card.`);
   }
 
-  const roleCard = RoleCards[data.roleCard as RoleCardKeys];
+  const roleCard = RoleCards[data.roleCard as RoleCardKeysType];
   if (!roleCard) {
     console.warn(`Player ${player.getName()} has no role card.`);
     throw new Error(`Player ${player.getName()} has no role card.`);

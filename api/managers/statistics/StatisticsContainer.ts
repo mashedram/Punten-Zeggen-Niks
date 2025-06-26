@@ -58,8 +58,6 @@ export class StatisticsContainer {
     }
 
     this._instances[key].increment(client, value);
-
-    console.debug('Statistics: ', this._instances);
   }
 
   public clear() {
