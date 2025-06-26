@@ -76,11 +76,6 @@ export default function EnterPinScreen() {
             autoCapitalize="words"
           />
 
-          {/* Knop om de ingevoerde code te wissen */}
-          <Pressable style={styles.clearButton} onPress={() => setCode('')}>
-            <Text style={styles.clearButtonText}>Verwijder</Text>
-          </Pressable>
-
           {/* Knop om spel te joinen - alleen actief als er een code is ingevuld */}
           <Pressable
             style={[styles.button, (!code || !name) && styles.buttonDisabled]}
@@ -97,6 +92,11 @@ export default function EnterPinScreen() {
             disabled={!code.trim() || !name.trim()} // Schakel knop uit als code leeg of alleen spaties is
           >
             <Text style={styles.buttonText}>Naar lobby</Text>
+          </Pressable>
+
+          {/* Knop om de ingevoerde code te wissen */}
+          <Pressable style={styles.clearButton} onPress={() => setCode('')}>
+            <Text style={styles.clearButtonText}>Verwijder</Text>
           </Pressable>
         </View>
 
