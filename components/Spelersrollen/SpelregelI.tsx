@@ -2,103 +2,23 @@ import React from 'react';
 import { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { StyleSheet } from 'react-native';
-
-const infoSlides = [
-  {
-    titel: 'Hoe speel je het spel:',
-    tekst: `• Je valt aan door de cijfer- of qr code van een tegenstander te scannen/in te voeren. 
-    \n\
- • Je wint zodra je de vlag van het andere team (blauw/rood) hebt verovert.`,
-  },
-  {
-    titel: 'Teamleider',
-    tekst:
-      'Als teamleider kies je welke rol je aan welk teamlid geeft, breng je teamleden terug in het spel en zie je het beschikbaar aantal kaarten van een rol door op het 🎖 icoon te drukken.',
-  },
-  {
-    titel: 'Algemene spelregels:',
-    tekst: `• De pot bestaat uit rolkaarten 1 t/m 10 (minus 2) + de bom en de vlag.
-    \n\
- • Als spelers elkaar aanvallen, wint de speler met de hoogste rang.
- \n\
- • Als je wordt aangetikt moet je verdedigen met je rolkaart.
- 
- • Als je wordt verslagen, haal je een nieuwe rolkaart bij je teamleider.`,
-  },
-  {
-    titel: 'Specifieke rol spelregels:',
-    tekst: `• De rolkaarten "Bom" en "Vlag" kunnen geen aanval initiëren.
-    \n\
- • De Bom kan alleen door de Mineur (3) worden verslagen.
- \n\
- • De Spion (1) verslaat de Maarschalk (10), maar alleen als de Spion de aanval initieert.
- \n\
- • Als spelers met dezelfde rang elkaar aanvallen verliezen ze allebei.`,
-  },
-  {
-    subtitel: 'Lijst met rollen:',
-    subtekst:
-      'Vlag \n\
-Maarschalk = 10 \n\
-Generaal = 9 \n\
-Kolonel = 8 \n\
-Majoor = 7 \n\
-Kapitein = 6 \n\
-Luitenant = 5 \n\
-Sergeant = 4 \n\
-Mineur = 3 \n\
-Spion = 1 \n\
-Bom',
-  },
-];
+import { GameRuleOverlayContent } from '../ui/GameRuleOverlay';
 
 export const SpelregelI = () => {
   const [showInfo, setShowInfo] = useState(false);
-  const [infoSlide, setInfoSlide] = useState(0);
   return (
-    <View style={styles.InfoButtonContainer}>
-      <Pressable onPress={() => setShowInfo(prev => !prev)}>
-        <View style={styles.InfoIconContainer}>
-          <Text style={styles.InfoButtonIcon}>i</Text>
-        </View>
-      </Pressable>
-      {showInfo && (
-        <View style={styles.SpelregelContainer}>
-          <Text style={styles.TitelStyling}>{infoSlides[infoSlide].titel}</Text>
-          <Text style={styles.TekstStyling}>{infoSlides[infoSlide].tekst}</Text>
-          {infoSlide === 4 && (
-            <>
-              <Text style={styles.Subtitel}>{infoSlides[4].subtitel}</Text>
-              <Text style={styles.Subtekst}>{infoSlides[4].subtekst}</Text>
-            </>
-          )}
-          <View style={styles.ButtonContainerStyling}>
-            <View style={styles.PijlContainerStyling}>
-              {infoSlide > 0 && (
-                <Pressable onPress={() => setInfoSlide(infoSlide - 1)}>
-                  <Text style={styles.PijlStyling}>{'←'}</Text>
-                </Pressable>
-              )}
-              {infoSlide < infoSlides.length - 1 && (
-                <Pressable onPress={() => setInfoSlide(infoSlide + 1)}>
-                  <Text style={styles.PijlStyling}>{'→'}</Text>
-                </Pressable>
-              )}
-            </View>
-            <Pressable
-              onPress={() => setShowInfo(false)}
-              style={{
-                marginTop: 8,
-                padding: 8,
-                borderRadius: 8,
-                backgroundColor: '#e0f7fa',
-              }}>
-              <Text style={styles.SluitStyling}>Sluiten</Text>
-            </Pressable>
+    <>
+      <View style={styles.InfoButtonContainer}>
+        <Pressable onPress={() => setShowInfo(prev => !prev)}>
+          <View style={styles.InfoIconContainer}>
+            <Text style={styles.InfoButtonIcon}>i</Text>
           </View>
-        </View>
+        </Pressable>
+      </View>
+      {showInfo && (
+        <GameRuleOverlayContent onClose={() => setShowInfo(false)} />
       )}
-    </View>
+    </>
   );
 };
 
@@ -107,7 +27,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 50,
     right: 20,
-    zIndex: 10,
   },
 
   InfoIconContainer: {

@@ -32,6 +32,7 @@
     "@trpc/tanstack-react-query": "^11.0.3",
     "@types/bun": "^1.2.9",
     "@types/cors": "^2.8.17",
+    "@yudiel/react-qr-scanner": "^2.3.1",
     "eslint-import-resolver-typescript": "^4.3.4",
     "expo": "~52.0.43",
     "expo-barcode-scanner": "^13.0.1",

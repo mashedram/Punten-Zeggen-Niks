@@ -1,78 +1,23 @@
 import { TeamColors } from '@/constants/Colors';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
-import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 
 interface AttackQrCodeProps {
   onQrScan: (qrAttackCode: string) => void;
 }
-
-const AttackScanner = ({
-  onScan,
-  currentTeamColor,
-  onExit,
-}: {
-  onScan: (data: { data: string }) => void;
-  currentTeamColor: string;
-  onExit: () => void;
-}) => {
-  const [permission, requestPermission] = useCameraPermissions();
-
-  if (!permission?.granted) {
-    return (
-      <View style={styles.cameraPermission}>
-        <Text>Camera toestemming is vereist.</Text>
-        <TouchableOpacity
-          style={[
-            styles.permissionButtonContainer,
-            { backgroundColor: currentTeamColor },
-          ]}
-          onPress={requestPermission}>
-          <Text style={styles.buttonText}>Toestemming geven</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.permissionButtonContainer,
-            { backgroundColor: currentTeamColor },
-          ]}
-          onPress={() => onExit()}>
-          <Text style={styles.buttonText}>Sluiten</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  return (
-    <CameraView
-      style={styles.cameraView}
-      barcodeScannerSettings={{
-        barcodeTypes: ['qr'],
-      }}
-      onBarcodeScanned={onScan}
-      autofocus="on">
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={[
-            styles.permissionButtonContainer,
-            { backgroundColor: currentTeamColor },
-          ]}
-          onPress={() => onExit()}>
-          <Text style={styles.buttonText}>Sluiten</Text>
-        </TouchableOpacity>
-      </View>
-    </CameraView>
-  );
-};
 
 export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
   const stratego = useStrategoUnsafe();
 
   const [scannerVisible, setScannerVisible] = useState(false);
 
-  const handleBarCodeScanned = ({ data }: { data: string }) => {
+  const handleBarCodeScanned = (data: IDetectedBarcode[]) => {
     setScannerVisible(false);
-    onQrScan(data);
+
+    const code = data[0].rawValue;
+    onQrScan(code);
   };
 
   const currentTeamColor =
@@ -92,10 +37,10 @@ export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
       </TouchableOpacity>
       <Modal visible={scannerVisible} animationType="slide">
         <View style={styles.container}>
-          <AttackScanner
+          <Scanner
+            allowMultiple={true}
+            formats={['qr_code']}
             onScan={handleBarCodeScanned}
-            currentTeamColor={currentTeamColor}
-            onExit={() => setScannerVisible(false)}
           />
         </View>
       </Modal>

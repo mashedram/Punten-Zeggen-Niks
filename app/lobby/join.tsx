@@ -36,7 +36,7 @@ export default function EnterPinScreen() {
    * State voor de ingevoerde code (PIN)
    * @type {[string, React.Dispatch<React.SetStateAction<string>>]}
    */
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState(forceCode || '');
 
   const [name, setName] = useState('');
 
@@ -56,7 +56,7 @@ export default function EnterPinScreen() {
         <View style={styles.joinContainer}>
           {/* Invoerveld voor de PIN-code */}
           <CodeInput
-            code={forceCode || code} // Gebruik de geforceerde code of de huidige state
+            code={code} // Gebruik de geforceerde code of de huidige state
             maxLength={6} // Maximaal 6 cijfers voor de PIN-code
             autoFocus={!forceCode} // Focus automatisch op het invoerveld als er geen geforceerde code is
             keyboardType="numeric" // Numeriek toetsenbord voor PIN-code
