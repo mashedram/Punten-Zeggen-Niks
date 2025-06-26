@@ -3,7 +3,7 @@ import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
 import { Picker } from '@react-native-picker/picker';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Button, Modal, Pressable, Text, TextInput, View } from 'react-native';
+import { Button, Modal, TextInput, View } from 'react-native';
 import { StyleSheet } from 'react-native';
 
 export const FeedbackForm = ({ onClose }: { onClose: () => void }) => {

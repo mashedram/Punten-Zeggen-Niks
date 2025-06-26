@@ -1,17 +1,13 @@
-import { TeamColors } from '@/constants/Colors';
-import { useStratego } from '@/hooks/game/useStratego';
-import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
 import { useLobbyUnsafe } from '@/hooks/useLobbyUnsafe';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Text } from 'react-native';
 import { Button, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { FeedbackForm } from '../ui/FeedbackForm';
 import React from 'react';
-import { GameRuleOverlay, GameRuleOverlayContent } from '../ui/GameRuleOverlay';
+import { GameRuleOverlayContent } from '../ui/GameRuleOverlay';
 
 const MainMenuPopup = ({ onClose }: { onClose: () => void }) => {
   const lobby = useLobbyUnsafe();
-  const stratego = useStrategoUnsafe();
 
   const [isFeedbackOpen, setFeedbackOpen] = useState(false);
   const [isGamerulesOpen, setGamerulesOpen] = useState(false);

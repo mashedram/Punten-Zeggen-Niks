@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Image,
-  Animated,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native';
+import { StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { View } from 'react-native';
 import { Text } from 'react-native';
 import { RoleCard } from '@/constants/RoleCards';
