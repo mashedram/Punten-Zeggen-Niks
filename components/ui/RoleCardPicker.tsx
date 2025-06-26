@@ -75,6 +75,7 @@ export const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ onClose }) => {
     [getTargetId, sendReviveMutation],
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const assignFlag = useCallback(() => {
     const targetId = getTargetId();
 
