@@ -17,11 +17,15 @@ export const AttackButton = () => {
   const trpc = useTRPC();
   const stratego = useStrategoUnsafe();
 
-  const sendAttackMutation = useMutation(
-    trpc.stratego.attack.mutationOptions({}),
-  );
-
   const [enemyAttackCode, setEnemyAttackCode] = useState('');
+
+  const sendAttackMutation = useMutation(
+    trpc.stratego.attack.mutationOptions({
+      onSuccess: () => {
+        setEnemyAttackCode('');
+      },
+    }),
+  );
 
   const playerRoleCard = AllRoleCards.find(
     card => card.id === stratego.self.roleCard,
