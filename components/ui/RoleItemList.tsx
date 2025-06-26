@@ -33,8 +33,14 @@ export const RoleItemList: React.FC<RoleItemListProps> = ({
       <View style={{ display: 'flex', width: '20%' }}>
         <Image
           source={image}
-          style={{ width: imageSize, height: imageSize }}
-          resizeMode="center"
+          style={{
+            width: imageSize,
+            height: imageSize,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'white',
+          }}
+          resizeMode="contain"
         />
       </View>
       <View style={{ display: 'flex', width: '45%' }}>

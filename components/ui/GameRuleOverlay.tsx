@@ -27,7 +27,7 @@ export const GameRuleOverlayContent = ({
   const maxPages = rulePages.length - 1;
 
   return (
-    <Modal style={styles.container}>
+    <Modal style={styles.container} transparent>
       <View style={styles.primaryContainer}>
         <View style={styles.titleContainer}>
           <View style={styles.innerTitleContainer}>
@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
   primaryContainer: {
     width: '100%',
     height: '90%',
+    backgroundColor: 'rgba(92, 163, 194, 1)',
   },
   titleContainer: {
     width: '100%',
