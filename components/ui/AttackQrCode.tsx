@@ -1,7 +1,14 @@
 import { TeamColors } from '@/constants/Colors';
 import { useStrategoUnsafe } from '@/hooks/game/useStrategoUnsafe';
 import React, { useState } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Button,
+} from 'react-native';
 import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 
 interface AttackQrCodeProps {
@@ -42,6 +49,13 @@ export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
             formats={['qr_code']}
             onScan={handleBarCodeScanned}
           />
+          <View style={styles.buttonsContainer}>
+            <Button
+              color={currentTeamColor}
+              title="Close"
+              onPress={() => setScannerVisible(false)}
+            />
+          </View>
         </View>
       </Modal>
     </>
@@ -50,7 +64,9 @@ export const AttackQrCode: React.FC<AttackQrCodeProps> = ({ onQrScan }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    display: 'flex',
+    width: '100%',
+    height: '100%',
   },
   permissionButtonContainer: {
     marginTop: 15,
@@ -74,9 +90,8 @@ const styles = StyleSheet.create({
   cameraView: {},
   buttonsContainer: {
     position: 'absolute',
-    bottom: 40,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
+    bottom: 0,
+
+    width: '100%',
   },
 });
