@@ -56,7 +56,7 @@ export const GameRuleOverlayContent = ({
                     }
                   }}
                   disabled={page <= 0}>
-                  <Text style={styles.navigationText}>vorige</Text>
+                  <Text style={styles.navigationText}>Vorige</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.navigationRightContainer}>
@@ -74,7 +74,7 @@ export const GameRuleOverlayContent = ({
                     }
                   }}
                   disabled={page >= maxPages}>
-                  <Text style={styles.navigationText}>volgende</Text>
+                  <Text style={styles.navigationText}>Volgende</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -354,11 +354,11 @@ const rulePages = [
         </Text>
         <Text style={styles.pageContentText}>
           Als er: <FontAwesome5 name="crown" size={20} /> , naast je naam staat
-          in de lobby dan ben je de host. Als jij de host bent kan je door op de
-          naam van de speler te drukken van een speler. Deze speler krijgt dan
-          de prioriteit om een teamleider te zijn. Je kan er meer dan 2 kiezen,
-          maar dan kiest het spel er nog steeds twee. Het spel kiest dan welke
-          van de geselecteerde spelers een teamleider wordt.
+          in de lobby dan ben je de host. Als jij de host bent kan je op een
+          naam van een speler klikken. Wanneer deze speler gekozen wordt krijgt
+          hij dan de prioriteit om een teamleider te zijn. Je kan er meer dan 2
+          kiezen, maar dan kiest het spel er nog steeds twee. Het spel kiest dan
+          welke van de geselecteerde spelers een teamleider wordt.
         </Text>
       </View>
     </ScrollView>
