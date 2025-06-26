@@ -10,6 +10,7 @@ interface EventMap {
   onClientDisconnected: [client: Client];
   onClientCreated: [client: Client];
   onClientRemoved: [client: Client];
+  onClientInactive: [client: Client];
 }
 
 export class ClientManager extends EventEmitter<EventMap> {
@@ -96,7 +97,7 @@ export class ClientManager extends EventEmitter<EventMap> {
         throw new Error('Client not found in context');
       }
 
-      const listener = on(ctx.client.getEventEmitter(), 'packet', {
+      const listener = on(ctx.client, 'packet', {
         signal,
       });
 

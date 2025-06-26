@@ -10,6 +10,8 @@ export type GameType<P extends PlayerGameData, L extends LobbyGameData> = {
   createPlayerData: (lobbyData: Lobby, player: Player) => P;
   onGameStart?: (lobby: Lobby) => void;
   onLateJoin?: (lobby: Lobby, player: Player) => void;
+  onPlayerInactive?: (lobby: Lobby, player: Player) => void;
+  onPlayerActive?: (lobby: Lobby, player: Player) => void;
 };
 
 export const GameTypes = [GameTypeStratego];

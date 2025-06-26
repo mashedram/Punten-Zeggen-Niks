@@ -80,18 +80,30 @@ export class Lobby {
       if (player) {
         player.setConnected(true);
       }
+
+      if (this._gameState.id === null) {
+        return;
+      }
+
+      this._gameState.type.onPlayerActive?.(this, player);
     });
 
     this._clients.on('onClientDisconnected', client => {
       const player = this._players[client.getId()];
-      if (player) {
-        if (this._gameState.id == null) {
-          this.removePlayer(player.getId());
-          return;
-        }
-
-        player.setConnected(false);
+      if (!player) {
+        return;
       }
+
+      player.setConnected(false);
+    });
+
+    this._clients.on('onClientInactive', client => {
+      const player = this._players[client.getId()];
+      if (this._gameState.id == null || !player) {
+        return;
+      }
+
+      this._gameState.type.onPlayerInactive?.(this, player);
     });
   }
 

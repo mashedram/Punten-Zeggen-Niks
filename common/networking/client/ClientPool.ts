@@ -7,6 +7,7 @@ type EventMap = {
   onClientConnected: [Client];
   onClientDisconnected: [Client];
   onClientRemoved: [Client];
+  onClientInactive: [Client];
 };
 
 /**
@@ -33,6 +34,12 @@ export class ClientPool extends EventEmitter<EventMap> {
     CLIENT_MANAGER.on('onClientRemoved', client => {
       if (!this._clients.has(client)) return;
       this.removeClient(client);
+    });
+
+    CLIENT_MANAGER.on('onClientInactive', client => {
+      if (!this._clients.has(client)) return;
+      console.log(`ClientPool: Client inactive: ${client.getId()}`);
+      this.emit('onClientInactive', client);
     });
   }
 

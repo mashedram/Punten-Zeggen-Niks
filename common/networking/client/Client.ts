@@ -9,6 +9,8 @@ import { Player } from '@/api/managers/lobby/Player';
 import { ClientManager } from '@/common/networking/client/ClientManager';
 import { CLIENT_MANAGER } from '@/common/networking/Globals';
 
+const PLAYER_INACTIVE_TIMEOUT = 10 * 1000;
+
 // All client data *must* be optional
 type ClientData = {
   lobby?: { lobby: Lobby; player: Player };
@@ -20,21 +22,23 @@ interface EventMap {
   packet: [packet: unknown];
 }
 
-export class Client {
+export class Client extends EventEmitter<EventMap> {
   private _id: string;
   private _token: string;
-  private _emitter: EventEmitter<EventMap>;
   private _transformer: PacketTransformer;
   private _lastConnected: number | undefined;
+  private _isInactive: boolean;
+  private _inactiveTimeout: NodeJS.Timeout | undefined;
   private _owner: ClientManager;
   private _data: ClientData;
 
   constructor(owner: ClientManager, id: string = crypto.randomUUID()) {
+    super();
     this._id = id;
-    this._emitter = new EventEmitter();
     this._transformer = new PacketTransformer();
     this._token = crypto.randomUUID();
     this._lastConnected = Date.now();
+    this._isInactive = false;
     this._owner = owner;
     this._data = {};
   }
@@ -55,12 +59,26 @@ export class Client {
     );
     if (this._lastConnected === oldValue) return;
 
+    if (this._inactiveTimeout) {
+      clearTimeout(this._inactiveTimeout);
+      this._inactiveTimeout = undefined;
+      console.log(`Client ${this._id} inactive timeout cleared.`);
+    }
+
     if (this._lastConnected === undefined) {
       CLIENT_MANAGER.emit('onClientConnected', this);
       console.log(`Client ${this._id} connected.`);
     } else {
       CLIENT_MANAGER.emit('onClientDisconnected', this);
       console.log(`Client ${this._id} disconnected event emitted.`);
+
+      this._inactiveTimeout = setTimeout(() => {
+        this._isInactive = true;
+        this._inactiveTimeout = undefined;
+
+        CLIENT_MANAGER.emit('onClientInactive', this);
+        console.log(`Client ${this._id} is now inactive.`);
+      }, PLAYER_INACTIVE_TIMEOUT);
     }
   }
 
@@ -69,15 +87,11 @@ export class Client {
   }
 
   private send(packet: EncodedPacket): void {
-    this._emitter.emit('packet', packet);
+    this.emit('packet', packet);
   }
 
   public sendEncoded(packet: Packet<never>): void {
     this.send(this._transformer.encode(packet));
-  }
-
-  public getEventEmitter(): EventEmitter<EventMap> {
-    return this._emitter;
   }
 
   public getToken(): string {

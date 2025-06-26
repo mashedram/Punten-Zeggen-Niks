@@ -126,6 +126,36 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
     onLateJoin: (lobby: Lobby, player: Player) => {
       const data = getPlayerData(player);
       data.teamId = getNewPlayerTeam(lobby);
+
+      const hasTeamLeader = lobby.getPlayers().some(p => {
+        const playerData = getPlayerData(p);
+        return playerData.teamId === data.teamId && playerData.isTeamLeader;
+      });
+
+      if (!hasTeamLeader) {
+        data.isTeamLeader = true;
+      }
+    },
+    onPlayerInactive: (lobby: Lobby, player: Player) => {
+      const playerData = getPlayerData(player);
+      playerData.isTeamLeader = false;
+
+      const lobbyData = getLobbyData(lobby);
+      const teamId = playerData.teamId;
+      const team = lobbyData.teams.find(t => t.id === teamId);
+      if (!team) {
+        console.warn(
+          `Team with ID ${teamId} not found for player ${player.getName()}.`,
+        );
+        return;
+      }
+
+      if (playerData.roleCard) {
+        team.deck[playerData.roleCard] =
+          (team.deck[playerData.roleCard] || 0) + 1;
+        playerData.roleCard = null;
+        playerData.hasRoleCard = false;
+      }
     },
   };
 
