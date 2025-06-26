@@ -5,7 +5,8 @@ services:
       context: ./
       dockerfile: docker/web/Dockerfile
     environment:
-      EXPO_PUBLIC_SERVER_ADDRESS: wss://puntenzeggenniksapi.stbakker.nl
+      EXPO_PUBLIC_SERVER_URL: https://puntenzeggenniks.stbakker.nl
+      EXPO_PUBLIC_WEBSOCKET_URL: wss://puntenzeggenniksapi.stbakker.nl
       VIRTUAL_HOST: puntenzeggenniks.stbakker.nl
       VIRUTAL_PORT: 8081
       LETSENCRYPT_HOST: puntenzeggenniks.stbakker.nl
