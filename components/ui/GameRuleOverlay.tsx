@@ -15,14 +15,15 @@ import { defaultDeckSize } from '@/constants/RoleCardDeck';
 import CardCountBar from './CardCountBar';
 import { PowerCards } from '@/constants/powercard/PowerCards';
 
-export const GameRuleOverlay = () => {
-  const [isOpen, setOpen] = useState(true);
+interface GameRuleOverlayContentProps {
+  onClose: () => void;
+}
+
+export const GameRuleOverlayContent = ({
+  onClose,
+}: GameRuleOverlayContentProps) => {
   const [page, setPage] = useState(0);
   const maxPages = rulePages.length - 1;
-
-  if (!isOpen) {
-    return null;
-  }
 
   return (
     <View style={styles.container}>
@@ -82,15 +83,23 @@ export const GameRuleOverlay = () => {
       </View>
       <View style={styles.bottomCard}>
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setOpen(false)}>
+          <TouchableOpacity style={styles.button} onPress={() => onClose()}>
             <Text style={styles.buttonText}>Sluiten</Text>
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
+};
+
+export const GameRuleOverlay = () => {
+  const [isOpen, setOpen] = useState(true);
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return <GameRuleOverlayContent onClose={() => setOpen(false)} />;
 };
 
 const styles = StyleSheet.create({

@@ -203,7 +203,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     marginTop: 40,
-    zIndex: 50,
   },
   CaptainEllipse: {
     position: 'absolute',
