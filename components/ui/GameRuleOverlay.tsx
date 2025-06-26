@@ -55,7 +55,7 @@ export const GameRuleOverlay = () => {
                     }
                   }}
                   disabled={page <= 0}>
-                  <Text style={styles.navigationText}>vorrige</Text>
+                  <Text style={styles.navigationText}>vorige</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.navigationRightContainer}>
