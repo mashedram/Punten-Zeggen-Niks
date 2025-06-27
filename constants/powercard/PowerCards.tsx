@@ -5,18 +5,18 @@ export const PowerCards = {
     name: 'Kamikaze',
     description:
       'Je rol heeft nu de zelfde regels als een Bom. Jij en je tegenstander exploderen maar een Mineur kan niet je ontmantelen.',
-    cost: 20,
+    cost: 10,
   },
   bomvest: {
     name: 'Bomvest',
     description: 'Bescherm jezelf tegen 1 bom',
-    cost: 50,
+    cost: 10,
   },
   strongarm: {
     name: 'Goed getraind',
     description:
       'Als je tegen een speler met dezelfde kaart als jijzelf speelt, dan wint jij het gevegt!',
-    cost: 15,
+    cost: 5,
   },
 } satisfies { [K: string]: PowerCard };
 

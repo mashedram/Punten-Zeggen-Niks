@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   },
   bar: {
     bottom: 0,
-    backgroundColor: 'red',
+    backgroundColor: 'white',
     width: '100%',
     height: '100%',
     transitionDuration: '0.3s',

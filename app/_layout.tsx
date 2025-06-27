@@ -62,7 +62,7 @@ export default function RootLayout() {
     const wsClient = createWSClient({
       url: websocketServerUrl,
       connectionParams: () => {
-        const token = sessionStorage.getItem('player_token') ?? undefined;
+        const token = localStorage.getItem('player_token') ?? undefined;
         return {
           token,
         };

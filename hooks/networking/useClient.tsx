@@ -44,18 +44,18 @@ function useToken() {
   const [token, setToken] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    setToken(sessionStorage.getItem(KEY) ?? undefined);
+    setToken(localStorage.getItem(KEY) ?? undefined);
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
     if (isLoading) return;
     if (token) {
-      sessionStorage.setItem(KEY, token);
+      localStorage.setItem(KEY, token);
       return;
     }
 
-    sessionStorage.removeItem(KEY);
+    localStorage.removeItem(KEY);
   }, [isLoading, token]);
 
   const value = {
