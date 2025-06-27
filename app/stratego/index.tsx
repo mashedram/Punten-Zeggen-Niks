@@ -49,10 +49,13 @@ export default function Game() {
 
   const lastFightResult = stratego.self.lastFightResult;
   let fightPopUp = null;
-  if (
-    lastFightResult?.type === 'success' &&
-    lastFightResult.index !== lastFightPopup
-  ) {
+  if (lastFightResult !== null && lastFightResult.index !== lastFightPopup) {
+    if (lastFightResult.type === 'error') {
+      alert(`Error: ${lastFightResult.error}`);
+      setLastFightPopup(lastFightResult.index);
+      return;
+    }
+
     if (lastFightResult.state === 'win') {
       fightPopUp = (
         <WinPopUp onClose={() => setLastFightPopup(lastFightResult.index)} />

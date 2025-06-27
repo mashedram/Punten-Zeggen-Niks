@@ -198,13 +198,6 @@ export class TrackedInstance<T = never> implements Dereferable<T> {
     }
     const packet = this.getDataPacket(client);
 
-    if (TrackedInstance.shouldDrop(packet)) {
-      console.debug(
-        `Packet of ${this.getName()} on client ${client.getId()} dropped`,
-      );
-      return;
-    }
-
     clientData.step = packet.step;
     client.sendEncoded(packet as Packet<never>);
   }
