@@ -2,7 +2,7 @@ import { GameType } from '@/api/game/GameType';
 import { z } from 'zod';
 import { Lobby } from '../lobby/Lobby';
 import { Player } from '../lobby/Player';
-import { RoleCard } from '@/constants/RoleCards';
+import { RoleCard, RoleCardKeys } from '@/constants/RoleCards';
 import { GameState } from '@/constants/GameState';
 import { createRoleCardDeck, defaultDeckSize } from '@/constants/RoleCardDeck';
 import { performAttack } from './functions/AttackFunctions';
@@ -150,9 +150,13 @@ export const GameTypeStratego: GameType<PlayerDataStratego, LobbyDataStratego> =
         return;
       }
 
-      if (playerData.roleCard) {
-        team.deck[playerData.roleCard] =
-          (team.deck[playerData.roleCard] || 0) + 1;
+      const roleCard = playerData.roleCard;
+      if (roleCard) {
+        if (roleCard === RoleCardKeys.vlag) {
+          team.hasFlag = false;
+        }
+
+        team.deck[roleCard] = (team.deck[roleCard] || 0) + 1;
         playerData.roleCard = null;
         playerData.hasRoleCard = false;
       }
